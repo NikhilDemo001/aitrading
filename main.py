@@ -324,50 +324,13 @@ manager = ConnectionManager()
 async def websocket_endpoint(websocket: WebSocket):
     await manager.connect(websocket)
     try:
-        # Send initial data payload upon connection
-        client.load_config()
-        cfg = client.config
-        status_payload = {
-            "bot_running": bot_running,
-            "authenticated": bool(client.access_token),
-            "paper_trading": cfg.get("paper_trading", True),
-            "max_open_positions": cfg.get("max_open_positions", 3),
-            "max_daily_loss": cfg.get("max_daily_loss", 1000.0),
-            "max_risk_per_trade": cfg.get("max_risk_per_trade", 500.0),
-            "max_position_value": cfg.get("max_position_value", 50000.0),
-            "trade_start_time": cfg.get("trade_start_time", "09:30"),
-            "trade_end_time": cfg.get("trade_end_time", "14:30"),
-            "square_off_time": cfg.get("square_off_time", "15:10"),
-            "enable_trailing_stop": cfg.get("enable_trailing_stop", True),
-            "trailing_atr_multiplier": cfg.get("trailing_atr_multiplier", 1.5),
-            "watchlist": cfg.get("watchlist", []),
-            "auto_nifty50_watchlist": cfg.get("auto_nifty50_watchlist", True),
-            "enable_fno": cfg.get("enable_fno", False),
-            "fno_max_risk_per_trade": cfg.get("fno_max_risk_per_trade", 2000.0),
-            "fno_max_lots": cfg.get("fno_max_lots", 1),
-            "daily_pnl": round(get_total_daily_pnl(), 2),
-            "open_positions_count": len(active_positions),
-            "scanner_last_loop": scanner_state["last_loop"],
-            "scanner_last_scan": scanner_state["last_scan"],
-            "scanner_last_checked": scanner_state["last_scan_checked"],
-            "scanner_last_summary": scanner_state["last_scan_summary"],
-            "enable_time_filter": cfg.get("enable_time_filter", True),
-            "enable_volatility_filter": cfg.get("enable_volatility_filter", True),
-            "enable_nifty_filter": cfg.get("enable_nifty_filter", True),
-            "enable_confluence_filter": cfg.get("enable_confluence_filter", True),
-            "min_confluence_score": cfg.get("min_confluence_score", 4),
-            "enable_kelly_sizing": cfg.get("enable_kelly_sizing", True),
-            "enable_loss_halt": cfg.get("enable_loss_halt", True),
-            "max_consecutive_losses": cfg.get("max_consecutive_losses", 3),
-            "loss_halt_minutes": cfg.get("loss_halt_minutes", 30),
-            "enable_partial_exit_t1": cfg.get("enable_partial_exit_t1", True),
-            "max_trades_per_symbol_per_day": cfg.get("max_trades_per_symbol_per_day", 2),
-            "enable_vwap_trend_pullback": cfg.get("enable_vwap_trend_pullback", True),
-            "vwap_tp_confidence_threshold": cfg.get("vwap_tp_confidence_threshold", 80),
-            "enable_candlestick_confluence": cfg.get("enable_candlestick_confluence", True),
-            "cpc_volume_multiplier": cfg.get("cpc_volume_multiplier", 1.5),
-            "enable_level_aware_targets": cfg.get("enable_level_aware_targets", True),
-        }
+        # Send initial data payload upon connection. Status comes from the same get_status()
+        # that backs GET /api/status and the periodic state_update broadcast — one source of
+        # truth. (This used to be a hand-maintained copy that had drifted ~16 fields behind
+        # /api/status while also holding 3 fields /api/status lacked; the frontend's
+        # SettingsForm still fetches /api/status directly as a belt-and-braces workaround,
+        # which is now redundant but harmless.)
+        status_payload = get_status()
         import research_lab
         await websocket.send_json({
             "type": "init",
@@ -2894,6 +2857,9 @@ def get_status():
         "max_trades_per_symbol_per_day": cfg.get("max_trades_per_symbol_per_day", 2),
         "enable_vwap_trend_pullback": cfg.get("enable_vwap_trend_pullback", True),
         "vwap_tp_confidence_threshold": cfg.get("vwap_tp_confidence_threshold", 80),
+        "enable_candlestick_confluence": cfg.get("enable_candlestick_confluence", True),
+        "cpc_volume_multiplier": cfg.get("cpc_volume_multiplier", 1.5),
+        "enable_level_aware_targets": cfg.get("enable_level_aware_targets", True),
         "enable_full_market_scan": cfg.get("enable_full_market_scan", True),
         "scan_nse": cfg.get("scan_nse", True),
         "scan_bse": cfg.get("scan_bse", False),
