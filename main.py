@@ -3931,5 +3931,8 @@ if __name__ == "__main__":
         port=5000,
         ssl_keyfile="key.pem",
         ssl_certfile="cert.pem",
-        reload=True,
+        # Auto-reload restarts the process on ANY file change — with open positions that
+        # means a silent mid-session halt and in-memory state reset. Opt in for dev only:
+        #   BOT_DEV=1 python main.py
+        reload=os.environ.get("BOT_DEV") == "1",
     )
