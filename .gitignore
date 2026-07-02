@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.claude/
+
+# Credentials
+.env
+
+# Data and Logs
+active_positions.json
+trade_history.json
+*.db
+*.db-journal
+*.log
+*.pem
+data/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Live broker credentials (access_token JWT lives here) — use config.template.json
+config.json
+
+# Frontend
+node_modules/
+frontend/dist/
+
+# Session artifacts
+.playwright-mcp/
+/*.png

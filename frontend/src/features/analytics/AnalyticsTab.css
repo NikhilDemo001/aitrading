@@ -1,0 +1,25 @@
+.mq-analytics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mq-analytics-row {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.mq-analytics-row-2col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.mq-analytics-row-3col {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 1200px) {
+  .mq-analytics-row-2col,
+  .mq-analytics-row-3col {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,51 @@
+.mq-compare-pickers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.mq-compare-picker {
+  min-width: 160px;
+}
+
+.mq-compare-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex: 1;
+}
+
+.mq-compare-picker select {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-size: 0.78rem;
+  padding: 7px 10px;
+  text-transform: none;
+}
+
+.mq-compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.76rem;
+}
+
+.mq-compare-table th, .mq-compare-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  text-align: left;
+}
+
+.mq-compare-table th {
+  color: var(--ink-faint);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: var(--font-mono);
+}

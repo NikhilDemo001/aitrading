@@ -1,0 +1,187 @@
+:root {
+  /* Midnight Quant — base surfaces */
+  --bg: #0A0B0F;
+  --bg-raised: #101219;
+  --panel: #12141C;
+  --panel-solid: #14161F;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  /* Accent */
+  --accent: #7C6CFF;
+  --accent-dim: rgba(124, 108, 255, 0.16);
+  --accent-glow: rgba(124, 108, 255, 0.35);
+
+  /* Signal colors */
+  --profit: #34D399;
+  --profit-dim: rgba(52, 211, 153, 0.14);
+  --loss: #F43F5E;
+  --loss-dim: rgba(244, 63, 94, 0.14);
+  --warn: #FBBF24;
+  --warn-dim: rgba(251, 191, 36, 0.14);
+  --info: #38BDF8;
+
+  /* Ink */
+  --ink: #F4F5F7;
+  --ink-dim: #A8AAB8;
+  --ink-faint: #6C6E7C;
+
+  /* Type */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+
+  /* Shape */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+
+  /* Elevation / glass — "Antigravity" layered, diffused float shadows so cards read as
+     weightless rather than stuck to the page. Multiple stacked shadows at increasing
+     blur/offset create the soft, premium levitation look. */
+  --panel-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.30),
+    0 6px 14px rgba(0, 0, 0, 0.34),
+    0 18px 40px rgba(0, 0, 0, 0.40),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  /* Deeper shadow used on hover to make the element appear to lift toward the viewer. */
+  --panel-shadow-lift:
+    0 2px 4px rgba(0, 0, 0, 0.32),
+    0 12px 24px rgba(0, 0, 0, 0.40),
+    0 30px 60px rgba(0, 0, 0, 0.46),
+    0 0 0 1px rgba(124, 108, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --panel-glow-inset: inset 0 0 0 1px var(--border), inset 0 0 24px rgba(124, 108, 255, 0.05);
+  --blur-glass: blur(18px);
+  --ease-float: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Layout rhythm */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent-glow);
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-profit { color: var(--profit); }
+.text-loss { color: var(--loss); }
+.text-dim { color: var(--ink-dim); }
+.text-faint { color: var(--ink-faint); }
+
+/* Consistent on-brand focus ring everywhere (buttons, inputs, tabs, links) instead of the
+   browser-default blue outline, which clashed with the indigo palette. Only shows for
+   keyboard/programmatic focus (:focus-visible), not on mouse click. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* Dark themed scrollbars so the browser chrome matches the rest of the UI. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124, 108, 255, 0.35) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(124, 108, 255, 0.3);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 108, 255, 0.5);
+  background-clip: padding-box;
+}
+
+/* ── Antigravity motion ────────────────────────────────────────────────────
+   Weightless entrance: elements drift up + fade + settle from a slight scale,
+   with a subtle rotate for the "floating into place" feel. Applied to grid/panel
+   children; stagger is driven by an inline `--i` index so cards land like dominoes. */
+@keyframes mq-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mq-rise {
+  animation: mq-rise-in 0.55s var(--ease-float) both;
+  animation-delay: calc(var(--i, 0) * 0.06s);
+  will-change: transform, opacity;
+}
+
+/* When many children each carry .mq-rise, this container variant staggers them via
+   nth-child so callers don't have to hand-set --i on every element. */
+.mq-stagger > * {
+  animation: mq-rise-in 0.5s var(--ease-float) both;
+  will-change: transform, opacity;
+}
+.mq-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.mq-stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.mq-stagger > *:nth-child(3) { animation-delay: 0.14s; }
+.mq-stagger > *:nth-child(4) { animation-delay: 0.20s; }
+.mq-stagger > *:nth-child(5) { animation-delay: 0.26s; }
+.mq-stagger > *:nth-child(6) { animation-delay: 0.32s; }
+.mq-stagger > *:nth-child(7) { animation-delay: 0.38s; }
+.mq-stagger > *:nth-child(8) { animation-delay: 0.44s; }
+
+/* Accessibility: honor reduced-motion by disabling all the float/entrance motion and
+   after-effects. Content still renders fully — just without the weightless choreography. */
+@media (prefers-reduced-motion: reduce) {
+  .mq-rise,
+  .mq-stagger > * {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+  }
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(124, 108, 255, 0.5);
+  background-clip: padding-box;
+}

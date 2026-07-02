@@ -1,0 +1,61 @@
+.mq-watchlist-panel {
+  height: 420px;
+}
+
+.mq-watchlist-search {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.mq-watchlist-search input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-size: 0.72rem;
+  padding: 6px 10px;
+  font-family: var(--font-ui);
+}
+
+.mq-watchlist-search input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.mq-watchlist-list {
+  overflow-y: auto;
+  height: calc(100% - 45px);
+}
+
+.mq-watchlist-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  padding: 8px 14px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.mq-watchlist-row:hover { background: rgba(255,255,255,0.03); }
+.mq-watchlist-row.active { background: var(--accent-dim); }
+
+.mq-wl-sym {
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.mq-wl-price {
+  font-size: 0.66rem;
+  color: var(--ink-faint);
+}
+
+.mq-watchlist-empty {
+  padding: var(--space-4);
+  font-size: 0.72rem;
+}

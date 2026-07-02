@@ -1,0 +1,15 @@
+.mq-rebuild-row {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.mq-rebuild-row input {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-size: 0.72rem;
+  padding: 6px 8px;
+  font-family: var(--font-mono);
+}

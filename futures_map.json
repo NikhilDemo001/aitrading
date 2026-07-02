@@ -1,0 +1,4272 @@
+{
+  "MAXHEALTH": [
+    {
+      "instrument_key": "NSE_FO|61241",
+      "trading_symbol": "MAXHEALTH FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 525
+    },
+    {
+      "instrument_key": "NSE_FO|58307",
+      "trading_symbol": "MAXHEALTH FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 525
+    },
+    {
+      "instrument_key": "NSE_FO|68672",
+      "trading_symbol": "MAXHEALTH FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 525
+    }
+  ],
+  "MAZDOCK": [
+    {
+      "instrument_key": "NSE_FO|61242",
+      "trading_symbol": "MAZDOCK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 225
+    },
+    {
+      "instrument_key": "NSE_FO|58310",
+      "trading_symbol": "MAZDOCK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 225
+    },
+    {
+      "instrument_key": "NSE_FO|68673",
+      "trading_symbol": "MAZDOCK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 225
+    }
+  ],
+  "LUPIN": [
+    {
+      "instrument_key": "NSE_FO|61235",
+      "trading_symbol": "LUPIN FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 425
+    },
+    {
+      "instrument_key": "NSE_FO|58301",
+      "trading_symbol": "LUPIN FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 425
+    },
+    {
+      "instrument_key": "NSE_FO|68645",
+      "trading_symbol": "LUPIN FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 425
+    }
+  ],
+  "LTM": [
+    {
+      "instrument_key": "NSE_FO|61234",
+      "trading_symbol": "LTM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|58298",
+      "trading_symbol": "LTM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|68644",
+      "trading_symbol": "LTM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 150
+    }
+  ],
+  "MANAPPURAM": [
+    {
+      "instrument_key": "NSE_FO|61237",
+      "trading_symbol": "MANAPPURAM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 3000
+    },
+    {
+      "instrument_key": "NSE_FO|58303",
+      "trading_symbol": "MANAPPURAM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 3000
+    },
+    {
+      "instrument_key": "NSE_FO|68647",
+      "trading_symbol": "MANAPPURAM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 3000
+    }
+  ],
+  "M&M": [
+    {
+      "instrument_key": "NSE_FO|61236",
+      "trading_symbol": "M&M FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 200
+    },
+    {
+      "instrument_key": "NSE_FO|58302",
+      "trading_symbol": "M&M FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 200
+    },
+    {
+      "instrument_key": "NSE_FO|68646",
+      "trading_symbol": "M&M FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 200
+    }
+  ],
+  "MARICO": [
+    {
+      "instrument_key": "NSE_FO|61239",
+      "trading_symbol": "MARICO FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1200
+    },
+    {
+      "instrument_key": "NSE_FO|58305",
+      "trading_symbol": "MARICO FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1200
+    },
+    {
+      "instrument_key": "NSE_FO|68649",
+      "trading_symbol": "MARICO FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1200
+    }
+  ],
+  "MANKIND": [
+    {
+      "instrument_key": "NSE_FO|61238",
+      "trading_symbol": "MANKIND FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 250
+    },
+    {
+      "instrument_key": "NSE_FO|58304",
+      "trading_symbol": "MANKIND FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 250
+    },
+    {
+      "instrument_key": "NSE_FO|68648",
+      "trading_symbol": "MANKIND FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 250
+    }
+  ],
+  "MARUTI": [
+    {
+      "instrument_key": "NSE_FO|61240",
+      "trading_symbol": "MARUTI FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 50
+    },
+    {
+      "instrument_key": "NSE_FO|58306",
+      "trading_symbol": "MARUTI FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 50
+    },
+    {
+      "instrument_key": "NSE_FO|68650",
+      "trading_symbol": "MARUTI FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 50
+    }
+  ],
+  "LTF": [
+    {
+      "instrument_key": "NSE_FO|61233",
+      "trading_symbol": "LTF FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2250
+    },
+    {
+      "instrument_key": "NSE_FO|58297",
+      "trading_symbol": "LTF FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2250
+    },
+    {
+      "instrument_key": "NSE_FO|68643",
+      "trading_symbol": "LTF FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2250
+    }
+  ],
+  "KFINTECH": [
+    {
+      "instrument_key": "NSE_FO|61225",
+      "trading_symbol": "KFINTECH FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 575
+    },
+    {
+      "instrument_key": "NSE_FO|58276",
+      "trading_symbol": "KFINTECH FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 575
+    },
+    {
+      "instrument_key": "NSE_FO|68606",
+      "trading_symbol": "KFINTECH FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 575
+    }
+  ],
+  "KOTAKBANK": [
+    {
+      "instrument_key": "NSE_FO|61226",
+      "trading_symbol": "KOTAKBANK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2000
+    },
+    {
+      "instrument_key": "NSE_FO|58277",
+      "trading_symbol": "KOTAKBANK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2000
+    },
+    {
+      "instrument_key": "NSE_FO|68610",
+      "trading_symbol": "KOTAKBANK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2000
+    }
+  ],
+  "LAURUSLABS": [
+    {
+      "instrument_key": "NSE_FO|61228",
+      "trading_symbol": "LAURUSLABS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 850
+    },
+    {
+      "instrument_key": "NSE_FO|58279",
+      "trading_symbol": "LAURUSLABS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 850
+    },
+    {
+      "instrument_key": "NSE_FO|68612",
+      "trading_symbol": "LAURUSLABS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 850
+    }
+  ],
+  "KPITTECH": [
+    {
+      "instrument_key": "NSE_FO|61227",
+      "trading_symbol": "KPITTECH FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 775
+    },
+    {
+      "instrument_key": "NSE_FO|58278",
+      "trading_symbol": "KPITTECH FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 775
+    },
+    {
+      "instrument_key": "NSE_FO|68611",
+      "trading_symbol": "KPITTECH FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 775
+    }
+  ],
+  "LICI": [
+    {
+      "instrument_key": "NSE_FO|61230",
+      "trading_symbol": "LICI FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1400
+    },
+    {
+      "instrument_key": "NSE_FO|58290",
+      "trading_symbol": "LICI FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1400
+    },
+    {
+      "instrument_key": "NSE_FO|68614",
+      "trading_symbol": "LICI FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1400
+    }
+  ],
+  "LICHSGFIN": [
+    {
+      "instrument_key": "NSE_FO|61229",
+      "trading_symbol": "LICHSGFIN FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1000
+    },
+    {
+      "instrument_key": "NSE_FO|58289",
+      "trading_symbol": "LICHSGFIN FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1000
+    },
+    {
+      "instrument_key": "NSE_FO|68613",
+      "trading_symbol": "LICHSGFIN FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1000
+    }
+  ],
+  "LODHA": [
+    {
+      "instrument_key": "NSE_FO|61231",
+      "trading_symbol": "LODHA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|58291",
+      "trading_symbol": "LODHA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|68619",
+      "trading_symbol": "LODHA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 625
+    }
+  ],
+  "LT": [
+    {
+      "instrument_key": "NSE_FO|61232",
+      "trading_symbol": "LT FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|58292",
+      "trading_symbol": "LT FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|68620",
+      "trading_symbol": "LT FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 175
+    }
+  ],
+  "MCX": [
+    {
+      "instrument_key": "NSE_FO|61243",
+      "trading_symbol": "MCX FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 225
+    },
+    {
+      "instrument_key": "NSE_FO|58316",
+      "trading_symbol": "MCX FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 225
+    },
+    {
+      "instrument_key": "NSE_FO|68690",
+      "trading_symbol": "MCX FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 225
+    }
+  ],
+  "MFSL": [
+    {
+      "instrument_key": "NSE_FO|61244",
+      "trading_symbol": "MFSL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 400
+    },
+    {
+      "instrument_key": "NSE_FO|58317",
+      "trading_symbol": "MFSL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 400
+    },
+    {
+      "instrument_key": "NSE_FO|68691",
+      "trading_symbol": "MFSL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 400
+    }
+  ],
+  "MOTHERSON": [
+    {
+      "instrument_key": "NSE_FO|61245",
+      "trading_symbol": "MOTHERSON FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 6150
+    },
+    {
+      "instrument_key": "NSE_FO|58319",
+      "trading_symbol": "MOTHERSON FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 6150
+    },
+    {
+      "instrument_key": "NSE_FO|68700",
+      "trading_symbol": "MOTHERSON FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 6150
+    }
+  ],
+  "MOTILALOFS": [
+    {
+      "instrument_key": "NSE_FO|61246",
+      "trading_symbol": "MOTILALOFS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 775
+    },
+    {
+      "instrument_key": "NSE_FO|58320",
+      "trading_symbol": "MOTILALOFS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 775
+    },
+    {
+      "instrument_key": "NSE_FO|68701",
+      "trading_symbol": "MOTILALOFS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 775
+    }
+  ],
+  "IDFCFIRSTB": [
+    {
+      "instrument_key": "NSE_FO|61201",
+      "trading_symbol": "IDFCFIRSTB FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 9275
+    },
+    {
+      "instrument_key": "NSE_FO|58236",
+      "trading_symbol": "IDFCFIRSTB FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 9275
+    },
+    {
+      "instrument_key": "NSE_FO|68546",
+      "trading_symbol": "IDFCFIRSTB FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 9275
+    }
+  ],
+  "IDEA": [
+    {
+      "instrument_key": "NSE_FO|61200",
+      "trading_symbol": "IDEA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 71475
+    },
+    {
+      "instrument_key": "NSE_FO|58235",
+      "trading_symbol": "IDEA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 71475
+    },
+    {
+      "instrument_key": "NSE_FO|68545",
+      "trading_symbol": "IDEA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 71475
+    }
+  ],
+  "INDHOTEL": [
+    {
+      "instrument_key": "NSE_FO|61203",
+      "trading_symbol": "INDHOTEL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1000
+    },
+    {
+      "instrument_key": "NSE_FO|58240",
+      "trading_symbol": "INDHOTEL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1000
+    },
+    {
+      "instrument_key": "NSE_FO|68548",
+      "trading_symbol": "INDHOTEL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1000
+    }
+  ],
+  "IEX": [
+    {
+      "instrument_key": "NSE_FO|61202",
+      "trading_symbol": "IEX FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 4350
+    },
+    {
+      "instrument_key": "NSE_FO|58237",
+      "trading_symbol": "IEX FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 4350
+    },
+    {
+      "instrument_key": "NSE_FO|68547",
+      "trading_symbol": "IEX FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 4350
+    }
+  ],
+  "INDIANB": [
+    {
+      "instrument_key": "NSE_FO|61204",
+      "trading_symbol": "INDIANB FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1000
+    },
+    {
+      "instrument_key": "NSE_FO|58241",
+      "trading_symbol": "INDIANB FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1000
+    },
+    {
+      "instrument_key": "NSE_FO|68549",
+      "trading_symbol": "INDIANB FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1000
+    }
+  ],
+  "INDUSINDBK": [
+    {
+      "instrument_key": "NSE_FO|61206",
+      "trading_symbol": "INDUSINDBK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 700
+    },
+    {
+      "instrument_key": "NSE_FO|58243",
+      "trading_symbol": "INDUSINDBK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 700
+    },
+    {
+      "instrument_key": "NSE_FO|68551",
+      "trading_symbol": "INDUSINDBK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 700
+    }
+  ],
+  "INDIGO": [
+    {
+      "instrument_key": "NSE_FO|61205",
+      "trading_symbol": "INDIGO FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|58242",
+      "trading_symbol": "INDIGO FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|68550",
+      "trading_symbol": "INDIGO FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 150
+    }
+  ],
+  "INFY": [
+    {
+      "instrument_key": "NSE_FO|61209",
+      "trading_symbol": "INFY FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 400
+    },
+    {
+      "instrument_key": "NSE_FO|58245",
+      "trading_symbol": "INFY FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 400
+    },
+    {
+      "instrument_key": "NSE_FO|68553",
+      "trading_symbol": "INFY FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 400
+    }
+  ],
+  "INDUSTOWER": [
+    {
+      "instrument_key": "NSE_FO|61207",
+      "trading_symbol": "INDUSTOWER FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1700
+    },
+    {
+      "instrument_key": "NSE_FO|58244",
+      "trading_symbol": "INDUSTOWER FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1700
+    },
+    {
+      "instrument_key": "NSE_FO|68552",
+      "trading_symbol": "INDUSTOWER FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1700
+    }
+  ],
+  "IOC": [
+    {
+      "instrument_key": "NSE_FO|61213",
+      "trading_symbol": "IOC FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 4875
+    },
+    {
+      "instrument_key": "NSE_FO|58247",
+      "trading_symbol": "IOC FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 4875
+    },
+    {
+      "instrument_key": "NSE_FO|68555",
+      "trading_symbol": "IOC FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 4875
+    }
+  ],
+  "INOXWIND": [
+    {
+      "instrument_key": "NSE_FO|61210",
+      "trading_symbol": "INOXWIND FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 6400
+    },
+    {
+      "instrument_key": "NSE_FO|58246",
+      "trading_symbol": "INOXWIND FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 6400
+    },
+    {
+      "instrument_key": "NSE_FO|68554",
+      "trading_symbol": "INOXWIND FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 6400
+    }
+  ],
+  "IRFC": [
+    {
+      "instrument_key": "NSE_FO|61215",
+      "trading_symbol": "IRFC FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 5425
+    },
+    {
+      "instrument_key": "NSE_FO|58249",
+      "trading_symbol": "IRFC FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 5425
+    },
+    {
+      "instrument_key": "NSE_FO|68557",
+      "trading_symbol": "IRFC FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 5425
+    }
+  ],
+  "IREDA": [
+    {
+      "instrument_key": "NSE_FO|61214",
+      "trading_symbol": "IREDA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 4525
+    },
+    {
+      "instrument_key": "NSE_FO|58248",
+      "trading_symbol": "IREDA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 4525
+    },
+    {
+      "instrument_key": "NSE_FO|68556",
+      "trading_symbol": "IREDA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 4525
+    }
+  ],
+  "JINDALSTEL": [
+    {
+      "instrument_key": "NSE_FO|61217",
+      "trading_symbol": "JINDALSTEL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|58251",
+      "trading_symbol": "JINDALSTEL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|68559",
+      "trading_symbol": "JINDALSTEL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 625
+    }
+  ],
+  "ITC": [
+    {
+      "instrument_key": "NSE_FO|61216",
+      "trading_symbol": "ITC FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1725
+    },
+    {
+      "instrument_key": "NSE_FO|58250",
+      "trading_symbol": "ITC FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1725
+    },
+    {
+      "instrument_key": "NSE_FO|68558",
+      "trading_symbol": "ITC FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1725
+    }
+  ],
+  "JIOFIN": [
+    {
+      "instrument_key": "NSE_FO|61218",
+      "trading_symbol": "JIOFIN FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2350
+    },
+    {
+      "instrument_key": "NSE_FO|58256",
+      "trading_symbol": "JIOFIN FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2350
+    },
+    {
+      "instrument_key": "NSE_FO|68560",
+      "trading_symbol": "JIOFIN FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2350
+    }
+  ],
+  "JSWSTEEL": [
+    {
+      "instrument_key": "NSE_FO|61220",
+      "trading_symbol": "JSWSTEEL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 675
+    },
+    {
+      "instrument_key": "NSE_FO|58258",
+      "trading_symbol": "JSWSTEEL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 675
+    },
+    {
+      "instrument_key": "NSE_FO|68564",
+      "trading_symbol": "JSWSTEEL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 675
+    }
+  ],
+  "JSWENERGY": [
+    {
+      "instrument_key": "NSE_FO|61219",
+      "trading_symbol": "JSWENERGY FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1075
+    },
+    {
+      "instrument_key": "NSE_FO|58257",
+      "trading_symbol": "JSWENERGY FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1075
+    },
+    {
+      "instrument_key": "NSE_FO|68563",
+      "trading_symbol": "JSWENERGY FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1075
+    }
+  ],
+  "KALYANKJIL": [
+    {
+      "instrument_key": "NSE_FO|61222",
+      "trading_symbol": "KALYANKJIL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1350
+    },
+    {
+      "instrument_key": "NSE_FO|58261",
+      "trading_symbol": "KALYANKJIL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1350
+    },
+    {
+      "instrument_key": "NSE_FO|68566",
+      "trading_symbol": "KALYANKJIL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1350
+    }
+  ],
+  "JUBLFOOD": [
+    {
+      "instrument_key": "NSE_FO|61221",
+      "trading_symbol": "JUBLFOOD FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1250
+    },
+    {
+      "instrument_key": "NSE_FO|58260",
+      "trading_symbol": "JUBLFOOD FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1250
+    },
+    {
+      "instrument_key": "NSE_FO|68565",
+      "trading_symbol": "JUBLFOOD FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1250
+    }
+  ],
+  "HDFCLIFE": [
+    {
+      "instrument_key": "NSE_FO|61190",
+      "trading_symbol": "HDFCLIFE FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1100
+    },
+    {
+      "instrument_key": "NSE_FO|58217",
+      "trading_symbol": "HDFCLIFE FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1100
+    },
+    {
+      "instrument_key": "NSE_FO|68535",
+      "trading_symbol": "HDFCLIFE FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1100
+    }
+  ],
+  "HDFCBANK": [
+    {
+      "instrument_key": "NSE_FO|61189",
+      "trading_symbol": "HDFCBANK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 650
+    },
+    {
+      "instrument_key": "NSE_FO|58216",
+      "trading_symbol": "HDFCBANK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 650
+    },
+    {
+      "instrument_key": "NSE_FO|68534",
+      "trading_symbol": "HDFCBANK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 650
+    }
+  ],
+  "HINDALCO": [
+    {
+      "instrument_key": "NSE_FO|61192",
+      "trading_symbol": "HINDALCO FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 700
+    },
+    {
+      "instrument_key": "NSE_FO|58225",
+      "trading_symbol": "HINDALCO FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 700
+    },
+    {
+      "instrument_key": "NSE_FO|68537",
+      "trading_symbol": "HINDALCO FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 700
+    }
+  ],
+  "HEROMOTOCO": [
+    {
+      "instrument_key": "NSE_FO|61191",
+      "trading_symbol": "HEROMOTOCO FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|58218",
+      "trading_symbol": "HEROMOTOCO FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|68536",
+      "trading_symbol": "HEROMOTOCO FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 150
+    }
+  ],
+  "HINDUNILVR": [
+    {
+      "instrument_key": "NSE_FO|61194",
+      "trading_symbol": "HINDUNILVR FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 300
+    },
+    {
+      "instrument_key": "NSE_FO|58227",
+      "trading_symbol": "HINDUNILVR FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 300
+    },
+    {
+      "instrument_key": "NSE_FO|68539",
+      "trading_symbol": "HINDUNILVR FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 300
+    }
+  ],
+  "HINDPETRO": [
+    {
+      "instrument_key": "NSE_FO|61193",
+      "trading_symbol": "HINDPETRO FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2025
+    },
+    {
+      "instrument_key": "NSE_FO|58226",
+      "trading_symbol": "HINDPETRO FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2025
+    },
+    {
+      "instrument_key": "NSE_FO|68538",
+      "trading_symbol": "HINDPETRO FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2025
+    }
+  ],
+  "HINDZINC": [
+    {
+      "instrument_key": "NSE_FO|61195",
+      "trading_symbol": "HINDZINC FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1225
+    },
+    {
+      "instrument_key": "NSE_FO|58228",
+      "trading_symbol": "HINDZINC FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1225
+    },
+    {
+      "instrument_key": "NSE_FO|68540",
+      "trading_symbol": "HINDZINC FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1225
+    }
+  ],
+  "ICICIBANK": [
+    {
+      "instrument_key": "NSE_FO|61197",
+      "trading_symbol": "ICICIBANK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 700
+    },
+    {
+      "instrument_key": "NSE_FO|58232",
+      "trading_symbol": "ICICIBANK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 700
+    },
+    {
+      "instrument_key": "NSE_FO|68542",
+      "trading_symbol": "ICICIBANK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 700
+    }
+  ],
+  "HYUNDAI": [
+    {
+      "instrument_key": "NSE_FO|61196",
+      "trading_symbol": "HYUNDAI FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 275
+    },
+    {
+      "instrument_key": "NSE_FO|58229",
+      "trading_symbol": "HYUNDAI FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 275
+    },
+    {
+      "instrument_key": "NSE_FO|68541",
+      "trading_symbol": "HYUNDAI FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 275
+    }
+  ],
+  "ICICIPRULI": [
+    {
+      "instrument_key": "NSE_FO|61199",
+      "trading_symbol": "ICICIPRULI FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 925
+    },
+    {
+      "instrument_key": "NSE_FO|58234",
+      "trading_symbol": "ICICIPRULI FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 925
+    },
+    {
+      "instrument_key": "NSE_FO|68544",
+      "trading_symbol": "ICICIPRULI FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 925
+    }
+  ],
+  "ICICIGI": [
+    {
+      "instrument_key": "NSE_FO|61198",
+      "trading_symbol": "ICICIGI FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 325
+    },
+    {
+      "instrument_key": "NSE_FO|58233",
+      "trading_symbol": "ICICIGI FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 325
+    },
+    {
+      "instrument_key": "NSE_FO|68543",
+      "trading_symbol": "ICICIGI FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 325
+    }
+  ],
+  "HCLTECH": [
+    {
+      "instrument_key": "NSE_FO|61187",
+      "trading_symbol": "HCLTECH FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 400
+    },
+    {
+      "instrument_key": "NSE_FO|58214",
+      "trading_symbol": "HCLTECH FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 400
+    },
+    {
+      "instrument_key": "NSE_FO|68520",
+      "trading_symbol": "HCLTECH FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 400
+    }
+  ],
+  "HDFCAMC": [
+    {
+      "instrument_key": "NSE_FO|61188",
+      "trading_symbol": "HDFCAMC FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 300
+    },
+    {
+      "instrument_key": "NSE_FO|58215",
+      "trading_symbol": "HDFCAMC FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 300
+    },
+    {
+      "instrument_key": "NSE_FO|68521",
+      "trading_symbol": "HDFCAMC FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 300
+    }
+  ],
+  "KAYNES": [
+    {
+      "instrument_key": "NSE_FO|61223",
+      "trading_symbol": "KAYNES FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|58274",
+      "trading_symbol": "KAYNES FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|68595",
+      "trading_symbol": "KAYNES FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 150
+    }
+  ],
+  "KEI": [
+    {
+      "instrument_key": "NSE_FO|61224",
+      "trading_symbol": "KEI FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|58275",
+      "trading_symbol": "KEI FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|68596",
+      "trading_symbol": "KEI FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 175
+    }
+  ],
+  "APLAPOLLO": [
+    {
+      "instrument_key": "NSE_FO|61107",
+      "trading_symbol": "APLAPOLLO FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 350
+    },
+    {
+      "instrument_key": "NSE_FO|58104",
+      "trading_symbol": "APLAPOLLO FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 350
+    },
+    {
+      "instrument_key": "NSE_FO|68425",
+      "trading_symbol": "APLAPOLLO FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 350
+    }
+  ],
+  "ANGELONE": [
+    {
+      "instrument_key": "NSE_FO|61106",
+      "trading_symbol": "ANGELONE FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2500
+    },
+    {
+      "instrument_key": "NSE_FO|58103",
+      "trading_symbol": "ANGELONE FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2500
+    },
+    {
+      "instrument_key": "NSE_FO|68424",
+      "trading_symbol": "ANGELONE FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2500
+    }
+  ],
+  "ASHOKLEY": [
+    {
+      "instrument_key": "NSE_FO|61109",
+      "trading_symbol": "ASHOKLEY FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 5000
+    },
+    {
+      "instrument_key": "NSE_FO|58106",
+      "trading_symbol": "ASHOKLEY FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 5000
+    },
+    {
+      "instrument_key": "NSE_FO|68427",
+      "trading_symbol": "ASHOKLEY FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 5000
+    }
+  ],
+  "APOLLOHOSP": [
+    {
+      "instrument_key": "NSE_FO|61108",
+      "trading_symbol": "APOLLOHOSP FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|58105",
+      "trading_symbol": "APOLLOHOSP FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|68426",
+      "trading_symbol": "APOLLOHOSP FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 125
+    }
+  ],
+  "ASTRAL": [
+    {
+      "instrument_key": "NSE_FO|61111",
+      "trading_symbol": "ASTRAL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 425
+    },
+    {
+      "instrument_key": "NSE_FO|58108",
+      "trading_symbol": "ASTRAL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 425
+    },
+    {
+      "instrument_key": "NSE_FO|68429",
+      "trading_symbol": "ASTRAL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 425
+    }
+  ],
+  "ASIANPAINT": [
+    {
+      "instrument_key": "NSE_FO|61110",
+      "trading_symbol": "ASIANPAINT FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 250
+    },
+    {
+      "instrument_key": "NSE_FO|58107",
+      "trading_symbol": "ASIANPAINT FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 250
+    },
+    {
+      "instrument_key": "NSE_FO|68428",
+      "trading_symbol": "ASIANPAINT FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 250
+    }
+  ],
+  "AUBANK": [
+    {
+      "instrument_key": "NSE_FO|61112",
+      "trading_symbol": "AUBANK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1000
+    },
+    {
+      "instrument_key": "NSE_FO|58109",
+      "trading_symbol": "AUBANK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1000
+    },
+    {
+      "instrument_key": "NSE_FO|68432",
+      "trading_symbol": "AUBANK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1000
+    }
+  ],
+  "AXISBANK": [
+    {
+      "instrument_key": "NSE_FO|61114",
+      "trading_symbol": "AXISBANK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|58117",
+      "trading_symbol": "AXISBANK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|68434",
+      "trading_symbol": "AXISBANK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 625
+    }
+  ],
+  "AUROPHARMA": [
+    {
+      "instrument_key": "NSE_FO|61113",
+      "trading_symbol": "AUROPHARMA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 550
+    },
+    {
+      "instrument_key": "NSE_FO|58116",
+      "trading_symbol": "AUROPHARMA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 550
+    },
+    {
+      "instrument_key": "NSE_FO|68433",
+      "trading_symbol": "AUROPHARMA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 550
+    }
+  ],
+  "BAJAJFINSV": [
+    {
+      "instrument_key": "NSE_FO|61116",
+      "trading_symbol": "BAJAJFINSV FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 300
+    },
+    {
+      "instrument_key": "NSE_FO|58119",
+      "trading_symbol": "BAJAJFINSV FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 300
+    },
+    {
+      "instrument_key": "NSE_FO|68436",
+      "trading_symbol": "BAJAJFINSV FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 300
+    }
+  ],
+  "BAJAJ-AUTO": [
+    {
+      "instrument_key": "NSE_FO|61115",
+      "trading_symbol": "BAJAJ-AUTO FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 75
+    },
+    {
+      "instrument_key": "NSE_FO|58118",
+      "trading_symbol": "BAJAJ-AUTO FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 75
+    },
+    {
+      "instrument_key": "NSE_FO|68435",
+      "trading_symbol": "BAJAJ-AUTO FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 75
+    }
+  ],
+  "BAJAJHLDNG": [
+    {
+      "instrument_key": "NSE_FO|61117",
+      "trading_symbol": "BAJAJHLDNG FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 75
+    },
+    {
+      "instrument_key": "NSE_FO|58120",
+      "trading_symbol": "BAJAJHLDNG FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 75
+    },
+    {
+      "instrument_key": "NSE_FO|68437",
+      "trading_symbol": "BAJAJHLDNG FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 75
+    }
+  ],
+  "BANDHANBNK": [
+    {
+      "instrument_key": "NSE_FO|61121",
+      "trading_symbol": "BANDHANBNK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 3600
+    },
+    {
+      "instrument_key": "NSE_FO|58122",
+      "trading_symbol": "BANDHANBNK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 3600
+    },
+    {
+      "instrument_key": "NSE_FO|68443",
+      "trading_symbol": "BANDHANBNK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 3600
+    }
+  ],
+  "BAJFINANCE": [
+    {
+      "instrument_key": "NSE_FO|61118",
+      "trading_symbol": "BAJFINANCE FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 750
+    },
+    {
+      "instrument_key": "NSE_FO|58121",
+      "trading_symbol": "BAJFINANCE FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 750
+    },
+    {
+      "instrument_key": "NSE_FO|68442",
+      "trading_symbol": "BAJFINANCE FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 750
+    }
+  ],
+  "BANKINDIA": [
+    {
+      "instrument_key": "NSE_FO|61123",
+      "trading_symbol": "BANKINDIA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 5200
+    },
+    {
+      "instrument_key": "NSE_FO|58125",
+      "trading_symbol": "BANKINDIA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 5200
+    },
+    {
+      "instrument_key": "NSE_FO|68445",
+      "trading_symbol": "BANKINDIA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 5200
+    }
+  ],
+  "BANKBARODA": [
+    {
+      "instrument_key": "NSE_FO|61122",
+      "trading_symbol": "BANKBARODA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2925
+    },
+    {
+      "instrument_key": "NSE_FO|58123",
+      "trading_symbol": "BANKBARODA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2925
+    },
+    {
+      "instrument_key": "NSE_FO|68444",
+      "trading_symbol": "BANKBARODA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2925
+    }
+  ],
+  "NIFTY": [
+    {
+      "instrument_key": "NSE_FO|61093",
+      "trading_symbol": "NIFTY FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 65
+    },
+    {
+      "instrument_key": "NSE_FO|58072",
+      "trading_symbol": "NIFTY FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 65
+    },
+    {
+      "instrument_key": "NSE_FO|68407",
+      "trading_symbol": "NIFTY FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 65
+    }
+  ],
+  "MIDCPNIFTY": [
+    {
+      "instrument_key": "NSE_FO|61092",
+      "trading_symbol": "MIDCPNIFTY FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 120
+    },
+    {
+      "instrument_key": "NSE_FO|58071",
+      "trading_symbol": "MIDCPNIFTY FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 120
+    },
+    {
+      "instrument_key": "NSE_FO|68406",
+      "trading_symbol": "MIDCPNIFTY FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 120
+    }
+  ],
+  "NIFTYNXT50": [
+    {
+      "instrument_key": "NSE_FO|61094",
+      "trading_symbol": "NIFTYNXT50 FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 25
+    },
+    {
+      "instrument_key": "NSE_FO|58073",
+      "trading_symbol": "NIFTYNXT50 FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 25
+    },
+    {
+      "instrument_key": "NSE_FO|68412",
+      "trading_symbol": "NIFTYNXT50 FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 25
+    }
+  ],
+  "ABB": [
+    {
+      "instrument_key": "NSE_FO|61096",
+      "trading_symbol": "ABB FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|58075",
+      "trading_symbol": "ABB FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|68414",
+      "trading_symbol": "ABB FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 125
+    }
+  ],
+  "360ONE": [
+    {
+      "instrument_key": "NSE_FO|61095",
+      "trading_symbol": "360ONE FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|58074",
+      "trading_symbol": "360ONE FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|68413",
+      "trading_symbol": "360ONE FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 500
+    }
+  ],
+  "ADANIENSOL": [
+    {
+      "instrument_key": "NSE_FO|61098",
+      "trading_symbol": "ADANIENSOL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 675
+    },
+    {
+      "instrument_key": "NSE_FO|58087",
+      "trading_symbol": "ADANIENSOL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 675
+    },
+    {
+      "instrument_key": "NSE_FO|68416",
+      "trading_symbol": "ADANIENSOL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 675
+    }
+  ],
+  "ABCAPITAL": [
+    {
+      "instrument_key": "NSE_FO|61097",
+      "trading_symbol": "ABCAPITAL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 3100
+    },
+    {
+      "instrument_key": "NSE_FO|58086",
+      "trading_symbol": "ABCAPITAL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 3100
+    },
+    {
+      "instrument_key": "NSE_FO|68415",
+      "trading_symbol": "ABCAPITAL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 3100
+    }
+  ],
+  "ADANIGREEN": [
+    {
+      "instrument_key": "NSE_FO|61100",
+      "trading_symbol": "ADANIGREEN FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 600
+    },
+    {
+      "instrument_key": "NSE_FO|58089",
+      "trading_symbol": "ADANIGREEN FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 600
+    },
+    {
+      "instrument_key": "NSE_FO|68418",
+      "trading_symbol": "ADANIGREEN FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 600
+    }
+  ],
+  "ADANIENT": [
+    {
+      "instrument_key": "NSE_FO|61099",
+      "trading_symbol": "ADANIENT FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 309
+    },
+    {
+      "instrument_key": "NSE_FO|58088",
+      "trading_symbol": "ADANIENT FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 309
+    },
+    {
+      "instrument_key": "NSE_FO|68417",
+      "trading_symbol": "ADANIENT FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 309
+    }
+  ],
+  "ADANIPORTS": [
+    {
+      "instrument_key": "NSE_FO|61101",
+      "trading_symbol": "ADANIPORTS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 475
+    },
+    {
+      "instrument_key": "NSE_FO|58090",
+      "trading_symbol": "ADANIPORTS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 475
+    },
+    {
+      "instrument_key": "NSE_FO|68419",
+      "trading_symbol": "ADANIPORTS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 475
+    }
+  ],
+  "ALKEM": [
+    {
+      "instrument_key": "NSE_FO|61103",
+      "trading_symbol": "ALKEM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|58100",
+      "trading_symbol": "ALKEM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|68421",
+      "trading_symbol": "ALKEM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 125
+    }
+  ],
+  "ADANIPOWER": [
+    {
+      "instrument_key": "NSE_FO|61102",
+      "trading_symbol": "ADANIPOWER FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 3550
+    },
+    {
+      "instrument_key": "NSE_FO|58091",
+      "trading_symbol": "ADANIPOWER FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 3550
+    },
+    {
+      "instrument_key": "NSE_FO|68420",
+      "trading_symbol": "ADANIPOWER FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 3550
+    }
+  ],
+  "AMBUJACEM": [
+    {
+      "instrument_key": "NSE_FO|61105",
+      "trading_symbol": "AMBUJACEM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1200
+    },
+    {
+      "instrument_key": "NSE_FO|58102",
+      "trading_symbol": "AMBUJACEM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1200
+    },
+    {
+      "instrument_key": "NSE_FO|68423",
+      "trading_symbol": "AMBUJACEM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1200
+    }
+  ],
+  "AMBER": [
+    {
+      "instrument_key": "NSE_FO|61104",
+      "trading_symbol": "AMBER FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 100
+    },
+    {
+      "instrument_key": "NSE_FO|58101",
+      "trading_symbol": "AMBER FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 100
+    },
+    {
+      "instrument_key": "NSE_FO|68422",
+      "trading_symbol": "AMBER FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 100
+    }
+  ],
+  "HAL": [
+    {
+      "instrument_key": "NSE_FO|61185",
+      "trading_symbol": "HAL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|58212",
+      "trading_symbol": "HAL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|68490",
+      "trading_symbol": "HAL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 150
+    }
+  ],
+  "HAVELLS": [
+    {
+      "instrument_key": "NSE_FO|61186",
+      "trading_symbol": "HAVELLS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|58213",
+      "trading_symbol": "HAVELLS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|68491",
+      "trading_symbol": "HAVELLS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 500
+    }
+  ],
+  "CUMMINSIND": [
+    {
+      "instrument_key": "NSE_FO|61151",
+      "trading_symbol": "CUMMINSIND FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 200
+    },
+    {
+      "instrument_key": "NSE_FO|58156",
+      "trading_symbol": "CUMMINSIND FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 200
+    },
+    {
+      "instrument_key": "NSE_FO|68469",
+      "trading_symbol": "CUMMINSIND FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 200
+    }
+  ],
+  "CROMPTON": [
+    {
+      "instrument_key": "NSE_FO|61150",
+      "trading_symbol": "CROMPTON FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2150
+    },
+    {
+      "instrument_key": "NSE_FO|58155",
+      "trading_symbol": "CROMPTON FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2150
+    },
+    {
+      "instrument_key": "NSE_FO|68468",
+      "trading_symbol": "CROMPTON FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2150
+    }
+  ],
+  "DABUR": [
+    {
+      "instrument_key": "NSE_FO|61152",
+      "trading_symbol": "DABUR FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1250
+    },
+    {
+      "instrument_key": "NSE_FO|58157",
+      "trading_symbol": "DABUR FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1250
+    },
+    {
+      "instrument_key": "NSE_FO|68470",
+      "trading_symbol": "DABUR FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1250
+    }
+  ],
+  "DIVISLAB": [
+    {
+      "instrument_key": "NSE_FO|61159",
+      "trading_symbol": "DIVISLAB FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 100
+    },
+    {
+      "instrument_key": "NSE_FO|58160",
+      "trading_symbol": "DIVISLAB FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 100
+    },
+    {
+      "instrument_key": "NSE_FO|68472",
+      "trading_symbol": "DIVISLAB FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 100
+    }
+  ],
+  "DELHIVERY": [
+    {
+      "instrument_key": "NSE_FO|61158",
+      "trading_symbol": "DELHIVERY FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2075
+    },
+    {
+      "instrument_key": "NSE_FO|58159",
+      "trading_symbol": "DELHIVERY FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2075
+    },
+    {
+      "instrument_key": "NSE_FO|68471",
+      "trading_symbol": "DELHIVERY FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2075
+    }
+  ],
+  "DLF": [
+    {
+      "instrument_key": "NSE_FO|61161",
+      "trading_symbol": "DLF FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 950
+    },
+    {
+      "instrument_key": "NSE_FO|58162",
+      "trading_symbol": "DLF FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 950
+    },
+    {
+      "instrument_key": "NSE_FO|68474",
+      "trading_symbol": "DLF FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 950
+    }
+  ],
+  "DIXON": [
+    {
+      "instrument_key": "NSE_FO|61160",
+      "trading_symbol": "DIXON FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 50
+    },
+    {
+      "instrument_key": "NSE_FO|58161",
+      "trading_symbol": "DIXON FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 50
+    },
+    {
+      "instrument_key": "NSE_FO|68473",
+      "trading_symbol": "DIXON FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 50
+    }
+  ],
+  "DRREDDY": [
+    {
+      "instrument_key": "NSE_FO|61163",
+      "trading_symbol": "DRREDDY FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|58170",
+      "trading_symbol": "DRREDDY FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|68476",
+      "trading_symbol": "DRREDDY FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 625
+    }
+  ],
+  "DMART": [
+    {
+      "instrument_key": "NSE_FO|61162",
+      "trading_symbol": "DMART FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|58163",
+      "trading_symbol": "DMART FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|68475",
+      "trading_symbol": "DMART FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 150
+    }
+  ],
+  "ETERNAL": [
+    {
+      "instrument_key": "NSE_FO|61165",
+      "trading_symbol": "ETERNAL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2425
+    },
+    {
+      "instrument_key": "NSE_FO|58182",
+      "trading_symbol": "ETERNAL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2425
+    },
+    {
+      "instrument_key": "NSE_FO|68478",
+      "trading_symbol": "ETERNAL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2425
+    }
+  ],
+  "EICHERMOT": [
+    {
+      "instrument_key": "NSE_FO|61164",
+      "trading_symbol": "EICHERMOT FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 100
+    },
+    {
+      "instrument_key": "NSE_FO|58181",
+      "trading_symbol": "EICHERMOT FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 100
+    },
+    {
+      "instrument_key": "NSE_FO|68477",
+      "trading_symbol": "EICHERMOT FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 100
+    }
+  ],
+  "FEDERALBNK": [
+    {
+      "instrument_key": "NSE_FO|61167",
+      "trading_symbol": "FEDERALBNK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2500
+    },
+    {
+      "instrument_key": "NSE_FO|58183",
+      "trading_symbol": "FEDERALBNK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2500
+    },
+    {
+      "instrument_key": "NSE_FO|68479",
+      "trading_symbol": "FEDERALBNK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2500
+    }
+  ],
+  "FORTIS": [
+    {
+      "instrument_key": "NSE_FO|61169",
+      "trading_symbol": "FORTIS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 775
+    },
+    {
+      "instrument_key": "NSE_FO|58188",
+      "trading_symbol": "FORTIS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 775
+    },
+    {
+      "instrument_key": "NSE_FO|68481",
+      "trading_symbol": "FORTIS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 775
+    }
+  ],
+  "FORCEMOT": [
+    {
+      "instrument_key": "NSE_FO|61168",
+      "trading_symbol": "FORCEMOT FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 25
+    },
+    {
+      "instrument_key": "NSE_FO|58184",
+      "trading_symbol": "FORCEMOT FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 25
+    },
+    {
+      "instrument_key": "NSE_FO|68480",
+      "trading_symbol": "FORCEMOT FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 25
+    }
+  ],
+  "GLENMARK": [
+    {
+      "instrument_key": "NSE_FO|61171",
+      "trading_symbol": "GLENMARK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 375
+    },
+    {
+      "instrument_key": "NSE_FO|58198",
+      "trading_symbol": "GLENMARK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 375
+    },
+    {
+      "instrument_key": "NSE_FO|68483",
+      "trading_symbol": "GLENMARK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 375
+    }
+  ],
+  "GAIL": [
+    {
+      "instrument_key": "NSE_FO|61170",
+      "trading_symbol": "GAIL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 3550
+    },
+    {
+      "instrument_key": "NSE_FO|58189",
+      "trading_symbol": "GAIL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 3550
+    },
+    {
+      "instrument_key": "NSE_FO|68482",
+      "trading_symbol": "GAIL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 3550
+    }
+  ],
+  "GODFRYPHLP": [
+    {
+      "instrument_key": "NSE_FO|61179",
+      "trading_symbol": "GODFRYPHLP FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 275
+    },
+    {
+      "instrument_key": "NSE_FO|58200",
+      "trading_symbol": "GODFRYPHLP FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 275
+    },
+    {
+      "instrument_key": "NSE_FO|68485",
+      "trading_symbol": "GODFRYPHLP FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 275
+    }
+  ],
+  "GMRAIRPORT": [
+    {
+      "instrument_key": "NSE_FO|61178",
+      "trading_symbol": "GMRAIRPORT FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 6975
+    },
+    {
+      "instrument_key": "NSE_FO|58199",
+      "trading_symbol": "GMRAIRPORT FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 6975
+    },
+    {
+      "instrument_key": "NSE_FO|68484",
+      "trading_symbol": "GMRAIRPORT FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 6975
+    }
+  ],
+  "GODREJPROP": [
+    {
+      "instrument_key": "NSE_FO|61183",
+      "trading_symbol": "GODREJPROP FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 325
+    },
+    {
+      "instrument_key": "NSE_FO|58207",
+      "trading_symbol": "GODREJPROP FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 325
+    },
+    {
+      "instrument_key": "NSE_FO|68487",
+      "trading_symbol": "GODREJPROP FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 325
+    }
+  ],
+  "GODREJCP": [
+    {
+      "instrument_key": "NSE_FO|61182",
+      "trading_symbol": "GODREJCP FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|58201",
+      "trading_symbol": "GODREJCP FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|68486",
+      "trading_symbol": "GODREJCP FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 500
+    }
+  ],
+  "GVT&D": [
+    {
+      "instrument_key": "NSE_FO|58210",
+      "trading_symbol": "GVT&D FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|58211",
+      "trading_symbol": "GVT&D FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|68489",
+      "trading_symbol": "GVT&D FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 125
+    }
+  ],
+  "GRASIM": [
+    {
+      "instrument_key": "NSE_FO|61184",
+      "trading_symbol": "GRASIM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 250
+    },
+    {
+      "instrument_key": "NSE_FO|58208",
+      "trading_symbol": "GRASIM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 250
+    },
+    {
+      "instrument_key": "NSE_FO|68488",
+      "trading_symbol": "GRASIM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 250
+    }
+  ],
+  "BEL": [
+    {
+      "instrument_key": "NSE_FO|61125",
+      "trading_symbol": "BEL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1425
+    },
+    {
+      "instrument_key": "NSE_FO|58130",
+      "trading_symbol": "BEL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1425
+    },
+    {
+      "instrument_key": "NSE_FO|68447",
+      "trading_symbol": "BEL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1425
+    }
+  ],
+  "BDL": [
+    {
+      "instrument_key": "NSE_FO|61124",
+      "trading_symbol": "BDL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 425
+    },
+    {
+      "instrument_key": "NSE_FO|58126",
+      "trading_symbol": "BDL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 425
+    },
+    {
+      "instrument_key": "NSE_FO|68446",
+      "trading_symbol": "BDL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 425
+    }
+  ],
+  "BHARTIARTL": [
+    {
+      "instrument_key": "NSE_FO|61127",
+      "trading_symbol": "BHARTIARTL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 475
+    },
+    {
+      "instrument_key": "NSE_FO|58132",
+      "trading_symbol": "BHARTIARTL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 475
+    },
+    {
+      "instrument_key": "NSE_FO|68449",
+      "trading_symbol": "BHARTIARTL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 475
+    }
+  ],
+  "BHARATFORG": [
+    {
+      "instrument_key": "NSE_FO|61126",
+      "trading_symbol": "BHARATFORG FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|58131",
+      "trading_symbol": "BHARATFORG FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|68448",
+      "trading_symbol": "BHARATFORG FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 500
+    }
+  ],
+  "BHEL": [
+    {
+      "instrument_key": "NSE_FO|61128",
+      "trading_symbol": "BHEL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2625
+    },
+    {
+      "instrument_key": "NSE_FO|58133",
+      "trading_symbol": "BHEL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2625
+    },
+    {
+      "instrument_key": "NSE_FO|68450",
+      "trading_symbol": "BHEL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2625
+    }
+  ],
+  "BLUESTARCO": [
+    {
+      "instrument_key": "NSE_FO|61130",
+      "trading_symbol": "BLUESTARCO FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 325
+    },
+    {
+      "instrument_key": "NSE_FO|58135",
+      "trading_symbol": "BLUESTARCO FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 325
+    },
+    {
+      "instrument_key": "NSE_FO|68452",
+      "trading_symbol": "BLUESTARCO FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 325
+    }
+  ],
+  "BIOCON": [
+    {
+      "instrument_key": "NSE_FO|61129",
+      "trading_symbol": "BIOCON FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2500
+    },
+    {
+      "instrument_key": "NSE_FO|58134",
+      "trading_symbol": "BIOCON FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2500
+    },
+    {
+      "instrument_key": "NSE_FO|68451",
+      "trading_symbol": "BIOCON FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2500
+    }
+  ],
+  "BPCL": [
+    {
+      "instrument_key": "NSE_FO|61132",
+      "trading_symbol": "BPCL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1975
+    },
+    {
+      "instrument_key": "NSE_FO|58138",
+      "trading_symbol": "BPCL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1975
+    },
+    {
+      "instrument_key": "NSE_FO|68454",
+      "trading_symbol": "BPCL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1975
+    }
+  ],
+  "BOSCHLTD": [
+    {
+      "instrument_key": "NSE_FO|61131",
+      "trading_symbol": "BOSCHLTD FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 25
+    },
+    {
+      "instrument_key": "NSE_FO|58136",
+      "trading_symbol": "BOSCHLTD FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 25
+    },
+    {
+      "instrument_key": "NSE_FO|68453",
+      "trading_symbol": "BOSCHLTD FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 25
+    }
+  ],
+  "BSE": [
+    {
+      "instrument_key": "NSE_FO|61134",
+      "trading_symbol": "BSE FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 200
+    },
+    {
+      "instrument_key": "NSE_FO|58141",
+      "trading_symbol": "BSE FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 200
+    },
+    {
+      "instrument_key": "NSE_FO|68456",
+      "trading_symbol": "BSE FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 200
+    }
+  ],
+  "BRITANNIA": [
+    {
+      "instrument_key": "NSE_FO|61133",
+      "trading_symbol": "BRITANNIA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|58140",
+      "trading_symbol": "BRITANNIA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|68455",
+      "trading_symbol": "BRITANNIA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 125
+    }
+  ],
+  "CANBK": [
+    {
+      "instrument_key": "NSE_FO|61136",
+      "trading_symbol": "CANBK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 6750
+    },
+    {
+      "instrument_key": "NSE_FO|58143",
+      "trading_symbol": "CANBK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 6750
+    },
+    {
+      "instrument_key": "NSE_FO|68458",
+      "trading_symbol": "CANBK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 6750
+    }
+  ],
+  "CAMS": [
+    {
+      "instrument_key": "NSE_FO|61135",
+      "trading_symbol": "CAMS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 825
+    },
+    {
+      "instrument_key": "NSE_FO|58142",
+      "trading_symbol": "CAMS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 825
+    },
+    {
+      "instrument_key": "NSE_FO|68457",
+      "trading_symbol": "CAMS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 825
+    }
+  ],
+  "CDSL": [
+    {
+      "instrument_key": "NSE_FO|61139",
+      "trading_symbol": "CDSL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 475
+    },
+    {
+      "instrument_key": "NSE_FO|58144",
+      "trading_symbol": "CDSL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 475
+    },
+    {
+      "instrument_key": "NSE_FO|68459",
+      "trading_symbol": "CDSL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 475
+    }
+  ],
+  "CHOLAFIN": [
+    {
+      "instrument_key": "NSE_FO|61141",
+      "trading_symbol": "CHOLAFIN FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|58146",
+      "trading_symbol": "CHOLAFIN FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|68461",
+      "trading_symbol": "CHOLAFIN FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 625
+    }
+  ],
+  "CGPOWER": [
+    {
+      "instrument_key": "NSE_FO|61140",
+      "trading_symbol": "CGPOWER FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 850
+    },
+    {
+      "instrument_key": "NSE_FO|58145",
+      "trading_symbol": "CGPOWER FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 850
+    },
+    {
+      "instrument_key": "NSE_FO|68460",
+      "trading_symbol": "CGPOWER FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 850
+    }
+  ],
+  "COALINDIA": [
+    {
+      "instrument_key": "NSE_FO|61143",
+      "trading_symbol": "COALINDIA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1350
+    },
+    {
+      "instrument_key": "NSE_FO|58148",
+      "trading_symbol": "COALINDIA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1350
+    },
+    {
+      "instrument_key": "NSE_FO|68463",
+      "trading_symbol": "COALINDIA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1350
+    }
+  ],
+  "CIPLA": [
+    {
+      "instrument_key": "NSE_FO|61142",
+      "trading_symbol": "CIPLA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 425
+    },
+    {
+      "instrument_key": "NSE_FO|58147",
+      "trading_symbol": "CIPLA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 425
+    },
+    {
+      "instrument_key": "NSE_FO|68462",
+      "trading_symbol": "CIPLA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 425
+    }
+  ],
+  "COFORGE": [
+    {
+      "instrument_key": "NSE_FO|61145",
+      "trading_symbol": "COFORGE FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 475
+    },
+    {
+      "instrument_key": "NSE_FO|58152",
+      "trading_symbol": "COFORGE FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 475
+    },
+    {
+      "instrument_key": "NSE_FO|68465",
+      "trading_symbol": "COFORGE FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 475
+    }
+  ],
+  "COCHINSHIP": [
+    {
+      "instrument_key": "NSE_FO|61144",
+      "trading_symbol": "COCHINSHIP FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 400
+    },
+    {
+      "instrument_key": "NSE_FO|58149",
+      "trading_symbol": "COCHINSHIP FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 400
+    },
+    {
+      "instrument_key": "NSE_FO|68464",
+      "trading_symbol": "COCHINSHIP FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 400
+    }
+  ],
+  "CONCOR": [
+    {
+      "instrument_key": "NSE_FO|61149",
+      "trading_symbol": "CONCOR FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1250
+    },
+    {
+      "instrument_key": "NSE_FO|58154",
+      "trading_symbol": "CONCOR FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1250
+    },
+    {
+      "instrument_key": "NSE_FO|68467",
+      "trading_symbol": "CONCOR FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1250
+    }
+  ],
+  "COLPAL": [
+    {
+      "instrument_key": "NSE_FO|61146",
+      "trading_symbol": "COLPAL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 275
+    },
+    {
+      "instrument_key": "NSE_FO|58153",
+      "trading_symbol": "COLPAL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 275
+    },
+    {
+      "instrument_key": "NSE_FO|68466",
+      "trading_symbol": "COLPAL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 275
+    }
+  ],
+  "FINNIFTY": [
+    {
+      "instrument_key": "NSE_FO|61091",
+      "trading_symbol": "FINNIFTY FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 60
+    },
+    {
+      "instrument_key": "NSE_FO|58070",
+      "trading_symbol": "FINNIFTY FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 60
+    },
+    {
+      "instrument_key": "NSE_FO|68391",
+      "trading_symbol": "FINNIFTY FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 60
+    }
+  ],
+  "BANKNIFTY": [
+    {
+      "instrument_key": "NSE_FO|61088",
+      "trading_symbol": "BANKNIFTY FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 30
+    },
+    {
+      "instrument_key": "NSE_FO|58067",
+      "trading_symbol": "BANKNIFTY FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 30
+    },
+    {
+      "instrument_key": "NSE_FO|68390",
+      "trading_symbol": "BANKNIFTY FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 30
+    }
+  ],
+  "VEDL": [
+    {
+      "instrument_key": "NSE_FO|61318",
+      "trading_symbol": "VEDL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1150
+    },
+    {
+      "instrument_key": "NSE_FO|58415",
+      "trading_symbol": "VEDL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1150
+    },
+    {
+      "instrument_key": "NSE_FO|68865",
+      "trading_symbol": "VEDL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1150
+    }
+  ],
+  "VBL": [
+    {
+      "instrument_key": "NSE_FO|61317",
+      "trading_symbol": "VBL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1275
+    },
+    {
+      "instrument_key": "NSE_FO|58414",
+      "trading_symbol": "VBL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1275
+    },
+    {
+      "instrument_key": "NSE_FO|68864",
+      "trading_symbol": "VBL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1275
+    }
+  ],
+  "VOLTAS": [
+    {
+      "instrument_key": "NSE_FO|61320",
+      "trading_symbol": "VOLTAS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 375
+    },
+    {
+      "instrument_key": "NSE_FO|58417",
+      "trading_symbol": "VOLTAS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 375
+    },
+    {
+      "instrument_key": "NSE_FO|68867",
+      "trading_symbol": "VOLTAS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 375
+    }
+  ],
+  "VMM": [
+    {
+      "instrument_key": "NSE_FO|61319",
+      "trading_symbol": "VMM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 4850
+    },
+    {
+      "instrument_key": "NSE_FO|58416",
+      "trading_symbol": "VMM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 4850
+    },
+    {
+      "instrument_key": "NSE_FO|68866",
+      "trading_symbol": "VMM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 4850
+    }
+  ],
+  "WIPRO": [
+    {
+      "instrument_key": "NSE_FO|61322",
+      "trading_symbol": "WIPRO FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 3000
+    },
+    {
+      "instrument_key": "NSE_FO|58419",
+      "trading_symbol": "WIPRO FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 3000
+    },
+    {
+      "instrument_key": "NSE_FO|68869",
+      "trading_symbol": "WIPRO FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 3000
+    }
+  ],
+  "WAAREEENER": [
+    {
+      "instrument_key": "NSE_FO|61321",
+      "trading_symbol": "WAAREEENER FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|58418",
+      "trading_symbol": "WAAREEENER FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|68868",
+      "trading_symbol": "WAAREEENER FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 175
+    }
+  ],
+  "YESBANK": [
+    {
+      "instrument_key": "NSE_FO|61323",
+      "trading_symbol": "YESBANK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 31100
+    },
+    {
+      "instrument_key": "NSE_FO|58420",
+      "trading_symbol": "YESBANK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 31100
+    },
+    {
+      "instrument_key": "NSE_FO|68870",
+      "trading_symbol": "YESBANK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 31100
+    }
+  ],
+  "ZYDUSLIFE": [
+    {
+      "instrument_key": "NSE_FO|61324",
+      "trading_symbol": "ZYDUSLIFE FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 900
+    },
+    {
+      "instrument_key": "NSE_FO|58421",
+      "trading_symbol": "ZYDUSLIFE FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 900
+    },
+    {
+      "instrument_key": "NSE_FO|68871",
+      "trading_symbol": "ZYDUSLIFE FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 900
+    }
+  ],
+  "UNITDSPR": [
+    {
+      "instrument_key": "NSE_FO|61314",
+      "trading_symbol": "UNITDSPR FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 400
+    },
+    {
+      "instrument_key": "NSE_FO|58409",
+      "trading_symbol": "UNITDSPR FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 400
+    },
+    {
+      "instrument_key": "NSE_FO|68861",
+      "trading_symbol": "UNITDSPR FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 400
+    }
+  ],
+  "UPL": [
+    {
+      "instrument_key": "NSE_FO|61316",
+      "trading_symbol": "UPL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1355
+    },
+    {
+      "instrument_key": "NSE_FO|58413",
+      "trading_symbol": "UPL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1355
+    },
+    {
+      "instrument_key": "NSE_FO|68863",
+      "trading_symbol": "UPL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1355
+    }
+  ],
+  "UNOMINDA": [
+    {
+      "instrument_key": "NSE_FO|61315",
+      "trading_symbol": "UNOMINDA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 550
+    },
+    {
+      "instrument_key": "NSE_FO|58412",
+      "trading_symbol": "UNOMINDA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 550
+    },
+    {
+      "instrument_key": "NSE_FO|68862",
+      "trading_symbol": "UNOMINDA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 550
+    }
+  ],
+  "SRF": [
+    {
+      "instrument_key": "NSE_FO|61295",
+      "trading_symbol": "SRF FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 200
+    },
+    {
+      "instrument_key": "NSE_FO|58390",
+      "trading_symbol": "SRF FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 200
+    },
+    {
+      "instrument_key": "NSE_FO|68788",
+      "trading_symbol": "SRF FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 200
+    }
+  ],
+  "SONACOMS": [
+    {
+      "instrument_key": "NSE_FO|61294",
+      "trading_symbol": "SONACOMS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1225
+    },
+    {
+      "instrument_key": "NSE_FO|58389",
+      "trading_symbol": "SONACOMS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1225
+    },
+    {
+      "instrument_key": "NSE_FO|68787",
+      "trading_symbol": "SONACOMS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1225
+    }
+  ],
+  "SUNPHARMA": [
+    {
+      "instrument_key": "NSE_FO|61296",
+      "trading_symbol": "SUNPHARMA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 350
+    },
+    {
+      "instrument_key": "NSE_FO|58391",
+      "trading_symbol": "SUNPHARMA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 350
+    },
+    {
+      "instrument_key": "NSE_FO|68789",
+      "trading_symbol": "SUNPHARMA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 350
+    }
+  ],
+  "SUZLON": [
+    {
+      "instrument_key": "NSE_FO|61298",
+      "trading_symbol": "SUZLON FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 12700
+    },
+    {
+      "instrument_key": "NSE_FO|58393",
+      "trading_symbol": "SUZLON FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 12700
+    },
+    {
+      "instrument_key": "NSE_FO|68791",
+      "trading_symbol": "SUZLON FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 12700
+    }
+  ],
+  "SUPREMEIND": [
+    {
+      "instrument_key": "NSE_FO|61297",
+      "trading_symbol": "SUPREMEIND FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|58392",
+      "trading_symbol": "SUPREMEIND FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|68790",
+      "trading_symbol": "SUPREMEIND FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 175
+    }
+  ],
+  "TATACONSUM": [
+    {
+      "instrument_key": "NSE_FO|61300",
+      "trading_symbol": "TATACONSUM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 550
+    },
+    {
+      "instrument_key": "NSE_FO|58395",
+      "trading_symbol": "TATACONSUM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 550
+    },
+    {
+      "instrument_key": "NSE_FO|68793",
+      "trading_symbol": "TATACONSUM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 550
+    }
+  ],
+  "SWIGGY": [
+    {
+      "instrument_key": "NSE_FO|61299",
+      "trading_symbol": "SWIGGY FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1825
+    },
+    {
+      "instrument_key": "NSE_FO|58394",
+      "trading_symbol": "SWIGGY FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1825
+    },
+    {
+      "instrument_key": "NSE_FO|68792",
+      "trading_symbol": "SWIGGY FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1825
+    }
+  ],
+  "TATAPOWER": [
+    {
+      "instrument_key": "NSE_FO|61302",
+      "trading_symbol": "TATAPOWER FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1450
+    },
+    {
+      "instrument_key": "NSE_FO|58397",
+      "trading_symbol": "TATAPOWER FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1450
+    },
+    {
+      "instrument_key": "NSE_FO|68795",
+      "trading_symbol": "TATAPOWER FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1450
+    }
+  ],
+  "TATAELXSI": [
+    {
+      "instrument_key": "NSE_FO|61301",
+      "trading_symbol": "TATAELXSI FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|58396",
+      "trading_symbol": "TATAELXSI FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|68794",
+      "trading_symbol": "TATAELXSI FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 125
+    }
+  ],
+  "TCS": [
+    {
+      "instrument_key": "NSE_FO|61304",
+      "trading_symbol": "TCS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 225
+    },
+    {
+      "instrument_key": "NSE_FO|58399",
+      "trading_symbol": "TCS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 225
+    },
+    {
+      "instrument_key": "NSE_FO|68797",
+      "trading_symbol": "TCS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 225
+    }
+  ],
+  "TATASTEEL": [
+    {
+      "instrument_key": "NSE_FO|61303",
+      "trading_symbol": "TATASTEEL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2750
+    },
+    {
+      "instrument_key": "NSE_FO|58398",
+      "trading_symbol": "TATASTEEL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2750
+    },
+    {
+      "instrument_key": "NSE_FO|68796",
+      "trading_symbol": "TATASTEEL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2750
+    }
+  ],
+  "TIINDIA": [
+    {
+      "instrument_key": "NSE_FO|61306",
+      "trading_symbol": "TIINDIA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 200
+    },
+    {
+      "instrument_key": "NSE_FO|58401",
+      "trading_symbol": "TIINDIA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 200
+    },
+    {
+      "instrument_key": "NSE_FO|68799",
+      "trading_symbol": "TIINDIA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 200
+    }
+  ],
+  "TECHM": [
+    {
+      "instrument_key": "NSE_FO|61305",
+      "trading_symbol": "TECHM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 600
+    },
+    {
+      "instrument_key": "NSE_FO|58400",
+      "trading_symbol": "TECHM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 600
+    },
+    {
+      "instrument_key": "NSE_FO|68798",
+      "trading_symbol": "TECHM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 600
+    }
+  ],
+  "PNB": [
+    {
+      "instrument_key": "NSE_FO|61274",
+      "trading_symbol": "PNB FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 8000
+    },
+    {
+      "instrument_key": "NSE_FO|58350",
+      "trading_symbol": "PNB FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 8000
+    },
+    {
+      "instrument_key": "NSE_FO|68766",
+      "trading_symbol": "PNB FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 8000
+    }
+  ],
+  "PIIND": [
+    {
+      "instrument_key": "NSE_FO|61273",
+      "trading_symbol": "PIIND FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|58349",
+      "trading_symbol": "PIIND FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|68765",
+      "trading_symbol": "PIIND FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 175
+    }
+  ],
+  "POLICYBZR": [
+    {
+      "instrument_key": "NSE_FO|61276",
+      "trading_symbol": "POLICYBZR FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 350
+    },
+    {
+      "instrument_key": "NSE_FO|58355",
+      "trading_symbol": "POLICYBZR FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 350
+    },
+    {
+      "instrument_key": "NSE_FO|68768",
+      "trading_symbol": "POLICYBZR FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 350
+    }
+  ],
+  "PNBHOUSING": [
+    {
+      "instrument_key": "NSE_FO|61275",
+      "trading_symbol": "PNBHOUSING FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 650
+    },
+    {
+      "instrument_key": "NSE_FO|58351",
+      "trading_symbol": "PNBHOUSING FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 650
+    },
+    {
+      "instrument_key": "NSE_FO|68767",
+      "trading_symbol": "PNBHOUSING FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 650
+    }
+  ],
+  "POLYCAB": [
+    {
+      "instrument_key": "NSE_FO|61277",
+      "trading_symbol": "POLYCAB FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|58356",
+      "trading_symbol": "POLYCAB FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|68769",
+      "trading_symbol": "POLYCAB FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 125
+    }
+  ],
+  "POWERINDIA": [
+    {
+      "instrument_key": "NSE_FO|61279",
+      "trading_symbol": "POWERINDIA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 25
+    },
+    {
+      "instrument_key": "NSE_FO|58358",
+      "trading_symbol": "POWERINDIA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 25
+    },
+    {
+      "instrument_key": "NSE_FO|68771",
+      "trading_symbol": "POWERINDIA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 25
+    }
+  ],
+  "POWERGRID": [
+    {
+      "instrument_key": "NSE_FO|61278",
+      "trading_symbol": "POWERGRID FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1900
+    },
+    {
+      "instrument_key": "NSE_FO|58357",
+      "trading_symbol": "POWERGRID FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1900
+    },
+    {
+      "instrument_key": "NSE_FO|68770",
+      "trading_symbol": "POWERGRID FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1900
+    }
+  ],
+  "PRESTIGE": [
+    {
+      "instrument_key": "NSE_FO|61281",
+      "trading_symbol": "PRESTIGE FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 450
+    },
+    {
+      "instrument_key": "NSE_FO|58360",
+      "trading_symbol": "PRESTIGE FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 450
+    },
+    {
+      "instrument_key": "NSE_FO|68773",
+      "trading_symbol": "PRESTIGE FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 450
+    }
+  ],
+  "PREMIERENE": [
+    {
+      "instrument_key": "NSE_FO|61280",
+      "trading_symbol": "PREMIERENE FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 650
+    },
+    {
+      "instrument_key": "NSE_FO|58359",
+      "trading_symbol": "PREMIERENE FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 650
+    },
+    {
+      "instrument_key": "NSE_FO|68772",
+      "trading_symbol": "PREMIERENE FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 650
+    }
+  ],
+  "RBLBANK": [
+    {
+      "instrument_key": "NSE_FO|61282",
+      "trading_symbol": "RBLBANK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 3175
+    },
+    {
+      "instrument_key": "NSE_FO|58368",
+      "trading_symbol": "RBLBANK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 3175
+    },
+    {
+      "instrument_key": "NSE_FO|68775",
+      "trading_symbol": "RBLBANK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 3175
+    }
+  ],
+  "RADICO": [
+    {
+      "instrument_key": "NSE_FO|58362",
+      "trading_symbol": "RADICO FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|58367",
+      "trading_symbol": "RADICO FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 150
+    },
+    {
+      "instrument_key": "NSE_FO|68774",
+      "trading_symbol": "RADICO FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 150
+    }
+  ],
+  "RELIANCE": [
+    {
+      "instrument_key": "NSE_FO|61284",
+      "trading_symbol": "RELIANCE FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|58371",
+      "trading_symbol": "RELIANCE FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|68777",
+      "trading_symbol": "RELIANCE FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 500
+    }
+  ],
+  "RECLTD": [
+    {
+      "instrument_key": "NSE_FO|61283",
+      "trading_symbol": "RECLTD FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1575
+    },
+    {
+      "instrument_key": "NSE_FO|58369",
+      "trading_symbol": "RECLTD FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1575
+    },
+    {
+      "instrument_key": "NSE_FO|68776",
+      "trading_symbol": "RECLTD FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1575
+    }
+  ],
+  "SAIL": [
+    {
+      "instrument_key": "NSE_FO|61286",
+      "trading_symbol": "SAIL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 4700
+    },
+    {
+      "instrument_key": "NSE_FO|58375",
+      "trading_symbol": "SAIL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 4700
+    },
+    {
+      "instrument_key": "NSE_FO|68779",
+      "trading_symbol": "SAIL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 4700
+    }
+  ],
+  "RVNL": [
+    {
+      "instrument_key": "NSE_FO|61285",
+      "trading_symbol": "RVNL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1925
+    },
+    {
+      "instrument_key": "NSE_FO|58374",
+      "trading_symbol": "RVNL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1925
+    },
+    {
+      "instrument_key": "NSE_FO|68778",
+      "trading_symbol": "RVNL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1925
+    }
+  ],
+  "SBICARD": [
+    {
+      "instrument_key": "NSE_FO|61287",
+      "trading_symbol": "SBICARD FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 800
+    },
+    {
+      "instrument_key": "NSE_FO|58376",
+      "trading_symbol": "SBICARD FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 800
+    },
+    {
+      "instrument_key": "NSE_FO|68780",
+      "trading_symbol": "SBICARD FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 800
+    }
+  ],
+  "SBIN": [
+    {
+      "instrument_key": "NSE_FO|61289",
+      "trading_symbol": "SBIN FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 750
+    },
+    {
+      "instrument_key": "NSE_FO|58382",
+      "trading_symbol": "SBIN FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 750
+    },
+    {
+      "instrument_key": "NSE_FO|68782",
+      "trading_symbol": "SBIN FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 750
+    }
+  ],
+  "SBILIFE": [
+    {
+      "instrument_key": "NSE_FO|61288",
+      "trading_symbol": "SBILIFE FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 375
+    },
+    {
+      "instrument_key": "NSE_FO|58377",
+      "trading_symbol": "SBILIFE FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 375
+    },
+    {
+      "instrument_key": "NSE_FO|68781",
+      "trading_symbol": "SBILIFE FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 375
+    }
+  ],
+  "SHRIRAMFIN": [
+    {
+      "instrument_key": "NSE_FO|61291",
+      "trading_symbol": "SHRIRAMFIN FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 825
+    },
+    {
+      "instrument_key": "NSE_FO|58386",
+      "trading_symbol": "SHRIRAMFIN FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 825
+    },
+    {
+      "instrument_key": "NSE_FO|68784",
+      "trading_symbol": "SHRIRAMFIN FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 825
+    }
+  ],
+  "SHREECEM": [
+    {
+      "instrument_key": "NSE_FO|61290",
+      "trading_symbol": "SHREECEM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 25
+    },
+    {
+      "instrument_key": "NSE_FO|58383",
+      "trading_symbol": "SHREECEM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 25
+    },
+    {
+      "instrument_key": "NSE_FO|68783",
+      "trading_symbol": "SHREECEM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 25
+    }
+  ],
+  "SOLARINDS": [
+    {
+      "instrument_key": "NSE_FO|61293",
+      "trading_symbol": "SOLARINDS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 50
+    },
+    {
+      "instrument_key": "NSE_FO|58388",
+      "trading_symbol": "SOLARINDS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 50
+    },
+    {
+      "instrument_key": "NSE_FO|68786",
+      "trading_symbol": "SOLARINDS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 50
+    }
+  ],
+  "SIEMENS": [
+    {
+      "instrument_key": "NSE_FO|61292",
+      "trading_symbol": "SIEMENS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|58387",
+      "trading_symbol": "SIEMENS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|68785",
+      "trading_symbol": "SIEMENS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 175
+    }
+  ],
+  "NESTLEIND": [
+    {
+      "instrument_key": "NSE_FO|61253",
+      "trading_symbol": "NESTLEIND FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|58330",
+      "trading_symbol": "NESTLEIND FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|68744",
+      "trading_symbol": "NESTLEIND FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 500
+    }
+  ],
+  "NBCC": [
+    {
+      "instrument_key": "NSE_FO|61252",
+      "trading_symbol": "NBCC FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 6500
+    },
+    {
+      "instrument_key": "NSE_FO|58329",
+      "trading_symbol": "NBCC FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 6500
+    },
+    {
+      "instrument_key": "NSE_FO|68743",
+      "trading_symbol": "NBCC FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 6500
+    }
+  ],
+  "NHPC": [
+    {
+      "instrument_key": "NSE_FO|61254",
+      "trading_symbol": "NHPC FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 6950
+    },
+    {
+      "instrument_key": "NSE_FO|58331",
+      "trading_symbol": "NHPC FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 6950
+    },
+    {
+      "instrument_key": "NSE_FO|68745",
+      "trading_symbol": "NHPC FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 6950
+    }
+  ],
+  "NMDC": [
+    {
+      "instrument_key": "NSE_FO|61255",
+      "trading_symbol": "NMDC FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 6750
+    },
+    {
+      "instrument_key": "NSE_FO|58332",
+      "trading_symbol": "NMDC FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 6750
+    },
+    {
+      "instrument_key": "NSE_FO|68748",
+      "trading_symbol": "NMDC FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 6750
+    }
+  ],
+  "NYKAA": [
+    {
+      "instrument_key": "NSE_FO|61258",
+      "trading_symbol": "NYKAA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 3125
+    },
+    {
+      "instrument_key": "NSE_FO|58334",
+      "trading_symbol": "NYKAA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 3125
+    },
+    {
+      "instrument_key": "NSE_FO|68751",
+      "trading_symbol": "NYKAA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 3125
+    }
+  ],
+  "NTPC": [
+    {
+      "instrument_key": "NSE_FO|61256",
+      "trading_symbol": "NTPC FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1500
+    },
+    {
+      "instrument_key": "NSE_FO|58333",
+      "trading_symbol": "NTPC FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1500
+    },
+    {
+      "instrument_key": "NSE_FO|68750",
+      "trading_symbol": "NTPC FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1500
+    }
+  ],
+  "OFSS": [
+    {
+      "instrument_key": "NSE_FO|61260",
+      "trading_symbol": "OFSS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 100
+    },
+    {
+      "instrument_key": "NSE_FO|58337",
+      "trading_symbol": "OFSS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 100
+    },
+    {
+      "instrument_key": "NSE_FO|68753",
+      "trading_symbol": "OFSS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 100
+    }
+  ],
+  "OBEROIRLTY": [
+    {
+      "instrument_key": "NSE_FO|61259",
+      "trading_symbol": "OBEROIRLTY FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 350
+    },
+    {
+      "instrument_key": "NSE_FO|58335",
+      "trading_symbol": "OBEROIRLTY FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 350
+    },
+    {
+      "instrument_key": "NSE_FO|68752",
+      "trading_symbol": "OBEROIRLTY FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 350
+    }
+  ],
+  "ONGC": [
+    {
+      "instrument_key": "NSE_FO|61262",
+      "trading_symbol": "ONGC FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 2250
+    },
+    {
+      "instrument_key": "NSE_FO|58339",
+      "trading_symbol": "ONGC FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 2250
+    },
+    {
+      "instrument_key": "NSE_FO|68755",
+      "trading_symbol": "ONGC FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 2250
+    }
+  ],
+  "OIL": [
+    {
+      "instrument_key": "NSE_FO|61261",
+      "trading_symbol": "OIL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1400
+    },
+    {
+      "instrument_key": "NSE_FO|58338",
+      "trading_symbol": "OIL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1400
+    },
+    {
+      "instrument_key": "NSE_FO|68754",
+      "trading_symbol": "OIL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1400
+    }
+  ],
+  "PATANJALI": [
+    {
+      "instrument_key": "NSE_FO|61264",
+      "trading_symbol": "PATANJALI FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1075
+    },
+    {
+      "instrument_key": "NSE_FO|58341",
+      "trading_symbol": "PATANJALI FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1075
+    },
+    {
+      "instrument_key": "NSE_FO|68757",
+      "trading_symbol": "PATANJALI FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1075
+    }
+  ],
+  "PAGEIND": [
+    {
+      "instrument_key": "NSE_FO|61263",
+      "trading_symbol": "PAGEIND FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 20
+    },
+    {
+      "instrument_key": "NSE_FO|58340",
+      "trading_symbol": "PAGEIND FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 20
+    },
+    {
+      "instrument_key": "NSE_FO|68756",
+      "trading_symbol": "PAGEIND FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 20
+    }
+  ],
+  "PERSISTENT": [
+    {
+      "instrument_key": "NSE_FO|61266",
+      "trading_symbol": "PERSISTENT FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|58343",
+      "trading_symbol": "PERSISTENT FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|68759",
+      "trading_symbol": "PERSISTENT FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 125
+    }
+  ],
+  "PAYTM": [
+    {
+      "instrument_key": "NSE_FO|61265",
+      "trading_symbol": "PAYTM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 725
+    },
+    {
+      "instrument_key": "NSE_FO|58342",
+      "trading_symbol": "PAYTM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 725
+    },
+    {
+      "instrument_key": "NSE_FO|68758",
+      "trading_symbol": "PAYTM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 725
+    }
+  ],
+  "PETRONET": [
+    {
+      "instrument_key": "NSE_FO|61267",
+      "trading_symbol": "PETRONET FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1900
+    },
+    {
+      "instrument_key": "NSE_FO|58344",
+      "trading_symbol": "PETRONET FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1900
+    },
+    {
+      "instrument_key": "NSE_FO|68760",
+      "trading_symbol": "PETRONET FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1900
+    }
+  ],
+  "PGEL": [
+    {
+      "instrument_key": "NSE_FO|61269",
+      "trading_symbol": "PGEL FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 950
+    },
+    {
+      "instrument_key": "NSE_FO|58346",
+      "trading_symbol": "PGEL FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 950
+    },
+    {
+      "instrument_key": "NSE_FO|68762",
+      "trading_symbol": "PGEL FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 950
+    }
+  ],
+  "PFC": [
+    {
+      "instrument_key": "NSE_FO|61268",
+      "trading_symbol": "PFC FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1300
+    },
+    {
+      "instrument_key": "NSE_FO|58345",
+      "trading_symbol": "PFC FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1300
+    },
+    {
+      "instrument_key": "NSE_FO|68761",
+      "trading_symbol": "PFC FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1300
+    }
+  ],
+  "PIDILITIND": [
+    {
+      "instrument_key": "NSE_FO|61272",
+      "trading_symbol": "PIDILITIND FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|58348",
+      "trading_symbol": "PIDILITIND FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 500
+    },
+    {
+      "instrument_key": "NSE_FO|68764",
+      "trading_symbol": "PIDILITIND FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 500
+    }
+  ],
+  "PHOENIXLTD": [
+    {
+      "instrument_key": "NSE_FO|61270",
+      "trading_symbol": "PHOENIXLTD FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 350
+    },
+    {
+      "instrument_key": "NSE_FO|58347",
+      "trading_symbol": "PHOENIXLTD FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 350
+    },
+    {
+      "instrument_key": "NSE_FO|68763",
+      "trading_symbol": "PHOENIXLTD FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 350
+    }
+  ],
+  "MUTHOOTFIN": [
+    {
+      "instrument_key": "NSE_FO|61248",
+      "trading_symbol": "MUTHOOTFIN FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 275
+    },
+    {
+      "instrument_key": "NSE_FO|58322",
+      "trading_symbol": "MUTHOOTFIN FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 275
+    },
+    {
+      "instrument_key": "NSE_FO|68737",
+      "trading_symbol": "MUTHOOTFIN FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 275
+    }
+  ],
+  "MPHASIS": [
+    {
+      "instrument_key": "NSE_FO|61247",
+      "trading_symbol": "MPHASIS FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 275
+    },
+    {
+      "instrument_key": "NSE_FO|58321",
+      "trading_symbol": "MPHASIS FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 275
+    },
+    {
+      "instrument_key": "NSE_FO|68736",
+      "trading_symbol": "MPHASIS FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 275
+    }
+  ],
+  "NAM-INDIA": [
+    {
+      "instrument_key": "NSE_FO|61249",
+      "trading_symbol": "NAM-INDIA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|58326",
+      "trading_symbol": "NAM-INDIA FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 625
+    },
+    {
+      "instrument_key": "NSE_FO|68738",
+      "trading_symbol": "NAM-INDIA FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 625
+    }
+  ],
+  "NAUKRI": [
+    {
+      "instrument_key": "NSE_FO|61251",
+      "trading_symbol": "NAUKRI FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 550
+    },
+    {
+      "instrument_key": "NSE_FO|58328",
+      "trading_symbol": "NAUKRI FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 550
+    },
+    {
+      "instrument_key": "NSE_FO|68742",
+      "trading_symbol": "NAUKRI FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 550
+    }
+  ],
+  "NATIONALUM": [
+    {
+      "instrument_key": "NSE_FO|61250",
+      "trading_symbol": "NATIONALUM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1875
+    },
+    {
+      "instrument_key": "NSE_FO|58327",
+      "trading_symbol": "NATIONALUM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1875
+    },
+    {
+      "instrument_key": "NSE_FO|68741",
+      "trading_symbol": "NATIONALUM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1875
+    }
+  ],
+  "TMPV": [
+    {
+      "instrument_key": "NSE_FO|61308",
+      "trading_symbol": "TMPV FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1600
+    },
+    {
+      "instrument_key": "NSE_FO|58403",
+      "trading_symbol": "TMPV FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 1600
+    },
+    {
+      "instrument_key": "NSE_FO|68801",
+      "trading_symbol": "TMPV FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 1600
+    }
+  ],
+  "TITAN": [
+    {
+      "instrument_key": "NSE_FO|61307",
+      "trading_symbol": "TITAN FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|58402",
+      "trading_symbol": "TITAN FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|68800",
+      "trading_symbol": "TITAN FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 175
+    }
+  ],
+  "TRENT": [
+    {
+      "instrument_key": "NSE_FO|61310",
+      "trading_symbol": "TRENT FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 225
+    },
+    {
+      "instrument_key": "NSE_FO|58405",
+      "trading_symbol": "TRENT FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 225
+    },
+    {
+      "instrument_key": "NSE_FO|68803",
+      "trading_symbol": "TRENT FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 225
+    }
+  ],
+  "TORNTPHARM": [
+    {
+      "instrument_key": "NSE_FO|61309",
+      "trading_symbol": "TORNTPHARM FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|58404",
+      "trading_symbol": "TORNTPHARM FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 125
+    },
+    {
+      "instrument_key": "NSE_FO|68802",
+      "trading_symbol": "TORNTPHARM FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 125
+    }
+  ],
+  "ULTRACEMCO": [
+    {
+      "instrument_key": "NSE_FO|61312",
+      "trading_symbol": "ULTRACEMCO FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 50
+    },
+    {
+      "instrument_key": "NSE_FO|58407",
+      "trading_symbol": "ULTRACEMCO FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 50
+    },
+    {
+      "instrument_key": "NSE_FO|68805",
+      "trading_symbol": "ULTRACEMCO FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 50
+    }
+  ],
+  "TVSMOTOR": [
+    {
+      "instrument_key": "NSE_FO|61311",
+      "trading_symbol": "TVSMOTOR FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|58406",
+      "trading_symbol": "TVSMOTOR FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 175
+    },
+    {
+      "instrument_key": "NSE_FO|68804",
+      "trading_symbol": "TVSMOTOR FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 175
+    }
+  ],
+  "UNIONBANK": [
+    {
+      "instrument_key": "NSE_FO|61313",
+      "trading_symbol": "UNIONBANK FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 4425
+    },
+    {
+      "instrument_key": "NSE_FO|58408",
+      "trading_symbol": "UNIONBANK FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 4425
+    },
+    {
+      "instrument_key": "NSE_FO|68806",
+      "trading_symbol": "UNIONBANK FUT 29 SEP 26",
+      "expiry_date": "2026-09-29",
+      "lot_size": 4425
+    }
+  ],
+  "NUVAMA": [
+    {
+      "instrument_key": "NSE_FO|61257",
+      "trading_symbol": "NUVAMA FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 500
+    }
+  ],
+  "EXIDEIND": [
+    {
+      "instrument_key": "NSE_FO|61166",
+      "trading_symbol": "EXIDEIND FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 1800
+    }
+  ],
+  "DALBHARAT": [
+    {
+      "instrument_key": "NSE_FO|61157",
+      "trading_symbol": "DALBHARAT FUT 28 JUL 26",
+      "expiry_date": "2026-07-28",
+      "lot_size": 325
+    },
+    {
+      "instrument_key": "NSE_FO|58158",
+      "trading_symbol": "DALBHARAT FUT 25 AUG 26",
+      "expiry_date": "2026-08-25",
+      "lot_size": 325
+    }
+  ]
+}

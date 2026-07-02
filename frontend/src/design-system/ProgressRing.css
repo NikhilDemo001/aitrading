@@ -1,0 +1,10 @@
+.mq-ring { position: relative; display: inline-flex; align-items: center; justify-content: center; }
+.mq-ring svg { display: block; }
+.mq-ring-track { stroke: rgba(255,255,255,0.07); }
+.mq-ring-bar { transition: stroke-dashoffset 0.6s var(--ease-float); }
+.mq-ring-profit .mq-ring-bar { stroke: var(--profit); filter: drop-shadow(0 0 6px rgba(var(--glow-green),0.7)); }
+.mq-ring-warn  .mq-ring-bar { stroke: var(--warn);   filter: drop-shadow(0 0 6px rgba(var(--glow-amber),0.7)); }
+.mq-ring-loss  .mq-ring-bar { stroke: var(--loss);   filter: drop-shadow(0 0 6px rgba(var(--glow-magenta),0.7)); }
+.mq-ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.mq-ring-label { font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; }
+.mq-ring-sub { font-family: var(--font-head); font-size: 0.5rem; letter-spacing: 0.08em; color: var(--ink-faint); text-transform: uppercase; margin-top: 2px; }

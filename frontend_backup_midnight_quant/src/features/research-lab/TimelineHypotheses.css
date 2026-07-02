@@ -1,0 +1,67 @@
+.mq-timeline-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mq-voice-text {
+  font-size: 0.82rem;
+  color: var(--ink);
+  line-height: 1.5;
+  margin: 0 0 8px 0;
+}
+
+.mq-voice-market {
+  font-size: 0.72rem;
+  margin: 0;
+}
+
+.mq-timeline-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+@media (max-width: 1100px) {
+  .mq-timeline-cols { grid-template-columns: 1fr; }
+}
+
+.mq-timeline-list {
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+.mq-timeline-item {
+  padding: 10px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.mq-timeline-item-hdr {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.mq-timeline-title {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.mq-timeline-detail {
+  font-size: 0.7rem;
+  color: var(--ink-dim);
+}
+
+.mq-timeline-result {
+  font-size: 0.68rem;
+  font-family: var(--font-mono);
+  margin-top: 3px;
+}
+
+.mq-timeline-empty {
+  padding: var(--space-4);
+  font-size: 0.72rem;
+}

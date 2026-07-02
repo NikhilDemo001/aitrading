@@ -1,0 +1,26 @@
+.mq-mae-empty {
+  font-size: 0.72rem;
+}
+
+.mq-mae-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mq-mae-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.7rem;
+}
+
+.mq-mae-sym {
+  font-weight: 600;
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.mq-mae-label {
+  font-family: var(--font-mono);
+}

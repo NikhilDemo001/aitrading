@@ -1,0 +1,70 @@
+.mq-feed-panel {
+  height: 420px;
+}
+
+.mq-feed-filters {
+  display: flex;
+  gap: 4px;
+}
+
+.mq-feed-filter {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  color: var(--ink-faint);
+  font-size: 0.6rem;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+
+.mq-feed-filter.active {
+  color: var(--accent);
+  border-color: rgba(0,240,255,0.4);
+  background: var(--accent-dim);
+}
+
+.mq-feed-search {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.mq-feed-search input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--ink);
+  font-size: 0.7rem;
+  padding: 5px 9px;
+}
+.mq-feed-search input:focus { outline: none; border-color: var(--accent); }
+
+.mq-feed-list {
+  overflow-y: auto;
+  height: calc(100% - 78px);
+}
+
+.mq-feed-row {
+  display: flex;
+  gap: 10px;
+  padding: 6px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size: 0.68rem;
+}
+
+.mq-feed-time {
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.mq-feed-msg {
+  color: var(--ink-dim);
+  overflow-wrap: anywhere;
+}
+
+.mq-feed-empty {
+  padding: var(--space-4);
+  font-size: 0.72rem;
+}

@@ -1,0 +1,44 @@
+.mq-ds-empty {
+  padding: var(--space-4);
+  font-size: 0.72rem;
+}
+
+.mq-ds-list {
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.mq-ds-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size: 0.68rem;
+}
+
+.mq-ds-sym {
+  font-weight: 600;
+  color: var(--ink);
+  min-width: 56px;
+  flex-shrink: 0;
+}
+
+.mq-ds-reason {
+  color: var(--ink-dim);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mq-ds-gate {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  flex-shrink: 0;
+}
+
+.mq-ds-time {
+  font-size: 0.6rem;
+  flex-shrink: 0;
+}

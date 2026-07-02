@@ -1,0 +1,11 @@
+.mq-hist-search {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--border); color: var(--ink);
+  font-family: var(--font-ui); font-size: 0.74rem; padding: 6px 10px; border-radius: var(--r-md); min-width: 220px;
+}
+.mq-hist-search:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.mq-hist-empty { padding: var(--space-5); text-align: center; }
+.mq-hist-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+.mq-hist-table th { text-align: left; font-family: var(--font-head); font-weight: 600; color: var(--ink-dim); padding: 8px var(--space-3); border-bottom: 1px solid var(--border); cursor: pointer; white-space: nowrap; user-select: none; }
+.mq-hist-table th:hover { color: var(--accent); }
+.mq-hist-table td { padding: 7px var(--space-3); border-bottom: 1px solid rgba(255,255,255,0.04); }
+.mq-hist-sym { font-family: var(--font-mono); font-weight: 600; }

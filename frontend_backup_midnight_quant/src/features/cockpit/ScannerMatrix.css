@@ -1,0 +1,66 @@
+.mq-scanner-empty {
+  padding: var(--space-4);
+  font-size: 0.72rem;
+}
+
+.mq-scanner-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.68rem;
+}
+
+.mq-scanner-table th {
+  text-align: left;
+  padding: 8px 14px;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+}
+
+.mq-scanner-table td {
+  padding: 7px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: var(--ink-dim);
+}
+
+.mq-scanner-sym {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: var(--ink) !important;
+}
+
+.mq-scanner-heat {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+  padding: var(--space-4);
+}
+
+.mq-heat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+}
+
+.mq-heat-profit  { background: var(--profit-dim); border-color: rgba(52,211,153,0.3); }
+.mq-heat-loss    { background: var(--loss-dim); border-color: rgba(244,63,94,0.3); }
+.mq-heat-neutral { background: rgba(255,255,255,0.03); }
+
+.mq-heat-sym {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.mq-heat-atr {
+  font-size: 0.62rem;
+  color: var(--ink-faint);
+}

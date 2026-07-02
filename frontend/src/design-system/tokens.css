@@ -1,0 +1,239 @@
+:root {
+  /* Neon Cyber-Terminal — base surfaces */
+  --bg: #07090E;
+  --bg-raised: #0C0F17;
+  --panel: rgba(15, 23, 42, 0.6);
+  --panel-solid: #0E1420;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  /* Accent — neon cyan */
+  --accent: #00F0FF;
+  --accent-dim: rgba(0, 240, 255, 0.14);
+  --accent-glow: rgba(0, 240, 255, 0.45);
+
+  /* Trading-mode accents */
+  --paper: #00F0FF;
+  --paper-glow: rgba(0, 240, 255, 0.5);
+  --live: #FF3B30;
+  --live-glow: rgba(255, 59, 48, 0.55);
+
+  /* Signal colors */
+  --profit: #00E676;
+  --profit-dim: rgba(0, 230, 118, 0.14);
+  --loss: #FF2D55;
+  --loss-dim: rgba(255, 45, 85, 0.14);
+  --warn: #FFB300;
+  --warn-dim: rgba(255, 179, 0, 0.14);
+  --info: #38BDF8;
+
+  /* Ink */
+  --ink: #EAF6F8;
+  --ink-dim: #9AA6B8;
+  --ink-faint: #5E6675;
+
+  /* Type */
+  --font-head: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', 'IBM Plex Mono', monospace;
+
+  /* Shape */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+
+  /* Neon glow tokens (RGB triplets for rgba() interpolation) */
+  --glow-cyan: 0, 240, 255;
+  --glow-green: 0, 230, 118;
+  --glow-magenta: 255, 45, 85;
+  --glow-amber: 255, 179, 0;
+  --glow-crimson: 255, 59, 48;
+
+  /* Elevation / glass */
+  --panel-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.40),
+    0 6px 14px rgba(0, 0, 0, 0.44),
+    0 18px 40px rgba(0, 0, 0, 0.50),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --panel-shadow-lift:
+    0 2px 4px rgba(0, 0, 0, 0.42),
+    0 12px 24px rgba(0, 0, 0, 0.50),
+    0 30px 60px rgba(0, 0, 0, 0.56),
+    0 0 0 1px rgba(0, 240, 255, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  --panel-glow-inset: inset 0 0 0 1px var(--border), inset 0 0 24px rgba(0, 240, 255, 0.05);
+  --blur-glass: blur(16px);
+  --ease-float: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Layout rhythm */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent-glow);
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.text-profit { color: var(--profit); }
+.text-loss { color: var(--loss); }
+.text-dim { color: var(--ink-dim); }
+.text-faint { color: var(--ink-faint); }
+
+/* Consistent on-brand focus ring everywhere (buttons, inputs, tabs, links) instead of the
+   browser-default blue outline, which clashed with the indigo palette. Only shows for
+   keyboard/programmatic focus (:focus-visible), not on mouse click. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* Dark themed scrollbars so the browser chrome matches the rest of the UI. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 240, 255, 0.35) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.3);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.5);
+  background-clip: padding-box;
+}
+
+/* ── Antigravity motion ────────────────────────────────────────────────────
+   Weightless entrance: elements drift up + fade + settle from a slight scale,
+   with a subtle rotate for the "floating into place" feel. Applied to grid/panel
+   children; stagger is driven by an inline `--i` index so cards land like dominoes. */
+@keyframes mq-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.mq-rise {
+  animation: mq-rise-in 0.55s var(--ease-float) both;
+  animation-delay: calc(var(--i, 0) * 0.06s);
+  will-change: transform, opacity;
+}
+
+/* When many children each carry .mq-rise, this container variant staggers them via
+   nth-child so callers don't have to hand-set --i on every element. */
+.mq-stagger > * {
+  animation: mq-rise-in 0.5s var(--ease-float) both;
+  will-change: transform, opacity;
+}
+.mq-stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.mq-stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.mq-stagger > *:nth-child(3) { animation-delay: 0.14s; }
+.mq-stagger > *:nth-child(4) { animation-delay: 0.20s; }
+.mq-stagger > *:nth-child(5) { animation-delay: 0.26s; }
+.mq-stagger > *:nth-child(6) { animation-delay: 0.32s; }
+.mq-stagger > *:nth-child(7) { animation-delay: 0.38s; }
+.mq-stagger > *:nth-child(8) { animation-delay: 0.44s; }
+
+/* Accessibility: honor reduced-motion by disabling all the float/entrance motion and
+   after-effects. Content still renders fully — just without the weightless choreography. */
+@media (prefers-reduced-motion: reduce) {
+  .mq-rise,
+  .mq-stagger > *,
+  .led-pulse,
+  .surface-live {
+    animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+  }
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.5);
+  background-clip: padding-box;
+}
+
+/* ── Neon LED + glow utilities ─────────────────────────────────────────────── */
+.led {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  box-shadow: 0 0 6px 1px rgba(94, 102, 117, 0.6);
+}
+.led-cyan    { background: var(--accent); box-shadow: 0 0 8px 1px rgba(var(--glow-cyan), 0.7); }
+.led-green   { background: var(--profit); box-shadow: 0 0 8px 1px rgba(var(--glow-green), 0.7); }
+.led-magenta { background: var(--loss);   box-shadow: 0 0 8px 1px rgba(var(--glow-magenta), 0.7); }
+.led-amber   { background: var(--warn);   box-shadow: 0 0 8px 1px rgba(var(--glow-amber), 0.7); }
+.led-crimson { background: var(--live);   box-shadow: 0 0 8px 1px rgba(var(--glow-crimson), 0.7); }
+.led-off     { background: var(--ink-faint); box-shadow: none; opacity: 0.5; }
+
+.led-pulse { animation: led-pulse 1.6s ease-out infinite; }
+@keyframes led-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(var(--led-rgb, 0,240,255), 0.55), 0 0 8px 1px rgba(var(--led-rgb, 0,240,255), 0.7); }
+  70%  { box-shadow: 0 0 0 8px rgba(var(--led-rgb, 0,240,255), 0),   0 0 8px 1px rgba(var(--led-rgb, 0,240,255), 0.7); }
+  100% { box-shadow: 0 0 0 0 rgba(var(--led-rgb, 0,240,255), 0),     0 0 8px 1px rgba(var(--led-rgb, 0,240,255), 0.7); }
+}
+.led-cyan.led-pulse    { --led-rgb: var(--glow-cyan); }
+.led-green.led-pulse   { --led-rgb: var(--glow-green); }
+.led-magenta.led-pulse { --led-rgb: var(--glow-magenta); }
+.led-amber.led-pulse   { --led-rgb: var(--glow-amber); }
+.led-crimson.led-pulse { --led-rgb: var(--glow-crimson); }
+
+.neon-text { text-shadow: 0 0 8px rgba(var(--glow-cyan), 0.55); }
+.neon-text-live { text-shadow: 0 0 10px rgba(var(--glow-crimson), 0.7); }
+
+/* Live-mode surface pulse (real capital); paper mode uses a steady cyan glow (no animation). */
+@keyframes live-pulse {
+  0%, 100% { box-shadow: 0 0 0 1px rgba(var(--glow-crimson), 0.5), 0 0 16px rgba(var(--glow-crimson), 0.35); }
+  50%      { box-shadow: 0 0 0 1px rgba(var(--glow-crimson), 0.9), 0 0 26px rgba(var(--glow-crimson), 0.6); }
+}
+.surface-live  { animation: live-pulse 2s ease-in-out infinite; border-color: rgba(var(--glow-crimson), 0.6) !important; }
+.surface-paper { box-shadow: 0 0 0 1px rgba(var(--glow-cyan), 0.4), 0 0 18px rgba(var(--glow-cyan), 0.28); border-color: rgba(var(--glow-cyan), 0.5) !important; }

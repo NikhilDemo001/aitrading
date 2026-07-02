@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="mq-grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7C6CFF"/>
+      <stop offset="100%" stop-color="#4C3ED9"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="#0A0B0F"/>
+  <rect x="2" y="2" width="28" height="28" rx="6" fill="url(#mq-grad)"/>
+  <path d="M8 21 L8 15 L12.5 19.5 L17 13 L21 17 L24 12" stroke="#0A0B0F" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="24" cy="12" r="1.6" fill="#34D399"/>
+</svg>

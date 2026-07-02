@@ -1,0 +1,49 @@
+.mq-btn {
+  font-family: var(--font-ui);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 8px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.mq-btn:active { transform: scale(0.96); }
+
+.mq-btn-ghost {
+  background: rgba(255,255,255,0.04);
+  color: var(--ink);
+}
+.mq-btn-ghost:hover { background: rgba(255,255,255,0.08); border-color: var(--border-strong); }
+
+.mq-btn-primary {
+  background: var(--accent);
+  color: #0A0B0F;
+  border-color: var(--accent);
+}
+.mq-btn-primary:hover { box-shadow: 0 0 0 3px var(--accent-dim); }
+
+.mq-btn-success {
+  background: var(--profit);
+  color: #062017;
+  border-color: var(--profit);
+}
+.mq-btn-success:hover { box-shadow: 0 0 0 3px var(--profit-dim); }
+
+.mq-btn-danger {
+  background: transparent;
+  color: var(--loss);
+  border-color: rgba(244,63,94,0.4);
+}
+.mq-btn-danger:hover { background: var(--loss-dim); }
+
+.mq-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+}
