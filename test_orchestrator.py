@@ -89,12 +89,29 @@ def test_decisions_log_records_skip_pick_and_trade_entries():
 
 
 def test_daily_loss_kill_switch_halts_and_flattens():
-    """A tiny max_daily_loss forces the kill switch to trip almost immediately and flatten
-    any open position — proves the orchestrator's RiskManager wiring is live, not decorative."""
-    orch = Orchestrator(broker=MockBroker(seed=9), config={"max_daily_loss": 0.01})
-    for _ in range(30):
-        orch.run_tick_for_all_symbols(now=IN_SESSION)
+    """Section 0 rule 2, live mode: once total daily P&L breaches -max_daily_loss, the next
+    tick must force-flatten every open position via the freeze path — not wait for the
+    position's own stop-loss. mode='live' because paper mode intentionally has no daily-loss
+    limit (the dashboard shows 'Unlimited (Paper Trading)'); MockBroker still means zero real
+    credentials or network. The position is seeded deep underwater with a stop so wide the
+    normal stop-loss exit can never fire — only the kill-switch flatten can close it, so this
+    proves the freeze wiring itself, deterministically (no seed luck)."""
+    orch = Orchestrator(broker=MockBroker(seed=9), config={"max_daily_loss": 500.0, "mode": "live"})
+    orch.open_positions["RELIANCE"] = {
+        "symbol": "RELIANCE", "instrument_key": "RELIANCE", "strategy": "ORB-Buy",
+        "direction": "LONG", "quantity": 10, "entry_price": 1000.0,
+        "entry_time": datetime(2026, 7, 1, 10, 0).isoformat(),
+        "stop_loss": 1.0, "target": 100000.0, "target_2": 100000.0,
+        "current_price": 940.0, "pnl": -600.0, "atr_at_entry": 5.0,
+        "regime": "trending_up", "htf_trend": "neutral", "market_context": {},
+    }
+    orch.run_tick_for_all_symbols(now=IN_SESSION)
     assert orch.open_positions == {}, "kill switch must force-flatten all open positions"
+    assert any("kill-switch" in t["reason"].lower() for t in orch.trade_history)
+    # The freeze must persist: no new entries for the rest of the session.
+    for _ in range(10):
+        orch.run_tick_for_all_symbols(now=IN_SESSION)
+    assert orch.open_positions == {}, "frozen session must not open new positions"
 
 
 def test_run_end_of_day_writes_history_snapshots(tmp_path, monkeypatch):

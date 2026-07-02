@@ -205,7 +205,13 @@ class Orchestrator:
 
     def run_tick_for_all_symbols(self, now: Optional[datetime] = None) -> None:
         now = now or datetime.now()
-        frozen, reason = self.risk.is_frozen(self._total_daily_pnl())
+        # RiskManager's daily-loss gate keys off `paper_trading` (paper = intentionally
+        # unlimited, matching the dashboard's "Unlimited (Paper Trading)"), but this config
+        # speaks `mode` — translate explicitly, exactly like the size_and_check call in
+        # tick() does, or the kill switch silently never fires (found via the freeze-path
+        # regression test below in test_orchestrator.py).
+        is_paper = self.config.get("mode", "paper") != "live"
+        frozen, reason = self.risk.is_frozen(self._total_daily_pnl(), paper_trading=is_paper)
         if frozen:
             if self.open_positions:
                 jsonl_logger.log_decision("skip", "ALL", reason, {"gate": "kill_switch"})
@@ -216,6 +222,14 @@ class Orchestrator:
             return
         for symbol in self.config["symbols"]:
             self.tick(symbol, instrument_key=symbol, now=now)
+        # Marks were just refreshed by the per-symbol pass — re-evaluate the kill switch so a
+        # breach discovered THIS tick flattens now rather than one full tick later (position
+        # P&L is only updated inside _manage_position, so the top-of-tick check always sees
+        # last tick's marks).
+        frozen, reason = self.risk.is_frozen(self._total_daily_pnl(), paper_trading=is_paper)
+        if frozen and self.open_positions:
+            jsonl_logger.log_decision("skip", "ALL", reason, {"gate": "kill_switch"})
+            self.ensure_flat(now)
 
 
 def run(iterations: int = 50, sleep_sec: float = 0.0) -> Orchestrator:
