@@ -1,9 +1,0 @@
-.mq-reco-list {
-  margin: 0;
-  padding-left: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 0.74rem;
-  color: var(--ink-dim);
-}
