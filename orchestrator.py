@@ -165,8 +165,12 @@ class Orchestrator:
             self._close_position(symbol, ltp, exit_reason, now)
 
     def _close_position(self, symbol: str, exit_price: float, reason: str, now: datetime) -> None:
-        pos = self.open_positions.pop(symbol)
+        # Place the exit order BEFORE removing the position from tracking: if the broker
+        # errors here in live mode, the position must stay in open_positions so the next
+        # tick retries — popping first would orphan a still-open live position.
+        pos = self.open_positions[symbol]
         self.execution.place_exit(symbol, pos["direction"], pos["quantity"], instrument_key=pos["instrument_key"])
+        self.open_positions.pop(symbol)
         pnl = (
             (exit_price - pos["entry_price"]) * pos["quantity"] if pos["direction"] == "LONG"
             else (pos["entry_price"] - exit_price) * pos["quantity"]
@@ -187,7 +191,14 @@ class Orchestrator:
         reason = self.risk.ensure_flat_reason(now)
         for symbol in list(self.open_positions.keys()):
             pos = self.open_positions[symbol]
-            self._close_position(symbol, pos.get("current_price", pos["entry_price"]), reason, now)
+            try:
+                self._close_position(symbol, pos.get("current_price", pos["entry_price"]), reason, now)
+            except Exception as e:
+                # One symbol's broker failure must not stop an emergency flatten of the
+                # rest; the failed position stays tracked and is retried next tick.
+                jsonl_logger.log_decision(
+                    "skip", symbol, f"Force-flatten failed, will retry: {e}", {"gate": "ensure_flat"}
+                )
 
     def run_end_of_day(self, now: Optional[datetime] = None) -> dict:
         """Section 3's run_end_of_day: rebuild the Lane-A leaderboard from the day's closed

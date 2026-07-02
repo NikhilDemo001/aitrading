@@ -134,6 +134,55 @@ def test_run_end_of_day_writes_history_snapshots(tmp_path, monkeypatch):
     assert history.load_leaderboard_asof(date_str) is not None
 
 
+def _make_pos(symbol: str, entry: float = 1000.0) -> dict:
+    return {
+        "symbol": symbol, "instrument_key": symbol, "strategy": "ORB-Buy",
+        "direction": "LONG", "quantity": 10, "entry_price": entry,
+        "entry_time": datetime(2026, 7, 1, 10, 0).isoformat(),
+        "stop_loss": entry - 10, "target": entry + 10, "target_2": entry + 10,
+        "current_price": entry, "pnl": 0.0, "atr_at_entry": 5.0,
+        "regime": "trending_up", "htf_trend": "neutral", "market_context": {},
+    }
+
+
+def test_failed_exit_keeps_position_tracked():
+    """Live-safety invariant: if the broker errors on the exit order, the position must
+    REMAIN in open_positions (so the next tick retries) and no trade record may be written.
+    Popping before the order is placed would orphan a live position from tracking."""
+    orch = Orchestrator(broker=MockBroker(seed=7))
+    orch.open_positions["RELIANCE"] = _make_pos("RELIANCE")
+
+    def boom(*a, **k):
+        raise RuntimeError("exchange rejected the exit order")
+    orch.execution.place_exit = boom
+
+    with pytest.raises(RuntimeError):
+        orch._close_position("RELIANCE", 990.0, "STOP LOSS", IN_SESSION)
+    assert "RELIANCE" in orch.open_positions, "failed exit must not drop the position from tracking"
+    assert orch.trade_history == [], "no trade record for an exit that never happened"
+    assert orch.daily_pnl == 0.0, "no P&L may be realized from a failed exit"
+
+
+def test_ensure_flat_continues_past_a_failing_symbol():
+    """During a force-flatten (kill switch / EOD), one symbol's broker error must not stop
+    the remaining positions from being closed."""
+    orch = Orchestrator(broker=MockBroker(seed=7))
+    orch.open_positions["RELIANCE"] = _make_pos("RELIANCE")
+    orch.open_positions["HDFCBANK"] = _make_pos("HDFCBANK", entry=1600.0)
+
+    real_place_exit = orch.execution.place_exit
+
+    def flaky(symbol, *a, **k):
+        if symbol == "RELIANCE":
+            raise RuntimeError("exchange rejected")
+        return real_place_exit(symbol, *a, **k)
+    orch.execution.place_exit = flaky
+
+    orch.ensure_flat(now=IN_SESSION)
+    assert "HDFCBANK" not in orch.open_positions, "healthy symbols must still be flattened"
+    assert "RELIANCE" in orch.open_positions, "failed symbol stays tracked for retry"
+
+
 def test_square_off_time_flattens_positions():
     orch = Orchestrator(broker=MockBroker(seed=11))
     # Manually open a position, then tick at a time past square_off_time.
