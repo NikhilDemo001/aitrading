@@ -114,6 +114,29 @@ def test_daily_loss_kill_switch_halts_and_flattens():
     assert orch.open_positions == {}, "frozen session must not open new positions"
 
 
+def test_weekly_drawdown_gate_blocks_new_entries(monkeypatch):
+    """Section 0: the weekly drawdown limit must gate new entries. The orchestrator derives
+    week-to-date realized P&L from the frozen kpi_daily history snapshots (prior days) plus
+    today's realized P&L. Regression: tick() used to hardcode weekly_pnl=0.0, making
+    RiskManager.check_weekly_drawdown permanently decorative."""
+    import history
+
+    # Prior-day snapshots deep in the red: breaches max(0.0001*capital, 5000) = 5000.
+    monkeypatch.setattr(
+        history, "load_kpi_daily",
+        lambda start=None, end=None: [{"snapshot_date": "2026-06-30", "net_pnl": -6000.0}],
+    )
+    orch = Orchestrator(
+        broker=MockBroker(seed=3),
+        config={"max_weekly_loss_abs": 5000.0, "max_weekly_loss_pct": 0.0001},
+    )
+    assert orch._weekly_pnl(IN_SESSION) == -6000.0
+    for _ in range(60):
+        orch.run_tick_for_all_symbols(now=IN_SESSION)
+    assert orch.open_positions == {}, "weekly drawdown breach must block all new entries"
+    assert orch.trade_history == [], "no trades may occur under a weekly drawdown halt"
+
+
 def test_run_end_of_day_writes_history_snapshots(tmp_path, monkeypatch):
     """DoD #9: after a session, run_end_of_day freezes the daily leaderboard/pattern/feature/KPI
     snapshots the date-range & as-of UI reads from."""

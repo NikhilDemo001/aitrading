@@ -22,7 +22,7 @@ tests) should target instead of main.py's dashboard-coupled loop.
 from __future__ import annotations
 
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 from broker_base import BrokerAdapter
@@ -78,6 +78,19 @@ class Orchestrator:
         unrealized = sum(p.get("pnl", 0.0) for p in self.open_positions.values())
         return self.daily_pnl + unrealized
 
+    def _weekly_pnl(self, now: datetime) -> float:
+        """Realized P&L over the trailing 7 calendar days: prior days come from the frozen
+        kpi_daily history snapshots (today's snapshot doesn't exist until run_end_of_day),
+        plus today's realized P&L. Feeds RiskManager.check_weekly_drawdown — previously this
+        was hardcoded 0.0, which made the weekly gate permanently decorative."""
+        try:
+            start = (now.date() - timedelta(days=7)).isoformat()
+            end = (now.date() - timedelta(days=1)).isoformat()
+            prior = sum(r.get("net_pnl") or 0.0 for r in history.load_kpi_daily(start, end))
+        except Exception:
+            prior = 0.0
+        return prior + self.daily_pnl
+
     def tick(self, symbol: str, instrument_key: str, now: datetime) -> None:
         """One symbol's worth of the per-tick loop body (Section 3 pseudocode)."""
         candles = self.execution.get_candles(instrument_key, self.config["timeframe"])
@@ -113,7 +126,7 @@ class Orchestrator:
             stop_loss=signal["stop_loss"],
             capital=self._capital(),
             total_pnl_today=self._total_daily_pnl(),
-            weekly_pnl=0.0,
+            weekly_pnl=self._weekly_pnl(now),
             open_positions=self.open_positions,
             trade_history=self.trade_history,
             now=now,
