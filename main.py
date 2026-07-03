@@ -226,6 +226,16 @@ def get_ist_now():
     """Returns a timezone-naive datetime representing Indian Standard Time (IST)."""
     return datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
 
+
+async def _off_loop(fn, *args, **kwargs):
+    """Run blocking work (network I/O, backtests, RL training) in the default executor so
+    the event loop — dashboard, WebSocket pushes, position exits — stays responsive.
+    Any sync call that can take more than ~100ms must go through this inside async code;
+    calling it directly on the loop freezes the entire server for its duration (observed
+    live: 30s+ stalls from research-lab candle fetches through a slow proxy)."""
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(None, functools.partial(fn, *args, **kwargs))
+
 async def get_warmed_up_candles(instrument_key, interval="5minute"):
     """
     Fetches historical candles from past days and merges them with today's
@@ -1102,9 +1112,9 @@ async def scanner_loop():
                         if os.path.exists("rl_policy.json"):
                             shutil.copyfile("rl_policy.json", "rl_policy_backup.json")
 
-                        # Validate proposed changes out-of-sample
+                        # Validate proposed changes out-of-sample (in executor — CPU-heavy)
                         from model_validator import validate_model_update
-                        approved = validate_model_update(trade_history, "rl_policy.json", "rl_policy_backup.json")
+                        approved = await _off_loop(validate_model_update, trade_history, "rl_policy.json", "rl_policy_backup.json")
                         if not approved and os.path.exists("rl_policy_backup.json"):
                             # Roll back policy if validation fails
                             shutil.copyfile("rl_policy_backup.json", "rl_policy.json")
@@ -1116,7 +1126,7 @@ async def scanner_loop():
                         try:
                             from learning_engine import QLearningAgent
                             agent = QLearningAgent()
-                            count = agent.batch_train_from_db("ai_research.db")
+                            count = await _off_loop(agent.batch_train_from_db, "ai_research.db")
                             log_scan("SYSTEM", f"AI RL Batch training completed. Trained on {count} historical trades.", "success")
                         except Exception as batch_err:
                             log_scan("SYSTEM", f"Error in offline RL batch training: {batch_err}", "danger")
@@ -1124,7 +1134,7 @@ async def scanner_loop():
                     # Trigger Autonomous AI Research Lab pipeline cycle
                     try:
                         import research_lab
-                        research_lab.run_autonomous_research_cycle()
+                        await _off_loop(research_lab.run_autonomous_research_cycle)
                         log_scan("SYSTEM", "Autonomous AI Research Lab cycle completed successfully.", "success")
                     except Exception as rl_cycle_err:
                         log_scan("SYSTEM", f"Error running autonomous AI Research Lab cycle: {rl_cycle_err}", "danger")
@@ -2550,7 +2560,9 @@ async def position_manager_loop():
                 if _research_ticks >= 10:
                     _research_ticks = 0
                     import research_lab
-                    research_lab.simulate_paper_trades_daily()
+                    # In executor: this does per-strategy, per-symbol candle fetches + a full
+                    # backtest — running it on the loop froze the whole server every 10s.
+                    await _off_loop(research_lab.simulate_paper_trades_daily)
         except Exception as ex:
             print(f"Error running paper trade simulation: {ex}")
 
