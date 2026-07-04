@@ -101,16 +101,16 @@
     "tick_size": 5.0,
     "lot_size": 1
   },
-  "SMLT": {
-    "instrument_key": "NSE_EQ|INE017W01010",
-    "name": "SARTHAK METALS LIMITED",
-    "tick_size": 1.0,
-    "lot_size": 1
-  },
   "VINYLINDIA": {
     "instrument_key": "NSE_EQ|INE250B01029",
     "name": "VINYL CHEMICALS (I) LTD.",
     "tick_size": 5.0,
+    "lot_size": 1
+  },
+  "SMLT": {
+    "instrument_key": "NSE_EQ|INE017W01010",
+    "name": "SARTHAK METALS LIMITED",
+    "tick_size": 1.0,
     "lot_size": 1
   },
   "IOLCP": {
@@ -377,18 +377,6 @@
     "tick_size": 1.0,
     "lot_size": 1
   },
-  "VELJAN": {
-    "instrument_key": "NSE_EQ|INE232E01013",
-    "name": "VELJAN DENISON LTD.",
-    "tick_size": 10.0,
-    "lot_size": 1
-  },
-  "EMMBI": {
-    "instrument_key": "NSE_EQ|INE753K01015",
-    "name": "EMMBI INDUSTRIES LIMITED",
-    "tick_size": 1.0,
-    "lot_size": 1
-  },
   "TEXMOPIPES": {
     "instrument_key": "NSE_EQ|INE141K01013",
     "name": "TEXMO PIPE & PRODUCTS LTD",
@@ -461,15 +449,15 @@
     "tick_size": 1.0,
     "lot_size": 1
   },
-  "AXISGOLD": {
+  "GOLDAXIS": {
     "instrument_key": "NSE_EQ|INF846K01W80",
-    "name": "AXIS MF - AXIS GOLD ETF",
+    "name": "AXISAMC-GOLDAXIS",
     "tick_size": 1.0,
     "lot_size": 1
   },
-  "AXISNIFTY": {
+  "NIFTYAXIS": {
     "instrument_key": "NSE_EQ|INF846K01W98",
-    "name": "AXISAMC - AXISNIFTY",
+    "name": "AXISAMC-NIFTYAXIS",
     "tick_size": 1.0,
     "lot_size": 1
   },
@@ -953,15 +941,15 @@
     "tick_size": 1.0,
     "lot_size": 1
   },
-  "GOLD1": {
-    "instrument_key": "NSE_EQ|INF174KA1HJ8",
-    "name": "KOTAK GOLD ETF",
-    "tick_size": 1.0,
-    "lot_size": 1
-  },
   "KAYA": {
     "instrument_key": "NSE_EQ|INE587G01015",
     "name": "KAYA LIMITED",
+    "tick_size": 1.0,
+    "lot_size": 1
+  },
+  "GOLD1": {
+    "instrument_key": "NSE_EQ|INF174KA1HJ8",
+    "name": "KOTAK GOLD ETF",
     "tick_size": 1.0,
     "lot_size": 1
   },
@@ -1277,15 +1265,15 @@
     "tick_size": 1.0,
     "lot_size": 1
   },
-  "AXISHCETF": {
+  "HEALTHAXIS": {
     "instrument_key": "NSE_EQ|INF846K01Z12",
-    "name": "AXISAMC - AXISHCETF",
+    "name": "AXISAMC-HEALTHAXIS",
     "tick_size": 1.0,
     "lot_size": 1
   },
-  "AXISTECETF": {
+  "ITAXIS": {
     "instrument_key": "NSE_EQ|INF846K01Y96",
-    "name": "AXISAMC - AXISTECETF",
+    "name": "AXISAMC-ITAXIS",
     "tick_size": 1.0,
     "lot_size": 1
   },
@@ -1313,9 +1301,9 @@
     "tick_size": 50.0,
     "lot_size": 1
   },
-  "AXISBNKETF": {
+  "BNKETFAXIS": {
     "instrument_key": "NSE_EQ|INF846K01X63",
-    "name": "AXISAMC - AXISBNKETF",
+    "name": "AXISAMC-BNKETFAXIS",
     "tick_size": 1.0,
     "lot_size": 1
   },
@@ -1575,12 +1563,6 @@
     "instrument_key": "NSE_EQ|INE411D01023",
     "name": "SKM EGG PROD EXPORT(I) LT",
     "tick_size": 5.0,
-    "lot_size": 1
-  },
-  "KILITCH": {
-    "instrument_key": "NSE_EQ|INE729D01010",
-    "name": "KILITCH DRUGS INDIA LTD",
-    "tick_size": 1.0,
     "lot_size": 1
   },
   "NEPHROPLUS": {
@@ -1943,12 +1925,6 @@
     "tick_size": 5.0,
     "lot_size": 1
   },
-  "DELPHIFX": {
-    "instrument_key": "NSE_EQ|INE726L01027",
-    "name": "DELPHI WORLD MONEY LTD",
-    "tick_size": 1.0,
-    "lot_size": 1
-  },
   "TATACAP": {
     "instrument_key": "NSE_EQ|INE976I01016",
     "name": "TATA CAPITAL LIMITED",
@@ -2043,12 +2019,6 @@
     "instrument_key": "NSE_EQ|INE025R01021",
     "name": "ARTEMIS MED SERVICE LTD",
     "tick_size": 5.0,
-    "lot_size": 1
-  },
-  "VARDHACRLC": {
-    "instrument_key": "NSE_EQ|INE116G01013",
-    "name": "VARDHAMAN ACRYLICS LTD",
-    "tick_size": 1.0,
     "lot_size": 1
   },
   "BAJAJHLDNG": {
@@ -2483,9 +2453,9 @@
     "tick_size": 5.0,
     "lot_size": 1
   },
-  "AXISILVER": {
+  "SILVERAXIS": {
     "instrument_key": "NSE_EQ|INF846K011K1",
-    "name": "AXISAMC - AXISILVER",
+    "name": "AXISAMC-SILVERAXIS",
     "tick_size": 1.0,
     "lot_size": 1
   },
@@ -2543,12 +2513,6 @@
     "tick_size": 1.0,
     "lot_size": 1
   },
-  "URAVIDEF": {
-    "instrument_key": "NSE_EQ|INE568Z01015",
-    "name": "URAVI DEFENCE &TECH LTD",
-    "tick_size": 1.0,
-    "lot_size": 1
-  },
   "ICICIPRULI": {
     "instrument_key": "NSE_EQ|INE726G01019",
     "name": "ICICI PRU LIFE INS CO LTD",
@@ -2597,9 +2561,9 @@
     "tick_size": 1.0,
     "lot_size": 1
   },
-  "AXSENSEX": {
+  "SENSEXAXIS": {
     "instrument_key": "NSE_EQ|INF846K010Q0",
-    "name": "AXISAMC - AXSENSEX",
+    "name": "AXISAMC-SENSEXAXIS",
     "tick_size": 1.0,
     "lot_size": 1
   },
@@ -2837,12 +2801,6 @@
     "tick_size": 5.0,
     "lot_size": 1
   },
-  "MICEL": {
-    "instrument_key": "NSE_EQ|INE287C01037",
-    "name": "MIC ELECTRONICS LTD",
-    "tick_size": 1.0,
-    "lot_size": 1
-  },
   "KARURVYSYA": {
     "instrument_key": "NSE_EQ|INE036D01028",
     "name": "KARUR VYSYA BANK LTD",
@@ -2889,12 +2847,6 @@
     "instrument_key": "NSE_EQ|INE169A01031",
     "name": "COROMANDEL INTERNTL. LTD",
     "tick_size": 10.0,
-    "lot_size": 1
-  },
-  "GEECEE": {
-    "instrument_key": "NSE_EQ|INE916G01016",
-    "name": "GEECEE VENTURES LIMITED",
-    "tick_size": 5.0,
     "lot_size": 1
   },
   "RANEHOLDIN": {
@@ -3323,9 +3275,9 @@
     "tick_size": 10.0,
     "lot_size": 1
   },
-  "AXISCETF": {
+  "CONSUMAXIS": {
     "instrument_key": "NSE_EQ|INF846K016C7",
-    "name": "AXISAMC - AXISCETF",
+    "name": "AXISAMC-CONSUMAXIS",
     "tick_size": 1.0,
     "lot_size": 1
   },
@@ -4214,12 +4166,6 @@
   "MODTHREAD": {
     "instrument_key": "NSE_EQ|INE794W01014",
     "name": "MODERN THREADS INDIA LTD",
-    "tick_size": 1.0,
-    "lot_size": 1
-  },
-  "OMFREIGHT": {
-    "instrument_key": "NSE_EQ|INE1BZC01019",
-    "name": "OM FREIGHT FORWARDERS LTD",
     "tick_size": 1.0,
     "lot_size": 1
   },
@@ -5171,12 +5117,6 @@
     "tick_size": 5.0,
     "lot_size": 1
   },
-  "SUTLEJTEX": {
-    "instrument_key": "NSE_EQ|INE645H01027",
-    "name": "SUTLEJ TEXT & INDUS LTD",
-    "tick_size": 1.0,
-    "lot_size": 1
-  },
   "MASTERTR": {
     "instrument_key": "NSE_EQ|INE677D01037",
     "name": "MASTER TRUST LIMITED",
@@ -5573,16 +5513,16 @@
     "tick_size": 1.0,
     "lot_size": 1
   },
-  "MAITHANALL": {
-    "instrument_key": "NSE_EQ|INE683C01011",
-    "name": "MAITHAN ALLOYS LTD",
-    "tick_size": 10.0,
-    "lot_size": 1
-  },
   "WAAREEINDO": {
     "instrument_key": "NSE_EQ|INE866K01023",
     "name": "INDOSOLAR LIMITED",
     "tick_size": 5.0,
+    "lot_size": 1
+  },
+  "MAITHANALL": {
+    "instrument_key": "NSE_EQ|INE683C01011",
+    "name": "MAITHAN ALLOYS LTD",
+    "tick_size": 10.0,
     "lot_size": 1
   },
   "PARKHOSPS": {
@@ -6048,7 +5988,7 @@
     "lot_size": 1
   },
   "MBAPL": {
-    "instrument_key": "NSE_EQ|INE900L01010",
+    "instrument_key": "NSE_EQ|INE900L01028",
     "name": "MADHYA BHARAT AGRO P. LTD",
     "tick_size": 5.0,
     "lot_size": 1
@@ -6104,12 +6044,6 @@
   "HLVLTD": {
     "instrument_key": "NSE_EQ|INE102A01024",
     "name": "HLV LIMITED",
-    "tick_size": 1.0,
-    "lot_size": 1
-  },
-  "NECCLTD": {
-    "instrument_key": "NSE_EQ|INE553C01016",
-    "name": "NORTH EAST CARRY CORP LTD",
     "tick_size": 1.0,
     "lot_size": 1
   },
@@ -8333,6 +8267,18 @@
     "tick_size": 1.0,
     "lot_size": 1
   },
+  "MIDQ50ADD": {
+    "instrument_key": "NSE_EQ|INF740KA1ZF3",
+    "name": "DSPAMC - DSPQ50ETF",
+    "tick_size": 1.0,
+    "lot_size": 1
+  },
+  "HEALTHADD": {
+    "instrument_key": "NSE_EQ|INF740KA1ZG1",
+    "name": "DSPAMC - HEALTHADD",
+    "tick_size": 1.0,
+    "lot_size": 1
+  },
   "FMCGADD": {
     "instrument_key": "NSE_EQ|INF740KA1ZA4",
     "name": "DSPAMC - FMCGADD",
@@ -8927,16 +8873,16 @@
     "tick_size": 1.0,
     "lot_size": 1
   },
-  "CHOICEIN": {
-    "instrument_key": "NSE_EQ|INE102B01014",
-    "name": "CHOICE INTERNATIONAL LTD",
-    "tick_size": 5.0,
-    "lot_size": 1
-  },
   "AMIRCHAND": {
     "instrument_key": "NSE_EQ|INE05TO01019",
     "name": "AMIR CHAND JAG KUM (E) L",
     "tick_size": 1.0,
+    "lot_size": 1
+  },
+  "CHOICEIN": {
+    "instrument_key": "NSE_EQ|INE102B01014",
+    "name": "CHOICE INTERNATIONAL LTD",
+    "tick_size": 5.0,
     "lot_size": 1
   },
   "WILLAMAGOR": {
@@ -9227,6 +9173,12 @@
     "tick_size": 5.0,
     "lot_size": 1
   },
+  "KRISHANA": {
+    "instrument_key": "NSE_EQ|INE506W01020",
+    "name": "KRISHANA PHOSCHEM LIMITED",
+    "tick_size": 5.0,
+    "lot_size": 1
+  },
   "SURYALA": {
     "instrument_key": "NSE_EQ|INE132C01027",
     "name": "SURYALATA SPINNING MILL L",
@@ -9269,12 +9221,6 @@
     "tick_size": 1.0,
     "lot_size": 1
   },
-  "KRISHANA": {
-    "instrument_key": "NSE_EQ|INE506W01012",
-    "name": "KRISHANA PHOSCHEM LIMITED",
-    "tick_size": 5.0,
-    "lot_size": 1
-  },
   "PLASTIBLEN": {
     "instrument_key": "NSE_EQ|INE083C01022",
     "name": "PLASTIBLENDS INDIA LTD",
@@ -9305,16 +9251,16 @@
     "tick_size": 5.0,
     "lot_size": 1
   },
-  "ASKAUTOLTD": {
-    "instrument_key": "NSE_EQ|INE491J01022",
-    "name": "ASK AUTOMOTIVE LIMITED",
-    "tick_size": 5.0,
-    "lot_size": 1
-  },
   "UFO": {
     "instrument_key": "NSE_EQ|INE527H01019",
     "name": "UFO MOVIEZ INDIA LTD.",
     "tick_size": 1.0,
+    "lot_size": 1
+  },
+  "ASKAUTOLTD": {
+    "instrument_key": "NSE_EQ|INE491J01022",
+    "name": "ASK AUTOMOTIVE LIMITED",
+    "tick_size": 5.0,
     "lot_size": 1
   },
   "IDFNIFTYET": {
@@ -9567,12 +9513,6 @@
     "instrument_key": "NSE_EQ|INE372A01015",
     "name": "APAR INDUSTRIES LTD.",
     "tick_size": 100.0,
-    "lot_size": 1
-  },
-  "MIDQ50ADD": {
-    "instrument_key": "NSE_EQ|INF740KA1QL0",
-    "name": "DSPAMC - DSPQ50ETF",
-    "tick_size": 1.0,
     "lot_size": 1
   },
   "EQUAL50ADD": {
@@ -9860,12 +9800,6 @@
   "LIQUIDADD": {
     "instrument_key": "NSE_EQ|INF740KA1UM0",
     "name": "DSPAMC - LIQUIDADD",
-    "tick_size": 1.0,
-    "lot_size": 1
-  },
-  "HEALTHADD": {
-    "instrument_key": "NSE_EQ|INF740KA1UF4",
-    "name": "DSPAMC - HEALTHADD",
     "tick_size": 1.0,
     "lot_size": 1
   },
@@ -11285,9 +11219,9 @@
     "tick_size": 5.0,
     "lot_size": 1
   },
-  "AXISVALUE": {
+  "VALUEAXIS": {
     "instrument_key": "NSE_EQ|INF846KA1119",
-    "name": "AXISAMC - AXISVALUE",
+    "name": "AXISAMC-VALUEAXIS",
     "tick_size": 1.0,
     "lot_size": 1
   },
@@ -12179,12 +12113,6 @@
     "tick_size": 10.0,
     "lot_size": 1
   },
-  "SHYAMCENT": {
-    "instrument_key": "NSE_EQ|INE979R01011",
-    "name": "SHYAM CENTURY FERROUS LTD",
-    "tick_size": 1.0,
-    "lot_size": 1
-  },
   "GRAVISSHO": {
     "instrument_key": "NSE_EQ|INE214F01026",
     "name": "GRAVISS HOSPITALITY LTD.",
@@ -13004,12 +12932,6 @@
   "JUBLPHARMA": {
     "instrument_key": "NSE_EQ|INE700A01033",
     "name": "JUBILANT PHARMOVA LTD",
-    "tick_size": 5.0,
-    "lot_size": 1
-  },
-  "BLISSGVS": {
-    "instrument_key": "NSE_EQ|INE416D01022",
-    "name": "BLISS GVS PHARMA LTD",
     "tick_size": 5.0,
     "lot_size": 1
   },
