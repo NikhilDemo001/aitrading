@@ -5,11 +5,10 @@ import json
 import asyncio
 import functools
 import threading
-from datetime import datetime, timezone, timedelta, time as datetime_time
+from datetime import datetime, timedelta, time as datetime_time, UTC
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, Depends, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import RedirectResponse, HTMLResponse, FileResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
@@ -23,9 +22,6 @@ def round_to_tick(price, tick_size=0.05):
 from strategies import (
     calculate_ema, calculate_vwap, calculate_atr, calculate_rsi,
     detect_market_regime, get_htf_trend, select_best_strategy,
-    check_orb_strategy, check_vwap_pullback_strategy,
-    check_momentum_breakout_strategy, check_mean_reversion_strategy,
-    check_trend_following_strategy,
 )
 from analytics import calculate_metrics, analyze_by_strategy, generate_session_report, get_adaptive_strategy_order
 from signal_quality import evaluate_signal, calculate_kelly_risk
@@ -224,7 +220,7 @@ async def add_no_cache_header(request: Request, call_next):
 # ─── Timezone Helper ───────────────────────────────────────────────────────────
 def get_ist_now():
     """Returns a timezone-naive datetime representing Indian Standard Time (IST)."""
-    return datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
+    return datetime.now(UTC).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
 
 
 async def _off_loop(fn, *args, **kwargs):
@@ -371,7 +367,6 @@ import jsonl_logger  # data/wins.jsonl, losses.jsonl, decisions.log (Section 6)
 import leaderboard   # data/strategy_stats.json — Lane A recency-weighted selector bias (Section 5A)
 import history       # data/history/* daily learning snapshots — powers the date/as-of/compare UI (Section 6)
 import lane_b        # Lane B EOD: Claude/heuristic lessons + parked proposals (gated, no spend by default)
-import promotion_gate  # data/proposals.jsonl lifecycle + Promotion Gate (Section 5)
 
 # ─── Global State ──────────────────────────────────────────────────────────────
 bot_running = False
@@ -1190,9 +1185,6 @@ async def scanner_loop():
                 continue
         watchlist = cfg.get("watchlist", [])
         max_positions = int(cfg.get("max_open_positions", 3))
-        max_loss = float(cfg.get("max_daily_loss", 1000.0))
-        trailing_enabled = cfg.get("enable_trailing_stop", True)
-        trailing_mult = float(cfg.get("trailing_atr_multiplier", 1.5))
 
         if not client.access_token:
             log_scan("SYSTEM", "Access token missing — please authenticate first.", "danger")
@@ -1431,7 +1423,7 @@ async def scan_for_entries(watchlist, max_positions, paper_trading):
             try:
                 from strategy_support_resistance import _get_daily_levels as _get_sr_daily_levels
                 pdh, pdl, pdc = _get_sr_daily_levels(client, inst["instrument_key"], today)
-            except Exception as pdl_err:
+            except Exception:
                 pass  # Non-critical: liquidity check will just skip PDH/PDL
 
             # H7: Run Institutional Engine for enhanced signal scoring
@@ -1450,8 +1442,6 @@ async def scan_for_entries(watchlist, max_positions, paper_trading):
                 # Relative Strength vs Nifty
                 nifty_candles_5m = await get_warmed_up_candles(_NIFTY_KEY, "5minute")
                 rel_strength = ie.check_relative_strength(candles_5m, nifty_candles_5m)
-                # MTF confirmation from 1H candles
-                is_long_signal = True  # Will be updated once signal direction known
                 
                 # Score institutional factors
                 if bos_bull:
@@ -1472,7 +1462,7 @@ async def scan_for_entries(watchlist, max_positions, paper_trading):
                 elif rel_strength == "Weak":
                     inst_score -= 1
                     inst_details.append("RS Weak vs Nifty")
-            except Exception as ie_err:
+            except Exception:
                 pass  # Non-critical: institutional engine is additive
 
             # Lane A (Section 5A): prefer the leaderboard's recency-weighted, regime/time-bucket
@@ -1550,7 +1540,7 @@ async def scan_for_entries(watchlist, max_positions, paper_trading):
                             _matrix_set(symbol, f"stale signal: {price_drift_pct:.2%} drift", "filtered", candles_5m, strategy=signal.get("strategy"))
                             signals_filtered += 1
                             continue
-                except Exception as slip_err:
+                except Exception:
                     pass  # Non-critical: proceed without slippage check if quote fetch fails
 
             # Scale targets if VIX is active
@@ -3425,7 +3415,7 @@ def get_chart(symbol: str):
 
 
 @app.get("/api/backtest/{symbol}")
-def backtest_symbol(symbol: str, days: int = 30, slippage_pct: float = None):
+def backtest_symbol(symbol: str, days: int = 30, slippage_pct: float | None = None):
     """
     Runs VWAPTrendPullback backtest on historical 5-min candles.
     ?days=30  — look back this many calendar days (max 90).
@@ -3465,474 +3455,18 @@ def backtest_symbol(symbol: str, days: int = 30, slippage_pct: float = None):
         raise HTTPException(500, str(e))
 
 
-# ─── AI Research Lab API Routes ────────────────────────────────────────────────
+# ─── API routers (extracted per docs/AUDIT-2026-07-04.md P3-14) ───────────────────────
 
-@app.get("/api/research/summary")
-def get_research_summary():
-    try:
-        import research_lab
-        conn = research_lab.get_db_connection()
-        cursor = conn.cursor()
-        
-        cursor.execute("SELECT status, COUNT(*) as cnt FROM strategies GROUP BY status;")
-        rows = cursor.fetchall()
-        
-        counts = {
-            "Idea Generated": 0,
-            "Backtesting": 0,
-            "Walk Forward Testing": 0,
-            "Validation": 0,
-            "Paper Trading": 0,
-            "Live Candidate": 0,
-            "Ready For Review": 0,
-            "Approved": 0,
-            "Retired": 0,
-            "Rejected": 0
-        }
-        total = 0
-        for r in rows:
-            status = r["status"]
-            cnt = r["cnt"]
-            if status in counts:
-                counts[status] = cnt
-            total += cnt
-            
-        conn.close()
-        return {
-            "total_strategies": total,
-            "under_research": counts["Idea Generated"],
-            "backtesting": counts["Backtesting"],
-            "walkforward": counts["Walk Forward Testing"],
-            "validation": counts["Validation"],
-            "papertrading": counts["Paper Trading"],
-            "live_candidates": counts["Live Candidate"],
-            "approved": counts["Approved"],
-            "retired": counts["Retired"],
-            "rejected": counts["Rejected"]
-        }
-    except Exception as e:
-        raise HTTPException(500, str(e))
+from routers import history as history_router
+from routers import lane_b as lane_b_router
+from routers import research as research_router
 
+history_router.configure(get_now=get_ist_now, get_config=lambda: client.config)
+lane_b_router.configure(get_config=lambda: client.config)
 
-@app.get("/api/research/strategies")
-def get_research_strategies():
-    try:
-        import research_lab
-        return research_lab.get_all_strategies()
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/research/strategy/{strategy_id}")
-def get_research_strategy(strategy_id: str):
-    try:
-        import research_lab
-        details = research_lab.get_strategy_details(strategy_id)
-        if not details:
-            raise HTTPException(404, f"Strategy {strategy_id} not found")
-        return details
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.post("/api/research/discover")
-async def discover_strategies_endpoint(count: int = 5):
-    try:
-        import research_lab
-        discovered = research_lab.discover_strategies(count)
-        return {"status": "success", "discovered": discovered}
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.post("/api/research/backtest")
-async def backtest_strategy_endpoint(strategy_id: str, version: int = 1):
-    try:
-        import research_lab
-        v_id = research_lab.backtest_strategy(strategy_id, version)
-        if v_id is None:
-            raise HTTPException(404, f"Strategy/Version not found")
-        return {"status": "success", "version_id": v_id}
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.post("/api/research/validate")
-async def validate_strategy_endpoint(strategy_id: str, version: int = 1):
-    try:
-        import research_lab
-        passed = research_lab.validate_strategy(strategy_id, version)
-        return {"status": "success", "passed": passed}
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.post("/api/research/evolve")
-async def evolve_strategy_endpoint(strategy_id: str):
-    try:
-        import research_lab
-        new_version = research_lab.evolve_strategy(strategy_id)
-        if new_version is None:
-            raise HTTPException(404, f"Strategy not found")
-        return {"status": "success", "new_version": new_version}
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.post("/api/research/battle")
-async def battle_arena_endpoint(req: dict):
-    try:
-        import research_lab
-        tournament_name = req.get("tournament_name", "Battle-Royale")
-        strategy_ids = req.get("strategy_ids", [])
-        winner = research_lab.run_battle_arena(tournament_name, strategy_ids)
-        return {"status": "success", "winner": winner}
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/research/leaderboard")
-def get_leaderboard_endpoint():
-    try:
-        import research_lab
-        research_lab.generate_daily_journal()
-        return research_lab.get_leaderboard()
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/research/journal")
-def get_research_journal(date: str = None):
-    try:
-        import research_lab
-        conn = research_lab.get_db_connection()
-        cursor = conn.cursor()
-        if date:
-            cursor.execute("SELECT * FROM research_journal WHERE date(created_at) = ? ORDER BY id DESC;", (date,))
-        else:
-            cursor.execute("SELECT * FROM research_journal ORDER BY id DESC LIMIT 20;")
-        rows = cursor.fetchall()
-        conn.close()
-        return [dict(r) for r in rows]
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.post("/api/research/control")
-async def update_strategy_control(req: dict):
-    try:
-        import research_lab
-        strategy_id = req.get("strategy_id")
-        status = req.get("status")
-        research_lab.update_strategy_status(strategy_id, status)
-        return {"status": "success"}
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.post("/api/research/chat")
-async def chat_cto_endpoint(req: dict):
-    try:
-        import research_lab
-        query = req.get("query", "")
-        return research_lab.interpret_chat_query(query)
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/research/status")
-def get_research_status_endpoint():
-    try:
-        import research_lab
-        return research_lab.research_status
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/research/timeline")
-def get_research_timeline_endpoint(date: str = None):
-    try:
-        import research_lab
-        return research_lab.get_chronological_timeline(date)
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/research/briefing")
-def get_ceo_briefing_endpoint(date: str = None):
-    try:
-        import research_lab
-        return research_lab.generate_ceo_briefing(date)
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/research/allocation")
-def get_capital_allocation_endpoint():
-    try:
-        import research_lab
-        return research_lab.calculate_capital_allocations()
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/research/hypotheses")
-def get_hypotheses_endpoint():
-    try:
-        import research_lab
-        return research_lab.get_all_hypotheses()
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-# ─── Phase 8: history / learning-analytics API (Section 6 data → Section 8 UI) ──────────
-# These expose the daily learning-history snapshots (history.py) plus the Section-6 trade log to
-# the frontend, so the global date-range selector, as-of-date reconstruction and compare mode
-# have a backend to read from. All range params are inclusive ISO dates (YYYY-MM-DD); omit them
-# for "all time". mode is paper | live | combined (default combined).
-
-def _filter_schema_trades(rows, mode=None, symbol=None, strategy=None):
-    """Shared filter for Section-6 wins/losses rows: mode (paper/live/combined), symbol and
-    strategy. symbol/strategy match either the exact stored value or a case-insensitive
-    substring (so 'RELIANCE' matches 'NSE:RELIANCE', 'ORB' matches 'ORB-Buy')."""
-    out = []
-    for r in rows:
-        if mode and mode != "combined" and r.get("mode") != mode:
-            continue
-        if symbol:
-            s = str(r.get("symbol", "")).upper()
-            if symbol.upper() not in s:
-                continue
-        if strategy:
-            st = str(r.get("strategy", "")).upper()
-            base = leaderboard.base_strategy_name(r.get("strategy", "")).upper()
-            if strategy.upper() not in st and strategy.upper() not in base:
-                continue
-        out.append(r)
-    return out
-
-
-@app.get("/api/history/dates")
-def history_dates():
-    """Dates for which an end-of-day snapshot exists (drives the as-of date picker)."""
-    return {"dates": history.list_snapshot_dates()}
-
-
-@app.get("/api/history/kpi")
-def history_kpi(start: str = None, end: str = None):
-    """Per-day KPI rows in range — equity/trend charts + calendar heatmap (Tab 8)."""
-    try:
-        return history.load_kpi_daily(start, end)
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/history/patterns")
-def history_patterns(start: str = None, end: str = None):
-    """Per-candlestick-pattern per-day reliability rows in range (Tab 4)."""
-    try:
-        return history.load_pattern_stats(start, end)
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/history/features")
-def history_features(start: str = None, end: str = None, dimension: str = None):
-    """Feature/condition bucket rows in range (Tab 5); optionally filter to one dimension
-    (rsi | volume_ratio | atr_pct | time_of_day | regime | symbol)."""
-    try:
-        rows = history.load_feature_stats(start, end)
-        if dimension:
-            rows = [r for r in rows if r.get("dimension") == dimension]
-        return rows
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/history/leaderboard")
-def history_leaderboard(as_of: str = None):
-    """Strategy leaderboard. With as_of=YYYY-MM-DD, reconstructs it exactly as it stood at that
-    day's close (or the latest prior snapshot). Without as_of, returns the current live stats."""
-    try:
-        if as_of:
-            snap = history.load_leaderboard_asof(as_of)
-            if snap is None:
-                return {"as_of": as_of, "leaderboard": {}, "resolved_from": None}
-            return {"as_of": as_of, "leaderboard": snap.get("leaderboard", {}), "resolved_from": snap.get("snapshot_date")}
-        return {"as_of": None, "leaderboard": leaderboard.load_stats(), "resolved_from": "live"}
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/history/leaderboard/series")
-def history_leaderboard_series(start: str = None, end: str = None):
-    """Per-day leaderboard snapshots across a range — the 'watch it learn / rank over time'
-    data source (Tab 3). One entry per snapshot date with that day's full leaderboard."""
-    try:
-        series = []
-        for d in history.list_snapshot_dates():
-            if (start and d < start) or (end and d > end):
-                continue
-            snap = history.load_leaderboard_asof(d)
-            if snap:
-                series.append({"date": d, "leaderboard": snap.get("leaderboard", {})})
-        return series
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/history/trades")
-def history_trades(start: str = None, end: str = None, mode: str = None, symbol: str = None, strategy: str = None):
-    """Full Section-6 schema closed trades (wins + losses) in range, with mode/symbol/strategy
-    filters — the drillable Trades tab source (Tab 2), carrying r_multiple, candlestick_patterns,
-    indicators_at_entry, lesson, tags, etc."""
-    try:
-        rows = history.load_all_trades()
-        rows = history.trades_in_range(rows, start, end)
-        rows = _filter_schema_trades(rows, mode=mode, symbol=symbol, strategy=strategy)
-        rows.sort(key=lambda t: t.get("timestamp_exit") or "", reverse=True)
-        return rows
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/history/summary")
-def history_summary(start: str = None, end: str = None, mode: str = None, symbol: str = None, strategy: str = None):
-    """Aggregate KPI cards for a range + filter set (Tab 8 'KPI cards for the range')."""
-    try:
-        rows = history.load_all_trades()
-        rows = history.trades_in_range(rows, start, end)
-        rows = _filter_schema_trades(rows, mode=mode, symbol=symbol, strategy=strategy)
-        return history.summarize(rows)
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/history/compare")
-def history_compare(a_start: str = None, a_end: str = None, b_start: str = None, b_end: str = None,
-                    mode: str = None, symbol: str = None, strategy: str = None):
-    """Compare mode: side-by-side aggregate metrics for two ranges + their deltas, so the UI can
-    show how the bot improved between them."""
-    try:
-        all_rows = history.load_all_trades()
-
-        def _agg(s, e):
-            r = _filter_schema_trades(history.trades_in_range(all_rows, s, e), mode=mode, symbol=symbol, strategy=strategy)
-            return history.summarize(r)
-
-        a = _agg(a_start, a_end)
-        b = _agg(b_start, b_end)
-        numeric = ("trades", "win_rate", "expectancy", "net_pnl", "max_drawdown", "avg_r")
-        delta = {}
-        for k in numeric:
-            av, bv = a.get(k), b.get(k)
-            if isinstance(av, (int, float)) and isinstance(bv, (int, float)):
-                delta[k] = round(bv - av, 4)
-        return {"a": {"range": [a_start, a_end], "metrics": a},
-                "b": {"range": [b_start, b_end], "metrics": b},
-                "delta": delta}
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/decisions")
-def get_decisions(limit: int = 200):
-    """Tail of data/decisions.log — the live pick/skip/trade decision stream (Tab 1) with reasons
-    (Section 0 rule 7: nothing silent)."""
-    try:
-        rows = jsonl_logger.read_jsonl(jsonl_logger.DECISIONS_FILE, limit=limit)
-        rows.reverse()  # newest first
-        return rows
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/llm-calls")
-def get_llm_calls(limit: int = 100):
-    """Tail of data/llm_calls.jsonl — the Claude lesson/proposal reasoning log (Tab 6). Returns
-    [] until Lane B (Phase 7) begins writing it."""
-    try:
-        path = os.path.join(jsonl_logger.DATA_DIR, "llm_calls.jsonl")
-        rows = jsonl_logger.read_jsonl(path, limit=limit)
-        rows.reverse()
-        return rows
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.post("/api/history/rebuild")
-def history_rebuild(req: dict = None):
-    """Tab-9 safe control: re-run end-of-day learning (leaderboard rebuild + history snapshots)
-    for a chosen date (default: today). Idempotent per date. Does NOT trade or self-modify code."""
-    try:
-        req = req or {}
-        date_str = req.get("date") or get_ist_now().strftime("%Y-%m-%d")
-        stats = leaderboard.rebuild(config=client.config)
-        snap = history.write_all(date_str, capital_start=client.config.get("capital", 100000), stats=stats)
-        return {"status": "success", "date": snap["date"], "trades_counted": snap["trades_counted"]}
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-# ─── Phase 7: Lane B proposals + LLM reasoning (Section 5 / Tab 7 + Tab 6) ───────────────
-
-@app.get("/api/proposals")
-def get_proposals():
-    """Full lifecycle per candidate (proposed → backtest → paper-validation → promoted/rejected)
-    with timestamps + approver — the Promotion-Gate audit trail (Tab 7)."""
-    try:
-        return promotion_gate.load_proposals()
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.post("/api/proposals/{proposal_id}/approve")
-def approve_proposal(proposal_id: str, req: dict = None):
-    """Human approval (respects require_human_approval). Promotes an awaiting-approval candidate."""
-    try:
-        approver = (req or {}).get("approver", "operator")
-        p = promotion_gate.approve(proposal_id, approver=approver)
-        if not p:
-            raise HTTPException(404, "proposal not found")
-        return {"status": "success", "proposal": p}
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.post("/api/proposals/{proposal_id}/reject")
-def reject_proposal(proposal_id: str, req: dict = None):
-    try:
-        req = req or {}
-        p = promotion_gate.reject(proposal_id, approver=req.get("approver", "operator"), reason=req.get("reason", ""))
-        if not p:
-            raise HTTPException(404, "proposal not found")
-        return {"status": "success", "proposal": p}
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(500, str(e))
-
-
-@app.get("/api/llm-status")
-def llm_status():
-    """Read-only (no spend): whether the Claude engine is enabled, keyed, and its remaining daily
-    call budget — so the UI/operator can see Lane B's live state at a glance."""
-    try:
-        import llm_engine
-        cfg = client.config
-        return {
-            "enabled": llm_engine.is_enabled(cfg),
-            "configured_on": bool(cfg.get("llm_enabled", False)),
-            "key_available": llm_engine.api_key_available(),
-            "model": cfg.get("llm_model") or llm_engine.DEFAULT_MODEL,
-            "calls_today": llm_engine.calls_today(),
-            "daily_cap": int(cfg.get("llm_max_daily_calls", 50)),
-            "budget_remaining": llm_engine.budget_remaining(cfg),
-        }
-    except Exception as e:
-        raise HTTPException(500, str(e))
+app.include_router(research_router.router)
+app.include_router(history_router.router)
+app.include_router(lane_b_router.router)
 
 
 if __name__ == "__main__":
