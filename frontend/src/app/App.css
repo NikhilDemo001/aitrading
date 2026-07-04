@@ -4,6 +4,12 @@
   height: 100%;
 }
 
+/* Keep all chrome/content stacked above the fixed ambient backdrop (z-index 0). */
+.mq-app > *:not(.mq-ambient) {
+  position: relative;
+  z-index: 1;
+}
+
 .mq-main {
   flex: 1;
   min-height: 0;

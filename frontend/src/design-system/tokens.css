@@ -148,16 +148,20 @@ body {
 @keyframes mq-rise-in {
   from {
     opacity: 0;
-    transform: translateY(22px) scale(0.985);
+    transform: perspective(700px) translateY(22px) rotateX(5deg) scale(0.985);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: perspective(700px) translateY(0) rotateX(0deg) scale(1);
   }
 }
 
+/* fill-mode `backwards` (not `both`): a forwards-filled animation keeps its final transform
+   applied forever, and CSS animations override inline styles — which silently disabled the
+   hover lift and the GSAP cursor tilt on every entered card. `backwards` still hides the
+   element during its stagger delay but releases the transform once the entrance finishes. */
 .mq-rise {
-  animation: mq-rise-in 0.55s var(--ease-float) both;
+  animation: mq-rise-in 0.55s var(--ease-float) backwards;
   animation-delay: calc(var(--i, 0) * 0.06s);
   will-change: transform, opacity;
 }
@@ -165,7 +169,7 @@ body {
 /* When many children each carry .mq-rise, this container variant staggers them via
    nth-child so callers don't have to hand-set --i on every element. */
 .mq-stagger > * {
-  animation: mq-rise-in 0.5s var(--ease-float) both;
+  animation: mq-rise-in 0.5s var(--ease-float) backwards;
   will-change: transform, opacity;
 }
 .mq-stagger > *:nth-child(1) { animation-delay: 0.02s; }

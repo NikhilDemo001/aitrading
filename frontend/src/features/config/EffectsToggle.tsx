@@ -7,12 +7,13 @@ export function EffectsToggle() {
   const setEffectsEnabled = useUiStore((s) => s.setEffectsEnabled)
 
   return (
-    <Panel title="3D Effects">
+    <Panel title="3D & Motion Effects">
       <p className="text-faint" style={{ marginTop: 0, fontSize: '0.74rem' }}>
-        Toggles the Three.js scenes on the Analytics tab. Disabling saves GPU/CPU on slower devices.
+        Toggles the Three.js scenes (Analytics tab), the ambient glow backdrop, and the
+        cursor-tilt on cards. Disabling saves GPU/CPU on slower devices.
       </p>
       <Button variant={effectsEnabled ? 'primary' : 'ghost'} onClick={() => setEffectsEnabled(!effectsEnabled)}>
-        {effectsEnabled ? '3D Effects: On' : '3D Effects: Off'}
+        {effectsEnabled ? 'Effects: On' : 'Effects: Off'}
       </Button>
     </Panel>
   )

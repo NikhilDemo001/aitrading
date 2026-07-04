@@ -3,6 +3,7 @@ import { useLiveConnection } from '../lib/ws/useLiveConnection'
 import { useGlobalHotkeys } from '../lib/useGlobalHotkeys'
 import { useUiStore } from '../lib/stores/useUiStore'
 import { TopNav } from './TopNav'
+import { AmbientBackdrop } from './AmbientBackdrop'
 import { CockpitTab } from '../features/cockpit/CockpitTab'
 import { AnalyticsTab } from '../features/analytics/AnalyticsTab'
 import { ConfigTab } from '../features/config/ConfigTab'
@@ -31,6 +32,7 @@ export default function App() {
 
   return (
     <div className="mq-app">
+      <AmbientBackdrop />
       <TopNav />
       <main className="mq-main">
         {activeTab === 'cockpit' && <CockpitTab />}
