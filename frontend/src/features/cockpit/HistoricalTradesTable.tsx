@@ -54,13 +54,30 @@ export function HistoricalTradesTable() {
   }
   const arrow = (k: SortKey) => (k === sortKey ? (sortDir === 'asc' ? ' ▲' : ' ▼') : '')
 
+  // Sortable headers as real <button>s inside <th>: clickable <th> alone is invisible to
+  // keyboard and screen-reader users. aria-sort announces the current order.
+  const sortableTh = (k: SortKey, label: string) => (
+    <th aria-sort={k === sortKey ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}>
+      <button type="button" className="mq-hist-sort-btn" onClick={() => toggleSort(k)}>
+        {label}
+        {arrow(k)}
+      </button>
+    </th>
+  )
+
   return (
     <Panel
       title="Historical Trades"
       padded={false}
       actions={
         <>
-          <input className="mq-hist-search" placeholder="Search symbol / strategy / reason" value={q} onChange={(e) => setQ(e.target.value)} />
+          <input
+            className="mq-hist-search"
+            placeholder="Search symbol / strategy / reason"
+            aria-label="Search trades by symbol, strategy or exit reason"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+          />
           <Button variant="primary" onClick={() => refetch()} disabled={isFetching}>{isFetching ? 'Loading…' : data ? 'Reload' : 'Load All'}</Button>
           <a className="mq-btn mq-btn-ghost" href="/api/trades/export" download>Export CSV</a>
         </>
@@ -78,12 +95,12 @@ export function HistoricalTradesTable() {
         <table className="mq-hist-table">
           <thead>
             <tr>
-              <th onClick={() => toggleSort('symbol')}>Symbol{arrow('symbol')}</th>
-              <th onClick={() => toggleSort('strategy')}>Strategy{arrow('strategy')}</th>
-              <th onClick={() => toggleSort('exit_reason')}>Exit Reason{arrow('exit_reason')}</th>
-              <th onClick={() => toggleSort('pnl')}>P&amp;L{arrow('pnl')}</th>
-              <th onClick={() => toggleSort('pnl_pct')}>P&amp;L %{arrow('pnl_pct')}</th>
-              <th onClick={() => toggleSort('r')}>R{arrow('r')}</th>
+              {sortableTh('symbol', 'Symbol')}
+              {sortableTh('strategy', 'Strategy')}
+              {sortableTh('exit_reason', 'Exit Reason')}
+              {sortableTh('pnl', 'P&L')}
+              {sortableTh('pnl_pct', 'P&L %')}
+              {sortableTh('r', 'R')}
             </tr>
           </thead>
           <tbody>

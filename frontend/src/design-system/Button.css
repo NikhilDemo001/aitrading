@@ -44,20 +44,31 @@
 
 .mq-btn-kill {
   background: var(--live);
-  color: #FFF;
+  /* Dark-on-red: 5.61:1 (AA). White on #FF3B30 measured 3.55:1 — failing contrast on the
+     most safety-critical control in the app. */
+  color: var(--bg);
   border-color: var(--live);
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   box-shadow: 0 0 14px rgba(var(--glow-crimson),0.55);
-  animation: mq-kill-pulse 1.8s ease-in-out infinite;
 }
-.mq-btn-kill:hover { box-shadow: 0 0 22px rgba(var(--glow-crimson),0.85); }
+/* Alarm-fatigue: a perpetually pulsing red button stops meaning "emergency" within an hour
+   of screen time. Steady glow at rest; the pulse is reserved for intent (hover/focus). */
+.mq-btn-kill:hover,
+.mq-btn-kill:focus-visible {
+  box-shadow: 0 0 22px rgba(var(--glow-crimson),0.85);
+  animation: mq-kill-pulse 1.2s ease-in-out infinite;
+}
 @keyframes mq-kill-pulse {
   0%, 100% { box-shadow: 0 0 12px rgba(var(--glow-crimson),0.45); }
-  50%      { box-shadow: 0 0 22px rgba(var(--glow-crimson),0.8); }
+  50%      { box-shadow: 0 0 26px rgba(var(--glow-crimson),0.9); }
 }
-@media (prefers-reduced-motion: reduce) { .mq-btn-kill { animation: none !important; } }
+@media (prefers-reduced-motion: reduce) {
+  .mq-btn-kill,
+  .mq-btn-kill:hover,
+  .mq-btn-kill:focus-visible { animation: none !important; }
+}
 
 .mq-btn:disabled {
   opacity: 0.45;

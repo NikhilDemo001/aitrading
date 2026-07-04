@@ -85,14 +85,33 @@ export function TopNav() {
         </div>
       </div>
 
-      <nav className="mq-tabnav" role="tablist">
+      <nav className="mq-tabnav" role="tablist" aria-label="Dashboard sections">
         {TABS.map((t) => (
           <button
             key={t.id}
+            id={`mq-tab-${t.id}`}
             role="tab"
             aria-selected={activeTab === t.id}
+            aria-controls="mq-tabpanel"
+            tabIndex={activeTab === t.id ? 0 : -1}
             className={`mq-tab-btn ${activeTab === t.id ? 'active' : ''}`}
             onClick={() => setActiveTab(t.id)}
+            onKeyDown={(e) => {
+              // WAI-ARIA APG tabs pattern: roving tabindex + arrow-key navigation.
+              // Position comes from the tab the event fired on (not React state), so
+              // rapid key-repeat can't act on a stale activeTab mid-render.
+              const idx = TABS.findIndex((x) => `mq-tab-${x.id}` === e.currentTarget.id)
+              let next = -1
+              if (e.key === 'ArrowRight') next = (idx + 1) % TABS.length
+              else if (e.key === 'ArrowLeft') next = (idx - 1 + TABS.length) % TABS.length
+              else if (e.key === 'Home') next = 0
+              else if (e.key === 'End') next = TABS.length - 1
+              if (next >= 0) {
+                e.preventDefault()
+                setActiveTab(TABS[next].id)
+                document.getElementById(`mq-tab-${TABS[next].id}`)?.focus()
+              }
+            }}
           >
             {t.label}
           </button>

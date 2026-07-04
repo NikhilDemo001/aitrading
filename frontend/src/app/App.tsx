@@ -34,7 +34,12 @@ export default function App() {
     <div className="mq-app">
       <AmbientBackdrop />
       <TopNav />
-      <main className="mq-main">
+      <main
+        className="mq-main"
+        id="mq-tabpanel"
+        role="tabpanel"
+        aria-labelledby={`mq-tab-${activeTab}`}
+      >
         {activeTab === 'cockpit' && <CockpitTab />}
         {activeTab === 'analytics' && <AnalyticsTab />}
         {activeTab === 'config' && <ConfigTab />}

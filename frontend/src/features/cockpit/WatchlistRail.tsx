@@ -28,6 +28,7 @@ export function WatchlistRail({
       <div className="mq-watchlist-search">
         <input
           placeholder="Filter watchlist..."
+          aria-label="Filter watchlist symbols"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />

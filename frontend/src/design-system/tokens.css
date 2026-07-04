@@ -30,7 +30,9 @@
   /* Ink */
   --ink: #EAF6F8;
   --ink-dim: #9AA6B8;
-  --ink-faint: #5E6675;
+  /* 5.18:1 on --bg, 4.59:1 on panels (WCAG AA for the small text this carries —
+     timestamps, exit reasons, sub-labels). The previous #5E6675 measured 3.45:1. */
+  --ink-faint: #78829A;
 
   /* Type */
   --font-head: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
