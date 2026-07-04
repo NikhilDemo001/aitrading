@@ -2,11 +2,16 @@
 llm_engine.py — Section 5 Lane B: genuine Claude reasoning for trade lessons + strategy proposals.
 
 SAFETY / SPEND CONTROL (this is the whole point of the gating below):
-  * Real Anthropic calls happen ONLY when ALL of these hold:
+  * Real LLM calls happen ONLY when ALL of these hold:
       - config["llm_enabled"] is True (default False — nothing spends out of the box),
-      - an ANTHROPIC_API_KEY is resolvable (env or .env),
-      - the anthropic SDK is importable,
+      - the provider's API key is resolvable (env or .env): ANTHROPIC_API_KEY for the
+        "anthropic" provider, NVIDIA_API_KEY (or config["llm_api_key_env"]) for "openai_compat",
+      - the provider's client dependency is importable,
       - today's call count is under config["llm_max_daily_calls"] (hard per-day budget cap).
+  * config["llm_provider"] selects the backend: "anthropic" (Claude SDK) or "openai_compat"
+    (any /chat/completions endpoint — NVIDIA build.nvidia.com, Ollama, LM Studio — via
+    config["llm_base_url"]). Every llm_calls.jsonl record carries model + source, so swapping
+    providers/models later never corrupts history: old records keep their original attribution.
   * When any of those is false, we fall back to a deterministic, clearly-labelled heuristic
     lesson/proposal (source="heuristic") so the whole Lane-B pipeline still runs, is testable,
     and is demonstrable WITHOUT spending — real Claude output (source="claude") only switches on
@@ -39,9 +44,20 @@ def llm_calls_path() -> str:
 
 # ── key + availability resolution ──────────────────────────────────────────────────────
 
-def _key_from_dotenv() -> str | None:
-    """Read ANTHROPIC_API_KEY straight from .env (the app doesn't push it into os.environ), so
-    enabling the engine doesn't require a separate export step. Value is never logged."""
+def _provider(config: dict | None) -> str:
+    return (config or {}).get("llm_provider", "anthropic")
+
+
+def _key_env_name(config: dict | None) -> str:
+    explicit = (config or {}).get("llm_api_key_env")
+    if explicit:
+        return str(explicit)
+    return "NVIDIA_API_KEY" if _provider(config) == "openai_compat" else "ANTHROPIC_API_KEY"
+
+
+def _key_from_dotenv(var_name: str) -> str | None:
+    """Read the key straight from .env (the app doesn't push it into os.environ), so enabling
+    the engine doesn't require a separate export step. Value is never logged."""
     try:
         with open(".env", encoding="utf-8") as f:
             for line in f:
@@ -49,22 +65,29 @@ def _key_from_dotenv() -> str | None:
                 if line.startswith("#") or "=" not in line:
                     continue
                 k, v = line.split("=", 1)
-                if k.strip() == "ANTHROPIC_API_KEY":
+                if k.strip() == var_name:
                     return v.strip().strip('"').strip("'") or None
     except OSError:
         pass
     return None
 
 
-def api_key_available() -> bool:
-    return bool(os.environ.get("ANTHROPIC_API_KEY") or _key_from_dotenv())
+def _resolve_key(config: dict | None = None) -> str | None:
+    var = _key_env_name(config)
+    return os.environ.get(var) or _key_from_dotenv(var)
 
 
-def _resolve_key() -> str | None:
-    return os.environ.get("ANTHROPIC_API_KEY") or _key_from_dotenv()
+def api_key_available(config: dict | None = None) -> bool:
+    return bool(_resolve_key(config))
 
 
-def _anthropic_available() -> bool:
+def _client_dep_available(config: dict | None) -> bool:
+    if _provider(config) == "openai_compat":
+        try:
+            import requests  # noqa: F401
+            return True
+        except Exception:
+            return False
     try:
         import anthropic  # noqa: F401
         return True
@@ -74,7 +97,7 @@ def _anthropic_available() -> bool:
 
 def is_enabled(config: dict | None) -> bool:
     config = config or {}
-    return bool(config.get("llm_enabled", False)) and api_key_available() and _anthropic_available()
+    return bool(config.get("llm_enabled", False)) and api_key_available(config) and _client_dep_available(config)
 
 
 def calls_today() -> int:
@@ -96,7 +119,7 @@ def log_call(kind: str, prompt_summary: str, response: str, model: str, source: 
     entry = {
         "time": datetime.now().isoformat(),
         "kind": kind,                    # lesson | proposal
-        "source": source,                # claude | heuristic
+        "source": source,                # claude | openai_compat | heuristic
         "model": model,
         "prompt_summary": prompt_summary[:600],
         "response": (response or "")[:2000],
@@ -145,13 +168,60 @@ class AnthropicClient:
         return "\n".join(parts).strip()
 
 
+class OpenAICompatClient:
+    """Any OpenAI-compatible /chat/completions endpoint: NVIDIA build.nvidia.com, Ollama,
+    LM Studio, vLLM. Plain `requests`, no extra SDK. Non-streaming on purpose — Lane B is an
+    EOD batch job that wants one compact JSON blob back, not tokens."""
+    source = "openai_compat"
+
+    def __init__(self, model: str, api_key: str | None, base_url: str,
+                 max_tokens: int = 512, timeout: int = 180):
+        self.model = model
+        self._api_key = api_key or ""
+        self._base_url = base_url.rstrip("/")
+        self.max_tokens = max_tokens
+        self._timeout = timeout
+
+    def complete(self, system: str, prompt: str) -> str:
+        import requests
+        headers = {"Content-Type": "application/json"}
+        if self._api_key:  # local servers (Ollama/LM Studio) need no key
+            headers["Authorization"] = f"Bearer {self._api_key}"
+        resp = requests.post(
+            f"{self._base_url}/chat/completions",
+            headers=headers,
+            json={
+                "model": self.model,
+                "messages": [
+                    {"role": "system", "content": system},
+                    {"role": "user", "content": prompt},
+                ],
+                "max_tokens": self.max_tokens,
+                "temperature": 0.2,  # lessons/proposals must be stable, parseable JSON
+                "stream": False,
+            },
+            timeout=self._timeout,
+        )
+        resp.raise_for_status()
+        content = resp.json()["choices"][0]["message"]["content"] or ""
+        return content.strip()
+
+
+DEFAULT_OPENAI_COMPAT_BASE_URL = "https://integrate.api.nvidia.com/v1"
+
+
 def get_client(config: dict | None):
-    """Returns an AnthropicClient when enabled + within budget, else a MockLLMClient (no spend)."""
+    """Returns a real client when enabled + keyed + within budget, else MockLLMClient (no spend)."""
     config = config or {}
+    model = config.get("llm_model") or DEFAULT_MODEL
     if is_enabled(config) and budget_remaining(config) > 0:
-        model = config.get("llm_model") or DEFAULT_MODEL
-        return AnthropicClient(model, _resolve_key())
-    return MockLLMClient(model=(config.get("llm_model") or DEFAULT_MODEL))
+        if _provider(config) == "openai_compat":
+            base_url = config.get("llm_base_url") or DEFAULT_OPENAI_COMPAT_BASE_URL
+            # Free/shared endpoints (NVIDIA trial) queue under load — allow a generous timeout.
+            timeout = int(config.get("llm_timeout_seconds", 180))
+            return OpenAICompatClient(model, _resolve_key(config), base_url, timeout=timeout)
+        return AnthropicClient(model, _resolve_key(config))
+    return MockLLMClient(model=model)
 
 
 # ── prompts + parsing ──────────────────────────────────────────────────────────────────
@@ -250,7 +320,7 @@ def extract_lessons_for_trades(trades: list, config: dict | None = None, client=
         if not tid or t.get("lesson"):
             continue
         # Re-check budget between calls so a real client stops at the cap mid-batch.
-        if isinstance(client, AnthropicClient) and budget_remaining(config) <= 0:
+        if not isinstance(client, MockLLMClient) and budget_remaining(config) <= 0:
             client = MockLLMClient(model=client.model)  # switch to heuristic for the remainder
         les = extract_lesson(t, config=config, client=client)
         out[tid] = les["lesson"]

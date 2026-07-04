@@ -69,7 +69,8 @@ def llm_status():
         return {
             "enabled": llm_engine.is_enabled(cfg),
             "configured_on": bool(cfg.get("llm_enabled", False)),
-            "key_available": llm_engine.api_key_available(),
+            "key_available": llm_engine.api_key_available(cfg),
+            "provider": cfg.get("llm_provider", "anthropic"),
             "model": cfg.get("llm_model") or llm_engine.DEFAULT_MODEL,
             "calls_today": llm_engine.calls_today(),
             "daily_cap": int(cfg.get("llm_max_daily_calls", 50)),
