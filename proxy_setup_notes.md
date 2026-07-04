@@ -19,8 +19,7 @@ This file contains the notes and current state of the bot's proxy configuration.
 
 - **Host:** `brd.superproxy.io`
 - **Port:** `33335`
-- **Username:** `REDACTED`
-- **Password:** `REDACTED`
+- **Username / Password:** stored locally in `.env` as `PROXY_URL` — never in this repo.
 - **Static IP Address:** `119.13.230.157` (This is the IP that must be registered on Upstox)
 
 ---
