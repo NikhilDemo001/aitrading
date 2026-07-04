@@ -170,12 +170,18 @@ def detect_morning_star(candles) -> bool:
         
     c1_body = c1['open'] - c1['close']
     c2_body = abs(c2['close'] - c2['open'])
+    c3_body = c3['close'] - c3['open']
     
     # 2. Second must be a star (small body)
     if c2_body >= (c1_body * 0.35):
         return False
         
-    # 3. Third closes above midpoint of first
+    # 3. Third must be a large candle: at least half the first's body (and thus clearly
+    #    bigger than the star) — a weak drift above the midpoint is not a reversal.
+    if c3_body < (c1_body * 0.5):
+        return False
+
+    # 4. Third closes above midpoint of first
     c1_midpoint = c1['close'] + (c1_body / 2.0)
     return c3['close'] > c1_midpoint
 
@@ -200,12 +206,18 @@ def detect_evening_star(candles) -> bool:
         
     c1_body = c1['close'] - c1['open']
     c2_body = abs(c2['close'] - c2['open'])
+    c3_body = c3['open'] - c3['close']
     
     # 2. Second must be a star (small body)
     if c2_body >= (c1_body * 0.35):
         return False
         
-    # 3. Third closes below midpoint of first
+    # 3. Third must be a large candle: at least half the first's body (and thus clearly
+    #    bigger than the star) — a weak drift below the midpoint is not a reversal.
+    if c3_body < (c1_body * 0.5):
+        return False
+
+    # 4. Third closes below midpoint of first
     c1_midpoint = c1['open'] + (c1_body / 2.0)
     return c3['close'] < c1_midpoint
 

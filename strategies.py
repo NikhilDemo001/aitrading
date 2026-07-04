@@ -270,6 +270,11 @@ def check_orb_strategy(candles, interval_minutes=5, range_duration_minutes=15, h
     range_high = max(c["high"] for c in candles[:num_range_candles])
     range_low = min(c["low"] for c in candles[:num_range_candles])
 
+    # A noise-level opening range (< 0.1% of price) has no meaningful breakout levels —
+    # and the ATR-based buffer below can be equally tiny in a flat open. Skip outright.
+    if (range_high - range_low) < ((range_high + range_low) / 2) * 0.001:
+        return None
+
     close_prices = [c["close"] for c in candles]
     ema_20 = calculate_ema(close_prices, 20)
     atr = calculate_atr(candles, 14)

@@ -8,6 +8,7 @@ from candlestick_patterns import (
     detect_inverted_hammer, detect_hanging_man, detect_spinning_top,
     detect_three_white_soldiers, detect_three_black_crows,
     detect_all_patterns, _recent_trend,
+    detect_morning_star, detect_evening_star,
 )
 
 
@@ -152,6 +153,28 @@ def test_strength_scores_are_all_ints_in_range():
     for name, score in result["strengths"].items():
         assert isinstance(score, int), f"{name} strength not an int"
         assert 0 <= score <= 100, f"{name} strength out of range: {score}"
+
+
+# ── Morning / Evening Star: third candle must be large, per the docstring definition ────────
+
+def test_morning_star_requires_large_third_candle():
+    c1 = candle(100.0, 100.5, 95.5, 96.0)      # big red, body 4 -> star cap 1.4, third-body floor 2.0
+    c2 = candle(95.8, 96.0, 95.4, 95.6)        # star, body 0.2
+    strong = candle(95.8, 99.2, 95.6, 99.0)    # body 3.2, closes above c1 midpoint (98)
+    weak = candle(96.5, 98.4, 96.3, 98.2)      # also closes above midpoint, but body only 1.7
+
+    assert detect_morning_star([c1, c2, strong]) is True
+    assert detect_morning_star([c1, c2, weak]) is False
+
+
+def test_evening_star_requires_large_third_candle():
+    c1 = candle(96.0, 100.5, 95.5, 100.0)      # big green, body 4, midpoint 98
+    c2 = candle(100.1, 100.5, 100.0, 100.3)    # star, body 0.2
+    strong = candle(100.0, 100.2, 95.3, 95.5)  # body 4.5, closes below midpoint
+    weak = candle(99.4, 99.6, 97.6, 97.8)      # also closes below midpoint, but body only 1.6
+
+    assert detect_evening_star([c1, c2, strong]) is True
+    assert detect_evening_star([c1, c2, weak]) is False
 
 
 if __name__ == "__main__":

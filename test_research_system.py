@@ -221,5 +221,28 @@ class TestAIResearchLab(unittest.TestCase):
         
         conn.close()
 
+
+class TestWalkforwardGate(unittest.TestCase):
+    """Pure-function tests for the walk-forward promotion gate (no DB, no candles)."""
+
+    def test_profit_factor(self):
+        self.assertEqual(research_lab._profit_factor([]), 1.0)
+        self.assertEqual(research_lab._profit_factor([{"pnl": 300.0}]), 300.0)  # no losses -> gross profit
+        self.assertAlmostEqual(research_lab._profit_factor([{"pnl": 300.0}, {"pnl": -150.0}]), 2.0)
+
+    def test_gate_passes_healthy_walkforward(self):
+        self.assertTrue(research_lab.walkforward_gate(5, 3, 4000.0, is_pf=1.6, oos_pf=1.3))
+
+    def test_gate_rejects_insample_loser(self):
+        # Out-of-sample looks great, but the strategy lost money in-sample: luck, not edge.
+        self.assertFalse(research_lab.walkforward_gate(5, 3, 4000.0, is_pf=0.7, oos_pf=1.5))
+
+    def test_gate_rejects_thin_or_unprofitable_oos(self):
+        self.assertFalse(research_lab.walkforward_gate(2, 3, 4000.0, is_pf=1.5, oos_pf=1.5))   # thin IS
+        self.assertFalse(research_lab.walkforward_gate(5, 1, 4000.0, is_pf=1.5, oos_pf=1.5))   # thin OOS
+        self.assertFalse(research_lab.walkforward_gate(5, 3, -500.0, is_pf=1.5, oos_pf=1.5))   # OOS loss
+        self.assertFalse(research_lab.walkforward_gate(5, 3, 4000.0, is_pf=1.5, oos_pf=1.05))  # weak OOS PF
+
+
 if __name__ == "__main__":
     unittest.main()

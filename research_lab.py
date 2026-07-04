@@ -699,6 +699,24 @@ def backtest_strategy(strategy_id, version=1):
 
 # ─── 3. Validation & Walkforward Engine ──────────────────────────────────────
 
+def _profit_factor(trades):
+    """Gross profit / gross loss; a no-loss set falls back to gross profit (1.0 if empty)."""
+    gp = sum(t["pnl"] for t in trades if t["pnl"] > 0)
+    gl = abs(sum(t["pnl"] for t in trades if t["pnl"] <= 0))
+    return (gp / gl) if gl > 0 else (gp if gp > 0 else 1.0)
+
+
+def walkforward_gate(n_is_trades, n_oos_trades, outsample_pnl, is_pf, oos_pf):
+    """Walk-forward promotion gate (pure, unit-testable).
+
+    Requires enough trades on both sides, positive out-of-sample PnL, an out-of-sample
+    profit factor with real edge (>= 1.1), and — so an out-of-sample fluke can't promote
+    an in-sample loser — an in-sample profit factor of at least 1.0.
+    """
+    return (outsample_pnl > 0 and n_is_trades >= 3 and n_oos_trades >= 2
+            and oos_pf >= 1.1 and is_pf >= 1.0)
+
+
 def validate_strategy(strategy_id, version=1):
     """
     Runs Walk-Forward Testing and Out-of-Sample Validation on a backtested strategy.
@@ -804,12 +822,10 @@ def validate_strategy(strategy_id, version=1):
         is_wins = [t for t in is_trades if t["pnl"] > 0]
         
         oos_wins = [t for t in oos_trades if t["pnl"] > 0]
-        oos_losses = [t for t in oos_trades if t["pnl"] <= 0]
-        oos_gp = sum(t["pnl"] for t in oos_wins)
-        oos_gl = abs(sum(t["pnl"] for t in oos_losses))
-        oos_pf = (oos_gp / oos_gl) if oos_gl > 0 else (oos_gp if oos_gp > 0 else 1.0)
+        is_pf = _profit_factor(is_trades)
+        oos_pf = _profit_factor(oos_trades)
         
-        passed = 1 if (outsample_pnl > 0 and len(is_trades) >= 3 and len(oos_trades) >= 2 and oos_pf >= 1.1) else 0
+        passed = 1 if walkforward_gate(len(is_trades), len(oos_trades), outsample_pnl, is_pf, oos_pf) else 0
         
         is_wr = (len(is_wins) / len(is_trades) * 100.0) if is_trades else 0.0
         oos_wr = (len(oos_wins) / len(oos_trades) * 100.0) if oos_trades else 0.0
