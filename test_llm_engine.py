@@ -4,7 +4,6 @@ NO network call is ever made, so running the suite never spends. Also asserts th
 (disabled out of the box -> no real client).
 """
 
-import json
 import os
 import shutil
 
@@ -77,7 +76,7 @@ def test_batch_lessons_skip_already_lessoned():
 
 
 def test_budget_counting():
-    for i in range(3):
+    for _ in range(3):
         llm_engine.log_call("lesson", "s", "r", "m", "heuristic")
     assert llm_engine.calls_today() == 3
     assert llm_engine.budget_remaining({"llm_max_daily_calls": 5}) == 2

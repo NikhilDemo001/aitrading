@@ -7,7 +7,6 @@ Usage:
 """
 
 import math
-from datetime import datetime
 
 
 class _Position:
@@ -36,7 +35,7 @@ class _Position:
 
     def update(self, candle):
         """Feed next candle; returns 'open' | 't1' | 'stop' | 'target' | 't1_stop'."""
-        hi, lo, cl = candle["high"], candle["low"], candle["close"]
+        hi, lo = candle["high"], candle["low"]
 
         if self.direction == "LONG":
             # Stop check first (using the stop level carried over from the previous candle)

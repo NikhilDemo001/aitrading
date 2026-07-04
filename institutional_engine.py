@@ -4,8 +4,7 @@ Institutional-Grade AI Intraday Trading Engine
 Implements 12 layers of filtering and checks to isolate only high-probability setups.
 """
 
-import math
-from strategies import calculate_ema, calculate_vwap, calculate_atr, calculate_rsi, calculate_adx
+from strategies import calculate_ema, calculate_vwap, calculate_atr, calculate_adx
 
 class InstitutionalTradingEngine:
     def __init__(self):
@@ -237,8 +236,6 @@ class InstitutionalTradingEngine:
             }
             
         close = candles_5m[-1]["close"]
-        high = candles_5m[-1]["high"]
-        low = candles_5m[-1]["low"]
         
         # Calculate technical indicators
         close_prices = [c["close"] for c in candles_5m]

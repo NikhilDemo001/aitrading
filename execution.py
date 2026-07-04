@@ -11,7 +11,6 @@ that swapping paper<->live is exactly a broker-instance swap, nothing else.
 
 from __future__ import annotations
 
-from typing import Optional
 
 from broker_base import BrokerAdapter
 
@@ -27,7 +26,7 @@ class ExecutionEngine:
         quantity: int,
         order_type: str,
         price: float,
-        instrument_key: Optional[str] = None,
+        instrument_key: str | None = None,
         tag: str = "autobot",
     ) -> dict:
         action = "BUY" if direction.upper() in ("LONG", "BUY") else "SELL"
@@ -39,7 +38,7 @@ class ExecutionEngine:
         direction: str,
         quantity: int,
         price: float = 0.0,
-        instrument_key: Optional[str] = None,
+        instrument_key: str | None = None,
         tag: str = "autobot_exit",
     ) -> dict:
         """`direction` is the position's entry direction — the exit order is the opposite side."""
@@ -55,11 +54,11 @@ class ExecutionEngine:
     def order_status(self, order_id: str) -> dict:
         return self.broker.get_order_status(order_id)
 
-    def get_quote(self, instrument_key: str) -> Optional[dict]:
+    def get_quote(self, instrument_key: str) -> dict | None:
         return self.broker.get_market_quote(instrument_key)
 
-    def get_candles(self, instrument_key: str, interval: str) -> Optional[list]:
+    def get_candles(self, instrument_key: str, interval: str) -> list | None:
         return self.broker.get_intraday_candles(instrument_key, interval)
 
-    def get_funds_and_margin(self) -> Optional[dict]:
+    def get_funds_and_margin(self) -> dict | None:
         return self.broker.get_funds_and_margin()

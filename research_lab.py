@@ -8,7 +8,6 @@ Autonomous AI Research Lab Engine for AutoTrade Intraday Bot
 5. Generates Research Journals and tracks Live Readiness Scores.
 """
 
-import os
 import sqlite3
 import json
 import random
@@ -505,9 +504,9 @@ def discover_strategies(count=5):
             )
             
         # Insert Hypothesis (AI Reasoning)
-        evidence = f"Backtesting scans identified recurring price reversion at S/R level confluences on volume surges."
-        reasoning = f"Institutional blocks accumulate/distribute at major support pivot levels, creating local price imbalances."
-        risks = f"False breakouts during highly volatile news releases (e.g. RBI rates) could trigger consecutive stop losses."
+        evidence = "Backtesting scans identified recurring price reversion at S/R level confluences on volume surges."
+        reasoning = "Institutional blocks accumulate/distribute at major support pivot levels, creating local price imbalances."
+        risks = "False breakouts during highly volatile news releases (e.g. RBI rates) could trigger consecutive stop losses."
         
         cursor.execute("""
         INSERT INTO strategy_hypotheses (strategy_id, version, pattern_description, evidence, reasoning, assumed_regimes, risks)
@@ -601,7 +600,7 @@ def backtest_strategy(strategy_id, version=1):
         equity_curve = [equity]
         drawdown_curve = [0.0]
         peak = equity
-        for t in range(total_trades):
+        for _ in range(total_trades):
             is_win = (random.random() * 100 < win_rate)
             pnl = random.uniform(800.0, 2200.0) if is_win else random.uniform(-500.0, -1000.0)
             equity += pnl
@@ -803,10 +802,6 @@ def validate_strategy(strategy_id, version=1):
         outsample_pnl = sum(t["pnl"] for t in oos_trades)
         
         is_wins = [t for t in is_trades if t["pnl"] > 0]
-        is_losses = [t for t in is_trades if t["pnl"] <= 0]
-        is_gp = sum(t["pnl"] for t in is_wins)
-        is_gl = abs(sum(t["pnl"] for t in is_losses))
-        is_pf = (is_gp / is_gl) if is_gl > 0 else (is_gp if is_gp > 0 else 1.0)
         
         oos_wins = [t for t in oos_trades if t["pnl"] > 0]
         oos_losses = [t for t in oos_trades if t["pnl"] <= 0]
@@ -1144,7 +1139,6 @@ def evolve_strategy(strategy_id):
         if all_trades:
             total_pnl = sum(t["pnl"] for t in all_trades)
             wins = [t for t in all_trades if t["pnl"] > 0]
-            losses = [t for t in all_trades if t["pnl"] < 0]
             win_rate = (len(wins) / len(all_trades)) * 100 if all_trades else 0.0
             
             # 1. Analyze hourly performance
@@ -2030,20 +2024,6 @@ def calculate_capital_allocations():
     return allocations
 
 
-def get_all_hypotheses():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        SELECT h.id, s.name, s.id as strat_id, h.pattern_description, h.evidence, h.reasoning, s.status, s.current_score
-        FROM strategy_hypotheses h
-        JOIN strategies s ON s.id = h.strategy_id
-        ORDER BY h.id DESC;
-    """)
-    rows = cursor.fetchall()
-    conn.close()
-    return [dict(r) for r in rows]
-
-
 def get_decision_explanation(strategy_id):
     conn = get_db_connection()
     cursor = conn.cursor()
@@ -2080,9 +2060,9 @@ def get_decision_explanation(strategy_id):
         if status == "Rejected":
             why_chosen = f"The strategy was rejected due to a low validation stability score of {score:.1f}% in the out-of-sample data walk-forward test."
         elif status == "Paper Trading":
-            why_chosen = f"The strategy passed backtests and out-of-sample validation. It is currently paper trading to gather forward sample fills and slippage parameters."
+            why_chosen = "The strategy passed backtests and out-of-sample validation. It is currently paper trading to gather forward sample fills and slippage parameters."
         elif status == "Approved":
-            why_chosen = f"The strategy has been approved for live trading due to high profit consistency and Sharpe ratio above the threshold."
+            why_chosen = "The strategy has been approved for live trading due to high profit consistency and Sharpe ratio above the threshold."
         elif status == "Retired":
             why_chosen = "The strategy has been retired because of structural regime shift and alpha decay in low volatility conditions."
         else:

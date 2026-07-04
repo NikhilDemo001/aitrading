@@ -10,7 +10,7 @@ Detects high-risk market events to suppress or reduce bot activity:
 """
 
 import datetime
-from datetime import timezone, timedelta
+from datetime import timedelta
 
 # NSE Holidays 2025-2026
 NSE_HOLIDAYS_2025 = [
@@ -63,7 +63,7 @@ BUDGET_DATES = [
 
 
 def get_ist_now():
-    return datetime.datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
+    return datetime.datetime.now(datetime.UTC).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
 
 
 def _get_fno_expiry_thursdays(year, month):

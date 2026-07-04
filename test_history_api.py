@@ -6,7 +6,6 @@ real data/ files are touched.
 
 import json
 import os
-import shutil
 
 import pytest
 

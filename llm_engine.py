@@ -24,7 +24,6 @@ import json
 import os
 import re
 from datetime import datetime
-from typing import Optional
 
 import jsonl_logger
 
@@ -40,7 +39,7 @@ def llm_calls_path() -> str:
 
 # ── key + availability resolution ──────────────────────────────────────────────────────
 
-def _key_from_dotenv() -> Optional[str]:
+def _key_from_dotenv() -> str | None:
     """Read ANTHROPIC_API_KEY straight from .env (the app doesn't push it into os.environ), so
     enabling the engine doesn't require a separate export step. Value is never logged."""
     try:
@@ -61,7 +60,7 @@ def api_key_available() -> bool:
     return bool(os.environ.get("ANTHROPIC_API_KEY") or _key_from_dotenv())
 
 
-def _resolve_key() -> Optional[str]:
+def _resolve_key() -> str | None:
     return os.environ.get("ANTHROPIC_API_KEY") or _key_from_dotenv()
 
 
@@ -73,7 +72,7 @@ def _anthropic_available() -> bool:
         return False
 
 
-def is_enabled(config: Optional[dict]) -> bool:
+def is_enabled(config: dict | None) -> bool:
     config = config or {}
     return bool(config.get("llm_enabled", False)) and api_key_available() and _anthropic_available()
 
@@ -84,7 +83,7 @@ def calls_today() -> int:
     return sum(1 for r in rows if str(r.get("time", "")).startswith(today))
 
 
-def budget_remaining(config: Optional[dict]) -> int:
+def budget_remaining(config: dict | None) -> int:
     cap = int((config or {}).get("llm_max_daily_calls", 50))
     return max(0, cap - calls_today())
 
@@ -92,7 +91,7 @@ def budget_remaining(config: Optional[dict]) -> int:
 # ── call logging (Section 6 data/llm_calls.jsonl) ──────────────────────────────────────
 
 def log_call(kind: str, prompt_summary: str, response: str, model: str, source: str,
-             ok: bool = True, error: Optional[str] = None) -> None:
+             ok: bool = True, error: str | None = None) -> None:
     os.makedirs(jsonl_logger.DATA_DIR, exist_ok=True)
     entry = {
         "time": datetime.now().isoformat(),
@@ -115,7 +114,7 @@ class MockLLMClient:
     fallback paths can be exercised without spending. `source` is 'heuristic'."""
     source = "heuristic"
 
-    def __init__(self, scripted: Optional[list] = None, model: str = "mock"):
+    def __init__(self, scripted: list | None = None, model: str = "mock"):
         self._scripted = list(scripted or [])
         self.model = model
 
@@ -146,7 +145,7 @@ class AnthropicClient:
         return "\n".join(parts).strip()
 
 
-def get_client(config: Optional[dict]):
+def get_client(config: dict | None):
     """Returns an AnthropicClient when enabled + within budget, else a MockLLMClient (no spend)."""
     config = config or {}
     if is_enabled(config) and budget_remaining(config) > 0:
@@ -186,7 +185,7 @@ def _lesson_prompt(trade: dict) -> str:
 _JSON_RE = re.compile(r"\{.*\}", re.S)
 
 
-def _extract_json(raw: str) -> Optional[dict]:
+def _extract_json(raw: str) -> dict | None:
     if not raw:
         return None
     m = _JSON_RE.search(raw)
@@ -214,7 +213,7 @@ def _heuristic_lesson(trade: dict) -> dict:
 
 # ── public API: lesson extraction ──────────────────────────────────────────────────────
 
-def extract_lesson(trade: dict, config: Optional[dict] = None, client=None) -> dict:
+def extract_lesson(trade: dict, config: dict | None = None, client=None) -> dict:
     """Returns {'lesson': str, 'tags': [str], 'source': 'claude'|'heuristic'} for one closed trade.
     Never raises — on any error or when disabled/over-budget it returns a heuristic lesson."""
     config = config or {}
@@ -240,7 +239,7 @@ def extract_lesson(trade: dict, config: Optional[dict] = None, client=None) -> d
         return _heuristic_lesson(trade)
 
 
-def extract_lessons_for_trades(trades: list, config: Optional[dict] = None, client=None) -> dict:
+def extract_lessons_for_trades(trades: list, config: dict | None = None, client=None) -> dict:
     """Batch lessons for a day's closed trades, honoring the daily budget cap. Returns
     {trade_id: lesson_text} suitable for jsonl_logger.backfill_lessons()."""
     config = config or {}
@@ -264,7 +263,7 @@ def _proposal_prompt(day_context: dict) -> str:
     return json.dumps(day_context, default=str)
 
 
-def _heuristic_proposal(day_context: dict) -> Optional[dict]:
+def _heuristic_proposal(day_context: dict) -> dict | None:
     """Mechanical proposal from the day's worst (strategy, regime): tighten it. Clearly heuristic."""
     worst = day_context.get("worst_combo")
     if not worst:
@@ -280,7 +279,7 @@ def _heuristic_proposal(day_context: dict) -> Optional[dict]:
     }
 
 
-def generate_proposal(day_context: dict, config: Optional[dict] = None, client=None) -> Optional[dict]:
+def generate_proposal(day_context: dict, config: dict | None = None, client=None) -> dict | None:
     """Returns ONE proposal dict (or None) — an INACTIVE candidate; it does not trade. Uses Claude
     when enabled, else a heuristic proposal so the Promotion-Gate pipeline is demonstrable."""
     config = config or {}
@@ -304,5 +303,5 @@ def generate_proposal(day_context: dict, config: Optional[dict] = None, client=N
         return _heuristic_proposal(day_context)
 
 
-def read_llm_calls(limit: Optional[int] = None) -> list:
+def read_llm_calls(limit: int | None = None) -> list:
     return jsonl_logger.read_jsonl(llm_calls_path(), limit=limit)

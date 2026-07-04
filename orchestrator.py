@@ -23,13 +23,11 @@ from __future__ import annotations
 
 import time
 from datetime import datetime, timedelta
-from typing import Optional
 
 from broker_base import BrokerAdapter
 from mock_broker import MockBroker
 from execution import ExecutionEngine
 from risk_manager import RiskManager
-from strategy_interface import Features
 from strategies import detect_market_regime, get_htf_trend, select_best_strategy
 import jsonl_logger
 import leaderboard
@@ -58,7 +56,7 @@ DEFAULT_CONFIG = {
 
 
 class Orchestrator:
-    def __init__(self, broker: Optional[BrokerAdapter] = None, config: Optional[dict] = None):
+    def __init__(self, broker: BrokerAdapter | None = None, config: dict | None = None):
         self.broker = broker or MockBroker()
         self.config = {**DEFAULT_CONFIG, **(config or {})}
         self.execution = ExecutionEngine(self.broker)
@@ -213,7 +211,7 @@ class Orchestrator:
                     "skip", symbol, f"Force-flatten failed, will retry: {e}", {"gate": "ensure_flat"}
                 )
 
-    def run_end_of_day(self, now: Optional[datetime] = None) -> dict:
+    def run_end_of_day(self, now: datetime | None = None) -> dict:
         """Section 3's run_end_of_day: rebuild the Lane-A leaderboard from the day's closed
         trades and freeze the Section-6 daily history snapshots (leaderboard / pattern / feature
         / KPI) so the date-range and as-of-date views can reconstruct this day exactly (DoD #9)."""
@@ -227,7 +225,7 @@ class Orchestrator:
         snap["lane_b"] = lane_b.run_eod(date_str, day_trades, self.config)
         return snap
 
-    def run_tick_for_all_symbols(self, now: Optional[datetime] = None) -> None:
+    def run_tick_for_all_symbols(self, now: datetime | None = None) -> None:
         now = now or datetime.now()
         # RiskManager's daily-loss gate keys off `paper_trading` (paper = intentionally
         # unlimited, matching the dashboard's "Unlimited (Paper Trading)"), but this config

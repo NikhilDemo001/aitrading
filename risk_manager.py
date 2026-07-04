@@ -19,7 +19,6 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from datetime import datetime, time as dtime
-from typing import Optional
 
 try:
     from signal_quality import check_consecutive_loss_halt, SECTOR_MAP
@@ -60,7 +59,7 @@ class RiskManager:
 
     # ── Individual gates (each independently unit-testable) ─────────────────────────
 
-    def check_daily_loss(self, total_pnl_today: float, paper_trading: Optional[bool] = None) -> RiskDecision:
+    def check_daily_loss(self, total_pnl_today: float, paper_trading: bool | None = None) -> RiskDecision:
         """Section 0 rule 2: hard daily loss kill switch."""
         is_paper = paper_trading if paper_trading is not None else self.config.get("paper_trading", True)
         if is_paper:
@@ -152,7 +151,7 @@ class RiskManager:
             return RiskDecision(False, 0, f"Per-symbol daily trade cap reached for {symbol} ({count_today}/{max_per_symbol}).")
         return RiskDecision(True)
 
-    def check_liquidity(self, volume: Optional[float], min_volume: Optional[float] = None) -> RiskDecision:
+    def check_liquidity(self, volume: float | None, min_volume: float | None = None) -> RiskDecision:
         min_v = min_volume if min_volume is not None else float(self.config.get("min_scan_volume", 50000))
         if volume is not None and volume < min_v:
             return RiskDecision(False, 0, f"Liquidity too low (volume {volume} < {min_v}).")
@@ -170,7 +169,7 @@ class RiskManager:
             stop_distance = 0.01
         return max(0, math.floor(risk_budget / stop_distance))
 
-    def is_frozen(self, total_pnl_today: float, paper_trading: Optional[bool] = None) -> tuple[bool, str]:
+    def is_frozen(self, total_pnl_today: float, paper_trading: bool | None = None) -> tuple[bool, str]:
         """Pure/stateless by design: reflects today's realized+unrealized P&L against the
         kill-switch threshold, so it naturally clears at day rollover once daily P&L resets to
         zero — no persisted 'tripped' flag to manage."""
@@ -200,9 +199,9 @@ class RiskManager:
         trade_history: list,
         now: datetime,
         paper_trading: bool = True,
-        proposed_qty: Optional[int] = None,
-        volume: Optional[float] = None,
-        max_qty_cap: Optional[int] = None,
+        proposed_qty: int | None = None,
+        volume: float | None = None,
+        max_qty_cap: int | None = None,
         skip_window_check: bool = False,
         skip_size_cap: bool = False,
     ) -> RiskDecision:

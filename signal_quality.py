@@ -3,14 +3,16 @@ Signal Quality Engine — multi-layer filters that only let high-conviction
 setups through. Each layer eliminates a category of losing trades.
 """
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, UTC
+
+from strategies import (
+    calculate_ema, calculate_vwap, calculate_atr, calculate_rsi
+)
+
 
 # Returns timezone-naive datetime representing IST (India Standard Time, UTC +5:30)
 def get_ist_now():
-    return datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
-from strategies import (
-    calculate_ema, calculate_vwap, calculate_atr, calculate_rsi, calculate_adx
-)
+    return datetime.now(UTC).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Optional event-calendar integration (H4)
@@ -450,7 +452,7 @@ def evaluate_signal(signal, candles, htf_candles, nifty_trend, trade_history, cf
             return False, reason, details
         ok2 = is_strategy_allowed_now(signal.get("strategy", ""))
         if not ok2:
-            return False, f"Strategy not permitted at current time", details
+            return False, "Strategy not permitted at current time", details
 
     # Layer 2: Volatility
     if cfg.get("enable_volatility_filter", True):

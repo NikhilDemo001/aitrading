@@ -25,15 +25,15 @@ def generate_self_signed_cert():
     
     # 2. Setup subject and issuer
     subject = issuer = x509.Name([
-        x509.NameAttribute(NameOID.COUNTRY_NAME, u"IN"),
-        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Maharashtra"),
-        x509.NameAttribute(NameOID.LOCALITY_NAME, u"Mumbai"),
-        x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"Intraday Helper"),
-        x509.NameAttribute(NameOID.COMMON_NAME, u"127.0.0.1"),
+        x509.NameAttribute(NameOID.COUNTRY_NAME, "IN"),
+        x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Maharashtra"),
+        x509.NameAttribute(NameOID.LOCALITY_NAME, "Mumbai"),
+        x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Intraday Helper"),
+        x509.NameAttribute(NameOID.COMMON_NAME, "127.0.0.1"),
     ])
     
     # 3. Build certificate
-    now = datetime.datetime.now(datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.UTC)
     cert = x509.CertificateBuilder().subject_name(
         subject
     ).issuer_name(
@@ -48,7 +48,7 @@ def generate_self_signed_cert():
         now + datetime.timedelta(days=365)
     ).add_extension(
         x509.SubjectAlternativeName([
-            x509.DNSName(u"localhost"),
+            x509.DNSName("localhost"),
             x509.IPAddress(ipaddress.ip_address(os.environ.get("LOCAL_IP", "127.0.0.1")))
         ]),
         critical=False,

@@ -13,10 +13,8 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import uuid
 from datetime import datetime
-from typing import Optional
 
 DATA_DIR = "data"
 WINS_FILE = os.path.join(DATA_DIR, "wins.jsonl")
@@ -59,7 +57,7 @@ def time_of_day_bucket(dt: datetime, market_open: str = "09:15", session_end: st
     return f"{start_dt.strftime('%H%M')}_{end_dt.strftime('%H%M')}"
 
 
-def build_trade_record(record: dict, mode: str, capital: Optional[float] = None) -> dict:
+def build_trade_record(record: dict, mode: str, capital: float | None = None) -> dict:
     """Converts an existing execute_exit()-style trade_history record into the full Section-6
     schema. Additive: every field already in `record` is preserved; only the schema's missing
     fields are derived/defaulted.
@@ -129,7 +127,7 @@ def build_trade_record(record: dict, mode: str, capital: Optional[float] = None)
     }
 
 
-def log_trade(record: dict, mode: str, capital: Optional[float] = None) -> dict:
+def log_trade(record: dict, mode: str, capital: float | None = None) -> dict:
     """Appends one line to data/wins.jsonl or data/losses.jsonl depending on pnl sign.
     Returns the full enriched record that was written."""
     _ensure_data_dir()
@@ -140,7 +138,7 @@ def log_trade(record: dict, mode: str, capital: Optional[float] = None) -> dict:
     return full_record
 
 
-def log_decision(decision_type: str, symbol: str, reason: str, extra: Optional[dict] = None) -> None:
+def log_decision(decision_type: str, symbol: str, reason: str, extra: dict | None = None) -> None:
     """Appends one line to data/decisions.log. decision_type: 'skip' | 'pick' | 'trade'."""
     _ensure_data_dir()
     entry = {
@@ -155,7 +153,7 @@ def log_decision(decision_type: str, symbol: str, reason: str, extra: Optional[d
         f.write(json.dumps(entry) + "\n")
 
 
-def read_jsonl(path: str, limit: Optional[int] = None) -> list:
+def read_jsonl(path: str, limit: int | None = None) -> list:
     """Reads a JSONL file into a list of dicts, tolerating malformed trailing lines (e.g. from
     a crash mid-write) rather than failing the whole read."""
     if not os.path.exists(path):

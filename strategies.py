@@ -269,8 +269,6 @@ def check_orb_strategy(candles, interval_minutes=5, range_duration_minutes=15, h
 
     range_high = max(c["high"] for c in candles[:num_range_candles])
     range_low = min(c["low"] for c in candles[:num_range_candles])
-    range_mid = (range_high + range_low) / 2
-    range_height = max(range_high - range_low, range_mid * 0.001)  # floor at 0.1% of price
 
     close_prices = [c["close"] for c in candles]
     ema_20 = calculate_ema(close_prices, 20)
@@ -649,6 +647,7 @@ def check_trend_following_strategy(candles, htf_trend="neutral"):
 # Maps base strategy name → checker (candles, htf_trend, cfg=None) → signal | None
 from strategy_vwap_trend_pullback import check_vwap_trend_pullback as _check_vtp
 from strategy_support_resistance import check_support_resistance_strategy as _check_sr
+from datetime import UTC
 
 def _check_cpc(c, htf_trend, config):
     from strategy_candlestick_confluence import check_candlestick_confluence_strategy
@@ -920,10 +919,10 @@ def adjust_targets_with_levels(signal, candles, config):
     levels = []
     try:
         from strategy_support_resistance import _get_daily_levels, _get_opening_range, _find_pivot_highs, _find_pivot_lows
-        from datetime import datetime, timezone, timedelta
+        from datetime import datetime, timedelta
         
         # Helper for IST
-        now_ist = datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
+        now_ist = datetime.now(UTC).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
         today_str = now_ist.date().isoformat()
         
         pdh, pdl, pdc = _get_daily_levels(client, instrument_key, today_str)

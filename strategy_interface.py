@@ -8,8 +8,7 @@ into the existing, working `check_*` function in strategies.py / strategy_*.py.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
 
 
 @dataclass
@@ -17,13 +16,13 @@ class Features:
     """Bundle of everything a strategy's check_* function might need. Built once per tick by
     the orchestrator/scanner and passed to every strategy identically."""
     candles: list                       # primary (e.g. 5-minute) OHLCV series, ascending
-    candles_15m: Optional[list] = None  # higher-timeframe series (also used as htf_candles)
+    candles_15m: list | None = None  # higher-timeframe series (also used as htf_candles)
     htf_trend: str = "neutral"
-    config: Optional[dict] = None
-    regime: Optional[str] = None        # precomputed market regime, if the caller has one
+    config: dict | None = None
+    regime: str | None = None        # precomputed market regime, if the caller has one
 
 
-def _normalize_signal(sig: Optional[dict]) -> Optional[dict]:
+def _normalize_signal(sig: dict | None) -> dict | None:
     """Additive normalization: injects a `direction` ("long"/"short") plus `entry`/`stop`/
     `target` aliases for the spec's Signal field names, without removing or renaming any of the
     existing entry_price/stop_loss/target_1 keys main.py already reads."""
@@ -42,7 +41,7 @@ class Strategy(ABC):
     name: str = "Strategy"
 
     @abstractmethod
-    def generate(self, features: Features) -> Optional[dict]:
+    def generate(self, features: Features) -> dict | None:
         """Returns a signal dict (direction/entry/stop/target/confidence, plus the strategy's
         own native fields) or None if no signal fires."""
         raise NotImplementedError
@@ -58,7 +57,7 @@ class ORBStrategy(Strategy):
     def suitable_regimes(self) -> list:
         return ["trending_up", "trending_down"]
 
-    def generate(self, features: Features) -> Optional[dict]:
+    def generate(self, features: Features) -> dict | None:
         from strategies import check_orb_strategy
         return _normalize_signal(check_orb_strategy(features.candles, 5, 15, features.htf_trend))
 
@@ -69,7 +68,7 @@ class VWAPPullbackStrategy(Strategy):
     def suitable_regimes(self) -> list:
         return ["trending_up", "trending_down", "ranging"]
 
-    def generate(self, features: Features) -> Optional[dict]:
+    def generate(self, features: Features) -> dict | None:
         from strategies import check_vwap_pullback_strategy
         return _normalize_signal(check_vwap_pullback_strategy(features.candles, features.htf_trend))
 
@@ -80,7 +79,7 @@ class MomentumStrategy(Strategy):
     def suitable_regimes(self) -> list:
         return ["trending_up", "trending_down"]
 
-    def generate(self, features: Features) -> Optional[dict]:
+    def generate(self, features: Features) -> dict | None:
         from strategies import check_momentum_breakout_strategy
         return _normalize_signal(check_momentum_breakout_strategy(features.candles, features.htf_trend))
 
@@ -91,7 +90,7 @@ class MeanReversionStrategy(Strategy):
     def suitable_regimes(self) -> list:
         return ["choppy", "ranging"]
 
-    def generate(self, features: Features) -> Optional[dict]:
+    def generate(self, features: Features) -> dict | None:
         from strategies import check_mean_reversion_strategy
         return _normalize_signal(check_mean_reversion_strategy(features.candles))
 
@@ -102,7 +101,7 @@ class TrendFollowStrategy(Strategy):
     def suitable_regimes(self) -> list:
         return ["trending_up", "trending_down"]
 
-    def generate(self, features: Features) -> Optional[dict]:
+    def generate(self, features: Features) -> dict | None:
         from strategies import check_trend_following_strategy
         return _normalize_signal(check_trend_following_strategy(features.candles, features.htf_trend))
 
@@ -113,7 +112,7 @@ class VWAPTrendPullbackStrategy(Strategy):
     def suitable_regimes(self) -> list:
         return ["trending_up", "trending_down"]
 
-    def generate(self, features: Features) -> Optional[dict]:
+    def generate(self, features: Features) -> dict | None:
         from strategy_vwap_trend_pullback import check_vwap_trend_pullback
         return _normalize_signal(check_vwap_trend_pullback(
             features.candles, htf_candles=features.candles_15m,
@@ -127,7 +126,7 @@ class SupportResistanceStrategy(Strategy):
     def suitable_regimes(self) -> list:
         return ["trending_up", "trending_down", "ranging", "choppy"]
 
-    def generate(self, features: Features) -> Optional[dict]:
+    def generate(self, features: Features) -> dict | None:
         from strategy_support_resistance import check_support_resistance_strategy
         return _normalize_signal(check_support_resistance_strategy(
             features.candles, candles_15m=features.candles_15m,
@@ -141,7 +140,7 @@ class CandlestickConfluenceStrategy(Strategy):
     def suitable_regimes(self) -> list:
         return ["trending_up", "trending_down", "ranging", "choppy"]
 
-    def generate(self, features: Features) -> Optional[dict]:
+    def generate(self, features: Features) -> dict | None:
         from strategy_candlestick_confluence import check_candlestick_confluence_strategy
         return _normalize_signal(check_candlestick_confluence_strategy(
             features.candles, candles_15m=features.candles_15m,

@@ -170,7 +170,6 @@ def detect_morning_star(candles) -> bool:
         
     c1_body = c1['open'] - c1['close']
     c2_body = abs(c2['close'] - c2['open'])
-    c3_body = c3['close'] - c3['open']
     
     # 2. Second must be a star (small body)
     if c2_body >= (c1_body * 0.35):
@@ -201,7 +200,6 @@ def detect_evening_star(candles) -> bool:
         
     c1_body = c1['close'] - c1['open']
     c2_body = abs(c2['close'] - c2['open'])
-    c3_body = c1['open'] - c3['close']  # raw difference for comparison
     
     # 2. Second must be a star (small body)
     if c2_body >= (c1_body * 0.35):

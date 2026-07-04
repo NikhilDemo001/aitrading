@@ -1,11 +1,10 @@
-import os
 import time
 import asyncio
 from datetime import datetime, timedelta
 import unittest
 from unittest.mock import MagicMock, AsyncMock, call, patch
 
-from upstox_client import RateLimiter, UpstoxClient
+from upstox_client import RateLimiter
 from backtester import run_backtest
 import main
 

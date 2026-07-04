@@ -10,7 +10,6 @@ Reinforcement Learning Engine for Trading Intelligence
 
 import os
 import json
-import datetime
 import math
 import random
 
@@ -96,7 +95,7 @@ class QLearningAgent:
         """Loads Q-table and network weights from policy file if it exists."""
         if os.path.exists(self.policy_path):
             try:
-                with open(self.policy_path, "r") as f:
+                with open(self.policy_path) as f:
                     data = json.load(f)
                 
                 # Support dictionary with dual elements (network weights + Q-table)
@@ -415,7 +414,6 @@ class QLearningAgent:
                     reward = self.calculate_counterfactual_reward(is_win)
                 else:
                     qty = float(trade.get("quantity", 1.0))
-                    entry = float(trade.get("entry_price", 1.0))
                     # Estimate risk_amount using atr_at_entry or entry/stop gap
                     atr = float(trade.get("atr_at_entry") or 0.0)
                     risk_amount = atr * qty if atr > 0 else abs(pnl) or 1.0

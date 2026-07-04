@@ -11,7 +11,6 @@ parks INACTIVE proposals that must still pass promotion_gate before ever going l
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Optional
 
 import jsonl_logger
 import llm_engine
@@ -44,7 +43,7 @@ def _build_day_context(date_str: str, day_trades: list) -> dict:
     }
 
 
-def run_eod(date_str: str, day_trades: list, config: Optional[dict], client=None) -> dict:
+def run_eod(date_str: str, day_trades: list, config: dict | None, client=None) -> dict:
     """1) extract lessons for the day's closed trades and backfill them into wins/losses.jsonl,
     2) generate one INACTIVE proposal from the day's context, 3) re-evaluate every non-terminal
     proposal against the Promotion Gate. Returns a small summary for logging."""

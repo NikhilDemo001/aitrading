@@ -1,7 +1,6 @@
 """Unit tests for Candlestick Pattern Confluence (CPC) Strategy."""
 
 import unittest
-import math
 from strategy_candlestick_confluence import check_candlestick_confluence_strategy
 
 class MockClient:

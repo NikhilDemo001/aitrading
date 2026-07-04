@@ -6,8 +6,6 @@ Model Validator for Out-of-Sample Walk-Forward Testing
 3. Rejects model updates that result in worse performance or increased drawdowns.
 """
 
-import os
-import json
 from learning_engine import QLearningAgent
 
 def validate_model_update(trade_history, temp_policy_path, current_policy_path):
@@ -75,7 +73,7 @@ def validate_model_update(trade_history, temp_policy_path, current_policy_path):
     # 2. Proposed policy must not increase drawdowns by more than 10%
     approved = (proposed_pnl >= current_pnl) and (proposed_drawdowns <= current_drawdowns * 1.1)
     
-    print(f"[Model Validator] Walk-forward results:")
+    print("[Model Validator] Walk-forward results:")
     print(f"  Current Policy PnL: Rs. {current_pnl:.2f} | Drawdowns: {current_drawdowns}")
     print(f"  Proposed Policy PnL: Rs. {proposed_pnl:.2f} | Drawdowns: {proposed_drawdowns}")
     print(f"  Validation Outcome: {'APPROVED' if approved else 'REJECTED'}")

@@ -17,7 +17,6 @@ import json
 import math
 import os
 from collections import defaultdict
-from typing import Optional
 
 import jsonl_logger
 
@@ -110,7 +109,7 @@ def compute_stats(trades: list, halflife: int = 40) -> dict:
     return stats
 
 
-def rebuild(halflife: Optional[int] = None, config: Optional[dict] = None) -> dict:
+def rebuild(halflife: int | None = None, config: dict | None = None) -> dict:
     """Reads wins.jsonl + losses.jsonl fresh and rewrites data/strategy_stats.json. Called both
     intraday (Section 3's time_for_intraday_learning()) and at EOD."""
     halflife = halflife if halflife is not None else (config or {}).get("recency_halflife_trades", 40)
@@ -133,8 +132,8 @@ def get_strategy_order_for(
     regime: str,
     time_bucket: str,
     min_samples: int = 15,
-    stats: Optional[dict] = None,
-) -> Optional[list]:
+    stats: dict | None = None,
+) -> list | None:
     """Returns base strategy names ranked by recency-weighted expectancy for this (regime,
     time_bucket), restricted to combos with >= min_samples trades (Section 5A's minimum-sample
     fallback rule). Returns None if no combo yet qualifies — the caller should fall back to
@@ -155,7 +154,7 @@ def explain_pick(
     time_bucket: str,
     chosen_strategy: str,
     min_samples: int = 15,
-    stats: Optional[dict] = None,
+    stats: dict | None = None,
 ) -> str:
     """Human-readable reasoning string for data/decisions.log and the UI's selector-reasoning
     panel (Section 8 Tab 1: 'the selector's reasoning and the compared scores it chose from')."""

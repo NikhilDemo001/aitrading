@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pytest
 
-from risk_manager import RiskManager, RiskDecision
+from risk_manager import RiskManager
 
 
 def make_config(**overrides):

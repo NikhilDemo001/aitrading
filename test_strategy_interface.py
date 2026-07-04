@@ -53,7 +53,7 @@ def test_generate_signal_matrix_does_not_raise_on_short_candle_list():
     data — every entry should just be None (or a caught-error dict), never propagate."""
     features = Features(candles=make_candles(n=5), config={})
     matrix = generate_signal_matrix(features)
-    for name, signal in matrix.items():
+    for signal in matrix.values():
         assert signal is None or isinstance(signal, dict)
 
 

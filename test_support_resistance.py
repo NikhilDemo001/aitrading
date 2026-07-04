@@ -6,7 +6,7 @@ and HTF trend alignment.
 """
 
 import datetime
-from strategy_support_resistance import check_support_resistance_strategy, SRLevel
+from strategy_support_resistance import check_support_resistance_strategy
 
 class MockClient:
     def __init__(self, daily_candles=None):

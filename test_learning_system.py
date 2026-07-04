@@ -10,7 +10,6 @@ Unit and System Tests for the AI Self-Learning Trading Intelligence System
 
 import os
 import json
-import shutil
 import unittest
 import datetime
 from learning_engine import QLearningAgent
@@ -178,8 +177,8 @@ class TestAISelfLearningSystem(unittest.TestCase):
             "time": "12:30"
         }
         
-        fav_state_key = self.agent.discretize_state(fav_context)     # trending_up_normal_strong_yes_yes_morning
-        unfav_state_key = self.agent.discretize_state(unfav_context) # choppy_high_weak_no_no_midday
+        _fav_state_key = self.agent.discretize_state(fav_context)     # trending_up_normal_strong_yes_yes_morning
+        _unfav_state_key = self.agent.discretize_state(unfav_context) # choppy_high_weak_no_no_midday
         
         trade_history = []
         today_str = datetime.date.today().isoformat()
@@ -199,14 +198,12 @@ class TestAISelfLearningSystem(unittest.TestCase):
                 # Favorable state wins 80% of the time
                 is_win = (i % 10 < 8)
                 pnl = 1500.0 if is_win else -500.0
-                risk = 500.0
                 market_context = fav_context
                 regime = "trending_up"
             else:
                 # Unfavorable state loses 80% of the time
                 is_win = (i % 10 < 2)
                 pnl = 1000.0 if is_win else -1000.0
-                risk = 1000.0
                 market_context = unfav_context
                 regime = "choppy"
                 
@@ -323,7 +320,7 @@ class TestAISelfLearningSystem(unittest.TestCase):
         report_path = "daily_learning_report.md"
         self.assertTrue(os.path.exists(report_path))
         
-        with open(report_path, "r", encoding="utf-8") as f:
+        with open(report_path, encoding="utf-8") as f:
             content = f.read()
             
         # Check for key sections

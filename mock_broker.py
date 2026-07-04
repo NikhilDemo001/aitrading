@@ -14,7 +14,7 @@ from __future__ import annotations
 import random
 import time
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 from broker_base import BrokerAdapter
 
@@ -42,7 +42,7 @@ class MockBroker(BrokerAdapter):
         order_type: str,
         price: float,
         tag: str = "",
-        instrument_key: Optional[str] = None,
+        instrument_key: str | None = None,
     ) -> dict:
         self._order_counter += 1
         order_id = f"MOCK-{self._order_counter}-{int(time.time() * 1000)}"
@@ -71,7 +71,7 @@ class MockBroker(BrokerAdapter):
     def get_order_status(self, order_id: str) -> dict:
         return self._orders.get(order_id, {"order_id": order_id, "status": "unknown"})
 
-    def get_market_quote(self, instrument_key: str) -> Optional[dict]:
+    def get_market_quote(self, instrument_key: str) -> dict | None:
         return {
             "ltp": self._price_for(instrument_key),
             "volume": self._rng.randint(50000, 500000),
@@ -81,7 +81,7 @@ class MockBroker(BrokerAdapter):
     def get_market_quotes(self, instrument_keys: list) -> dict:
         return {k: self.get_market_quote(k) for k in instrument_keys}
 
-    def get_intraday_candles(self, instrument_key: str, interval: str = "5minute") -> Optional[list]:
+    def get_intraday_candles(self, instrument_key: str, interval: str = "5minute") -> list | None:
         base = self._price_for(instrument_key)
         candles = []
         price = base * 0.98
@@ -102,7 +102,7 @@ class MockBroker(BrokerAdapter):
             price = c
         return candles
 
-    def get_funds_and_margin(self) -> Optional[dict]:
+    def get_funds_and_margin(self) -> dict | None:
         return {
             "status": "success",
             "data": {"equity": {"available_margin": self.starting_capital, "used_margin": 0.0}},

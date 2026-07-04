@@ -23,11 +23,9 @@ from __future__ import annotations
 
 import glob
 import json
-import math
 import os
 from collections import defaultdict
 from datetime import datetime
-from typing import Optional
 
 import jsonl_logger
 import leaderboard
@@ -110,7 +108,7 @@ def _max_drawdown(trades: list) -> float:
     return round(max_dd, 2)
 
 
-def _band(value: Optional[float], edges: list, labels: list) -> Optional[str]:
+def _band(value: float | None, edges: list, labels: list) -> str | None:
     """Maps a numeric value into a labeled band. len(labels) must be len(edges)+1."""
     if value is None:
         return None
@@ -133,7 +131,7 @@ def _rewrite_replacing_date(path: str, date_str: str, new_rows: list) -> None:
 
 # ── writers ──────────────────────────────────────────────────────────────────────────
 
-def snapshot_leaderboard(date_str: str, stats: Optional[dict] = None) -> dict:
+def snapshot_leaderboard(date_str: str, stats: dict | None = None) -> dict:
     """Freezes the full Lane-A leaderboard as it stood at the end of `date_str`. Overwriting the
     same date's file is naturally idempotent."""
     _ensure_dir()
@@ -182,7 +180,7 @@ _ATR_EDGES = [0.5, 1.0, 1.5]
 _ATR_LABELS = ["<0.5%", "0.5-1%", "1-1.5%", ">1.5%"]
 
 
-def _feature_bucket(trade: dict, dimension: str) -> Optional[str]:
+def _feature_bucket(trade: dict, dimension: str) -> str | None:
     ind = trade.get("indicators_at_entry") or {}
     if dimension == "rsi":
         return _band(ind.get("rsi"), _RSI_EDGES, _RSI_LABELS)
@@ -237,7 +235,7 @@ def snapshot_feature_stats(date_str: str, day_trades: list) -> list:
 def snapshot_kpi_daily(
     date_str: str,
     day_trades: list,
-    capital_start: Optional[float] = None,
+    capital_start: float | None = None,
 ) -> dict:
     """One KPI row for `date_str`: trades, win rate, expectancy, profit factor, max drawdown,
     net P&L, equity — powering the cumulative/trend charts and the calendar heatmap (Tab 8)."""
@@ -267,9 +265,9 @@ def snapshot_kpi_daily(
 
 
 def write_all(
-    date_str: Optional[str] = None,
-    capital_start: Optional[float] = None,
-    stats: Optional[dict] = None,
+    date_str: str | None = None,
+    capital_start: float | None = None,
+    stats: dict | None = None,
 ) -> dict:
     """EOD convenience: snapshot all four history artifacts for `date_str` (default: today).
     Reads closed trades from wins.jsonl/losses.jsonl and filters to the given date. Called from
@@ -299,7 +297,7 @@ def list_snapshot_dates() -> list:
     return sorted(dates)
 
 
-def load_leaderboard_asof(date_str: str) -> Optional[dict]:
+def load_leaderboard_asof(date_str: str) -> dict | None:
     """Leaderboard exactly as it stood at EOD on `date_str`, or the most recent prior snapshot
     if that exact date has none (weekend/holiday) — so 'as-of' always resolves to what the bot
     actually knew on or before that day."""
@@ -314,7 +312,7 @@ def load_leaderboard_asof(date_str: str) -> Optional[dict]:
         return json.load(f)
 
 
-def _load_range(filename: str, start: Optional[str], end: Optional[str]) -> list:
+def _load_range(filename: str, start: str | None, end: str | None) -> list:
     rows = jsonl_logger.read_jsonl(_path(filename))
     if start is None and end is None:
         return rows
@@ -326,15 +324,15 @@ def _load_range(filename: str, start: Optional[str], end: Optional[str]) -> list
     return out
 
 
-def load_pattern_stats(start: Optional[str] = None, end: Optional[str] = None) -> list:
+def load_pattern_stats(start: str | None = None, end: str | None = None) -> list:
     return _load_range(PATTERN_STATS_FILE, start, end)
 
 
-def load_feature_stats(start: Optional[str] = None, end: Optional[str] = None) -> list:
+def load_feature_stats(start: str | None = None, end: str | None = None) -> list:
     return _load_range(FEATURE_STATS_FILE, start, end)
 
 
-def load_kpi_daily(start: Optional[str] = None, end: Optional[str] = None) -> list:
+def load_kpi_daily(start: str | None = None, end: str | None = None) -> list:
     return sorted(_load_range(KPI_DAILY_FILE, start, end), key=lambda r: r.get("snapshot_date", ""))
 
 
@@ -345,7 +343,7 @@ def load_all_trades() -> list:
     return _all_closed_trades()
 
 
-def trades_in_range(trades: list, start: Optional[str] = None, end: Optional[str] = None) -> list:
+def trades_in_range(trades: list, start: str | None = None, end: str | None = None) -> list:
     """Filter trades by exit-date inclusive [start, end]."""
     out = []
     for t in trades:

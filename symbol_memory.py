@@ -10,9 +10,6 @@ Learns from past trades per symbol:
 """
 
 import sqlite3
-import os
-import datetime
-from datetime import timezone, timedelta
 
 MEMORY_DB = "symbol_memory.db"
 

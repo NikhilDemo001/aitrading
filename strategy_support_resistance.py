@@ -9,7 +9,7 @@ Advanced Support and Resistance (S/R) Trading Strategy
 """
 
 import datetime
-from datetime import timezone, timedelta
+from datetime import timedelta
 
 # Cache for Previous Day levels to avoid hitting rate limits.
 # Key: instrument_key, Value: {"date": "YYYY-MM-DD", "pdh": float, "pdl": float, "pdc": float}
@@ -17,7 +17,7 @@ _DAILY_LEVELS_CACHE = {}
 
 def get_ist_now():
     """Returns timezone-naive datetime representing IST (India Standard Time)."""
-    return datetime.datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
+    return datetime.datetime.now(datetime.UTC).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
 
 class SRLevel:
     def __init__(self, price, source, timeframe, base_weight):
@@ -290,7 +290,7 @@ def check_support_resistance_strategy(candles_5m, candles_15m=None, config=None,
                 risk = curr["close"] - stop_loss
                 if risk > 0.05:
                     return {
-                        "strategy": f"SupportResistance-Breakout-Buy",
+                        "strategy": "SupportResistance-Breakout-Buy",
                         "trigger_time": curr["timestamp"],
                         "entry_price": round(curr["close"], 2),
                         "stop_loss": round(stop_loss, 2),
@@ -320,7 +320,7 @@ def check_support_resistance_strategy(candles_5m, candles_15m=None, config=None,
                 risk = stop_loss - curr["close"]
                 if risk > 0.05:
                     return {
-                        "strategy": f"SupportResistance-Breakout-Short",
+                        "strategy": "SupportResistance-Breakout-Short",
                         "trigger_time": curr["timestamp"],
                         "entry_price": round(curr["close"], 2),
                         "stop_loss": round(stop_loss, 2),
@@ -364,7 +364,7 @@ def check_support_resistance_strategy(candles_5m, candles_15m=None, config=None,
                 risk = curr["close"] - stop_loss
                 if risk > 0.05:
                     return {
-                        "strategy": f"SupportResistance-Rejection-Buy",
+                        "strategy": "SupportResistance-Rejection-Buy",
                         "trigger_time": curr["timestamp"],
                         "entry_price": round(curr["close"], 2),
                         "stop_loss": round(stop_loss, 2),
@@ -402,7 +402,7 @@ def check_support_resistance_strategy(candles_5m, candles_15m=None, config=None,
                 risk = stop_loss - curr["close"]
                 if risk > 0.05:
                     return {
-                        "strategy": f"SupportResistance-Rejection-Short",
+                        "strategy": "SupportResistance-Rejection-Short",
                         "trigger_time": curr["timestamp"],
                         "entry_price": round(curr["close"], 2),
                         "stop_loss": round(stop_loss, 2),

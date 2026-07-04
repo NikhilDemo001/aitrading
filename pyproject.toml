@@ -1,0 +1,32 @@
+[tool.ruff]
+target-version = "py314"
+line-length = 120
+extend-exclude = [
+    "MarketDataFeedV3_pb2.py", # protoc-generated
+    "frontend",
+    "static",
+]
+
+[tool.ruff.lint]
+select = [
+    "E4",      # imports
+    "E7",      # statement style
+    "E9",      # syntax/runtime errors
+    "F",       # pyflakes (unused imports/vars, undefined names)
+    "UP",      # pyupgrade (modern syntax, Optional[X] -> X | None)
+    "B",       # bugbear (likely bugs: mutable defaults, late-binding loops)
+    "RUF013",  # implicit Optional (x: str = None)
+]
+ignore = [
+    "E701", # one-line `if x: y` is established style here (adopt `ruff format` to revisit)
+    "E702", # same, semicolon-joined statements
+    "E741", # legacy short names (l, O); renaming is churn in trading logic
+    "B904", # API handlers deliberately translate exceptions to HTTPException without chaining
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Router wiring imports live at the bottom of main.py by design (need app + client).
+"main.py" = ["E402"]
+# Strategy-module imports sit at the bottom because those modules import helpers back
+# from strategies (circular otherwise).
+"strategies.py" = ["E402"]

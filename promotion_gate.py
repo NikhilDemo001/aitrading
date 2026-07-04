@@ -20,7 +20,6 @@ import json
 import os
 import uuid
 from datetime import datetime
-from typing import Optional
 
 import jsonl_logger
 
@@ -49,7 +48,7 @@ def load_proposals() -> list:
     return jsonl_logger.read_jsonl(proposals_path())
 
 
-def get_proposal(proposal_id: str) -> Optional[dict]:
+def get_proposal(proposal_id: str) -> dict | None:
     for p in load_proposals():
         if p.get("id") == proposal_id:
             return p
@@ -69,7 +68,7 @@ def _append(proposal: dict) -> None:
         f.write(json.dumps(proposal) + "\n")
 
 
-def _update(proposal_id: str, mutate) -> Optional[dict]:
+def _update(proposal_id: str, mutate) -> dict | None:
     proposals = load_proposals()
     updated = None
     for p in proposals:
@@ -82,7 +81,7 @@ def _update(proposal_id: str, mutate) -> Optional[dict]:
     return updated
 
 
-def _event(proposal: dict, status: str, note: str = "", extra: Optional[dict] = None) -> None:
+def _event(proposal: dict, status: str, note: str = "", extra: dict | None = None) -> None:
     proposal["status"] = status
     proposal.setdefault("lifecycle", []).append({
         "at": _now(), "status": status, "note": note, **(extra or {})
@@ -113,7 +112,7 @@ def add_proposal(proposal: dict) -> dict:
 
 # ── evidence recording ────────────────────────────────────────────────────────────────
 
-def record_backtest(proposal_id: str, result: dict) -> Optional[dict]:
+def record_backtest(proposal_id: str, result: dict) -> dict | None:
     """result: {'expectancy': float, 'trades': int, 'max_drawdown': float, ...}"""
     def m(p):
         p["backtest"] = result
@@ -121,7 +120,7 @@ def record_backtest(proposal_id: str, result: dict) -> Optional[dict]:
     return _update(proposal_id, m)
 
 
-def record_paper_progress(proposal_id: str, trades: int, expectancy: Optional[float]) -> Optional[dict]:
+def record_paper_progress(proposal_id: str, trades: int, expectancy: float | None) -> dict | None:
     def m(p):
         p["paper"] = {"trades": int(trades), "expectancy": expectancy}
         _event(p, VALIDATING, "paper-validation progress", {"trades": trades, "expectancy": expectancy})
@@ -130,7 +129,7 @@ def record_paper_progress(proposal_id: str, trades: int, expectancy: Optional[fl
 
 # ── the gate (pure, unit-testable — DoD #5) ────────────────────────────────────────────
 
-def gate_decision(backtest: Optional[dict], paper: Optional[dict], config: Optional[dict]) -> dict:
+def gate_decision(backtest: dict | None, paper: dict | None, config: dict | None) -> dict:
     """Pure evaluation of the Promotion Gate against thresholds. Returns
     {'passes': bool, 'require_approval': bool, 'reasons': [str]} — no I/O, no state."""
     config = config or {}
@@ -166,7 +165,7 @@ def gate_decision(backtest: Optional[dict], paper: Optional[dict], config: Optio
     return {"passes": passes, "require_approval": require_approval, "reasons": reasons}
 
 
-def evaluate(proposal_id: str, config: Optional[dict]) -> Optional[dict]:
+def evaluate(proposal_id: str, config: dict | None) -> dict | None:
     """Run the gate on a stored proposal and advance its lifecycle accordingly:
       fail (with a backtest present, unfixable) -> rejected;
       fail (still gathering evidence)           -> validating;
@@ -199,7 +198,7 @@ def evaluate(proposal_id: str, config: Optional[dict]) -> Optional[dict]:
 
 # ── human approval (Section 5 / Tab 7) ─────────────────────────────────────────────────
 
-def approve(proposal_id: str, approver: str = "operator") -> Optional[dict]:
+def approve(proposal_id: str, approver: str = "operator") -> dict | None:
     def m(p):
         if p.get("status") in TERMINAL:
             return
@@ -208,7 +207,7 @@ def approve(proposal_id: str, approver: str = "operator") -> Optional[dict]:
     return _update(proposal_id, m)
 
 
-def reject(proposal_id: str, approver: str = "operator", reason: str = "") -> Optional[dict]:
+def reject(proposal_id: str, approver: str = "operator", reason: str = "") -> dict | None:
     def m(p):
         if p.get("status") in TERMINAL:
             return

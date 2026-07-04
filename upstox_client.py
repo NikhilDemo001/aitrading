@@ -64,7 +64,7 @@ class UpstoxClient:
                     pass
 
         try:
-            with open(env_path, "r") as f:
+            with open(env_path) as f:
                 lines = f.readlines()
         except Exception:
             lines = []
@@ -92,7 +92,7 @@ class UpstoxClient:
         except ImportError:
             pass
 
-        with open(self.config_path, "r") as f:
+        with open(self.config_path) as f:
             self.config = json.load(f)
 
         self.api_key = os.environ.get("UPSTOX_API_KEY") or self.config.get("api_key")
@@ -118,7 +118,7 @@ class UpstoxClient:
     def load_instrument_map(self):
         if os.path.exists(self.instrument_map_path):
             try:
-                with open(self.instrument_map_path, "r") as f:
+                with open(self.instrument_map_path) as f:
                     self.instrument_map = json.load(f)
                 print(f"Loaded {len(self.instrument_map)} instruments from local map.")
             except Exception as e:
@@ -126,7 +126,7 @@ class UpstoxClient:
                 self.instrument_map = {}
         if os.path.exists(self.futures_map_path):
             try:
-                with open(self.futures_map_path, "r") as f:
+                with open(self.futures_map_path) as f:
                     self.futures_map = json.load(f)
                 print(f"Loaded futures contracts for {len(self.futures_map)} underlyings.")
             except Exception as e:
@@ -134,7 +134,7 @@ class UpstoxClient:
                 self.futures_map = {}
         if os.path.exists(self.options_map_path):
             try:
-                with open(self.options_map_path, "r") as f:
+                with open(self.options_map_path) as f:
                     self.options_map = json.load(f)
                 print(f"Loaded options contracts for {len(self.options_map)} underlyings.")
             except Exception as e:
@@ -328,7 +328,8 @@ class UpstoxClient:
         url = "https://nsearchives.nseindia.com/content/indices/ind_nifty50list.csv"
         headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
         try:
-            import csv, io
+            import csv
+            import io
             response = self.session.get(url, headers=headers, timeout=15)
             if response.status_code != 200:
                 print(f"Failed to fetch Nifty 50 list: status code {response.status_code}")
@@ -593,7 +594,8 @@ class UpstoxClient:
         if not self.access_token:
             return True
         try:
-            import base64, json as _j
+            import base64
+            import json as _j
             payload = self.access_token.split('.')[1]
             payload += '=' * (4 - len(payload) % 4)
             data = _j.loads(base64.b64decode(payload))
@@ -614,7 +616,8 @@ class UpstoxClient:
             # For paper trading, simply extend token lifetime or generate a new mock token
             log_token = "eyJ0eXAiOiJKV1QiLCJrZXlfaWQiOiJza192MS4wIiwiYWxnIjoiSFMyNTYifQ"
             # mock standard payload with future expiry (1 day)
-            import json as _j, base64
+            import json as _j
+            import base64
             mock_payload = {
                 "sub": "FP0592",
                 "iat": int(datetime.now().timestamp()),

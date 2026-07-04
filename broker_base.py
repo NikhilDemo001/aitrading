@@ -15,7 +15,7 @@ constructed with.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any
 
 
 class BrokerAdapter(ABC):
@@ -30,7 +30,7 @@ class BrokerAdapter(ABC):
         order_type: str,
         price: float,
         tag: str = "",
-        instrument_key: Optional[str] = None,
+        instrument_key: str | None = None,
     ) -> dict:
         """Returns a dict with at least {order_id, price, status}."""
         raise NotImplementedError
@@ -48,17 +48,17 @@ class BrokerAdapter(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get_market_quote(self, instrument_key: str) -> Optional[dict]:
+    def get_market_quote(self, instrument_key: str) -> dict | None:
         """Returns a dict with at least {ltp}, or None if unavailable."""
         raise NotImplementedError
 
     @abstractmethod
-    def get_intraday_candles(self, instrument_key: str, interval: str) -> Optional[list]:
+    def get_intraday_candles(self, instrument_key: str, interval: str) -> list | None:
         """Returns a list of OHLCV candle dicts (ascending by time), or None."""
         raise NotImplementedError
 
     @abstractmethod
-    def get_funds_and_margin(self) -> Optional[dict]:
+    def get_funds_and_margin(self) -> dict | None:
         """Returns a dict shaped like Upstox's funds/margin response, or None."""
         raise NotImplementedError
 

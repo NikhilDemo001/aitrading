@@ -7,7 +7,7 @@ but only enters trades when they occur at key support/resistance levels
 """
 
 import datetime
-from datetime import timezone, timedelta
+from datetime import timedelta
 from strategies import calculate_ema, calculate_vwap, calculate_atr
 from candlestick_patterns import (
     detect_hammer, detect_shooting_star, detect_bullish_engulfing,
@@ -18,7 +18,7 @@ from candlestick_patterns import (
 
 def get_ist_now():
     """Returns timezone-naive datetime representing IST."""
-    return datetime.datetime.now(timezone.utc).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
+    return datetime.datetime.now(datetime.UTC).replace(tzinfo=None) + timedelta(hours=5, minutes=30)
 
 def check_candlestick_confluence_strategy(candles_5m, candles_15m=None, config=None, htf_trend="neutral"):
     """
@@ -188,7 +188,7 @@ def check_candlestick_confluence_strategy(candles_5m, candles_15m=None, config=N
             risk = entry - stop_loss
 
         return {
-            "strategy": f"CandlestickConfluence-Buy",
+            "strategy": "CandlestickConfluence-Buy",
             "trigger_time": curr["timestamp"],
             "entry_price": round(entry, 2),
             "stop_loss": round(stop_loss, 2),
@@ -214,7 +214,7 @@ def check_candlestick_confluence_strategy(candles_5m, candles_15m=None, config=N
             risk = stop_loss - entry
 
         return {
-            "strategy": f"CandlestickConfluence-Short",
+            "strategy": "CandlestickConfluence-Short",
             "trigger_time": curr["timestamp"],
             "entry_price": round(entry, 2),
             "stop_loss": round(stop_loss, 2),
