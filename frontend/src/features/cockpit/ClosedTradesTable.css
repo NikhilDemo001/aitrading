@@ -31,3 +31,37 @@
   font-weight: 600;
   color: var(--ink) !important;
 }
+
+/* Sortable headers reuse the table's th typography (the header cells hold real buttons
+   for keyboard/screen-reader access, same pattern as HistoricalTradesTable). */
+.mq-trades-table th {
+  padding: 0;
+}
+
+.mq-trades-sort-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 8px 14px;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.mq-trades-sort-btn:hover {
+  color: var(--accent);
+}
+
+.mq-trades-row {
+  cursor: pointer;
+}
+
+.mq-trades-row:hover td {
+  background: rgba(0, 240, 255, 0.05);
+}

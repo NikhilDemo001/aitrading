@@ -1,0 +1,90 @@
+.mq-tdm-sym {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+/* Hero: big P&L + the four numbers that judge the trade */
+.mq-tdm-hero {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  padding: var(--space-4);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  margin-bottom: var(--space-5);
+}
+
+.mq-tdm-hero-profit { background: var(--profit-dim); border-color: rgba(0, 230, 118, 0.25); }
+.mq-tdm-hero-loss   { background: var(--loss-dim);   border-color: rgba(255, 45, 85, 0.25); }
+
+.mq-tdm-pnl {
+  font-size: 1.7rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.mq-tdm-hero-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 4px var(--space-5);
+  flex: 1;
+  min-width: 240px;
+}
+
+/* Hero figures are short — never let a number wrap mid-digit there. */
+.mq-tdm-hero-stats .mq-tdm-value {
+  overflow-wrap: normal;
+  white-space: nowrap;
+}
+
+.mq-tdm-section {
+  margin-bottom: var(--space-5);
+}
+
+.mq-tdm-section-title {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.mq-tdm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 2px var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.mq-tdm-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  min-width: 0;
+}
+
+.mq-tdm-label {
+  font-size: 0.64rem;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.mq-tdm-value {
+  font-size: 0.72rem;
+  color: var(--ink);
+  text-align: right;
+  overflow-wrap: anywhere;
+}

@@ -3,21 +3,13 @@ import { useQuery } from '@tanstack/react-query'
 import { Panel } from '../../design-system/Panel'
 import { Button } from '../../design-system/Button'
 import { positionsApi } from '../../lib/api/statusApi'
+import { TradeDetailModal } from './TradeDetailModal'
 import type { Trade } from '../../types/api'
+import { rMultiple, pnlPct, exitReason } from '../../lib/tradeMath'
 import './HistoricalTradesTable.css'
 
-type SortKey = 'symbol' | 'strategy' | 'exit_reason' | 'pnl' | 'pnl_pct' | 'r'
+type SortKey = 'symbol' | 'strategy' | 'reason' | 'pnl' | 'pct' | 'r'
 type SortDir = 'asc' | 'desc'
-
-function rMultiple(t: Trade): number | null {
-  const { entry_price: entry, exit_price: exit, stop_loss: stop, direction } = t
-  if (entry == null || exit == null || stop == null) return null
-  const risk = Math.abs(entry - stop)
-  if (risk === 0) return null
-  const dir = (direction ?? '').toUpperCase()
-  const raw = dir === 'SELL' || dir === 'SHORT' ? entry - exit : exit - entry
-  return raw / risk
-}
 
 export function HistoricalTradesTable() {
   const { data, isLoading, isError, refetch, isFetching } = useQuery({
@@ -25,21 +17,30 @@ export function HistoricalTradesTable() {
     queryFn: positionsApi.getTradesAll,
     enabled: false, // click-to-fetch
   })
+  const [selected, setSelected] = useState<Trade | null>(null)
   const [q, setQ] = useState('')
   const [sortKey, setSortKey] = useState<SortKey>('pnl')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
 
   const rows = useMemo(() => {
-    let out = (data ?? []).map((t) => ({ ...t, _r: rMultiple(t) }))
+    let out = (data ?? []).map((t) => ({ t, r: rMultiple(t), pct: pnlPct(t), reason: exitReason(t) }))
     const needle = q.trim().toLowerCase()
     if (needle) {
-      out = out.filter((t) =>
-        [t.symbol, t.strategy, t.exit_reason].some((v) => (v ?? '').toLowerCase().includes(needle)),
+      out = out.filter(({ t, reason }) =>
+        [t.symbol, t.strategy, reason].some((v) => (v ?? '').toLowerCase().includes(needle)),
       )
     }
+    const val = (row: (typeof out)[number]): number | string | undefined => {
+      switch (sortKey) {
+        case 'r': return row.r ?? undefined
+        case 'pct': return row.pct ?? undefined
+        case 'reason': return row.reason ?? undefined
+        default: return row.t[sortKey] as number | string | undefined
+      }
+    }
     out.sort((a, b) => {
-      const av = sortKey === 'r' ? (a._r ?? -Infinity) : (a[sortKey] as number | string | undefined)
-      const bv = sortKey === 'r' ? (b._r ?? -Infinity) : (b[sortKey] as number | string | undefined)
+      const av = val(a)
+      const bv = val(b)
       let cmp: number
       if (typeof av === 'number' || typeof bv === 'number') cmp = ((av as number) ?? -Infinity) - ((bv as number) ?? -Infinity)
       else cmp = String(av ?? '').localeCompare(String(bv ?? ''))
@@ -97,29 +98,38 @@ export function HistoricalTradesTable() {
             <tr>
               {sortableTh('symbol', 'Symbol')}
               {sortableTh('strategy', 'Strategy')}
-              {sortableTh('exit_reason', 'Exit Reason')}
+              {sortableTh('reason', 'Exit Reason')}
               {sortableTh('pnl', 'P&L')}
-              {sortableTh('pnl_pct', 'P&L %')}
+              {sortableTh('pct', 'P&L %')}
               {sortableTh('r', 'R')}
             </tr>
           </thead>
           <tbody>
-            {rows.map((t, i) => {
+            {rows.map(({ t, r, pct, reason }, i) => {
               const pnl = t.pnl ?? 0
               return (
-                <tr key={i}>
+                <tr
+                  key={i}
+                  className="mq-hist-row"
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Open details for ${t.symbol} trade`}
+                  onClick={() => setSelected(t)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(t) } }}
+                >
                   <td className="mq-hist-sym">{t.symbol}</td>
                   <td>{t.strategy ?? '—'}</td>
-                  <td className="text-dim">{t.exit_reason ?? '—'}</td>
+                  <td className="text-dim">{reason ?? '—'}</td>
                   <td className={`num ${pnl >= 0 ? 'text-profit' : 'text-loss'}`}>{pnl >= 0 ? '+' : ''}₹{pnl.toFixed(2)}</td>
-                  <td className={`num ${(t.pnl_pct ?? 0) >= 0 ? 'text-profit' : 'text-loss'}`}>{t.pnl_pct != null ? `${t.pnl_pct.toFixed(2)}%` : '—'}</td>
-                  <td className={`num ${(t._r ?? 0) >= 0 ? 'text-profit' : 'text-loss'}`}>{t._r != null ? `${t._r.toFixed(2)}R` : '—'}</td>
+                  <td className={`num ${(pct ?? 0) >= 0 ? 'text-profit' : 'text-loss'}`}>{pct != null ? `${pct.toFixed(2)}%` : '—'}</td>
+                  <td className={`num ${(r ?? 0) >= 0 ? 'text-profit' : 'text-loss'}`}>{r != null ? `${r.toFixed(2)}R` : '—'}</td>
                 </tr>
               )
             })}
           </tbody>
         </table>
       )}
+      {selected && <TradeDetailModal trade={selected} onClose={() => setSelected(null)} />}
     </Panel>
   )
 }

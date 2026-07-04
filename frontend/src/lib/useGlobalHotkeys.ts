@@ -24,6 +24,9 @@ export function useGlobalHotkeys() {
       if (e.key in TAB_KEYS) {
         setActiveTab(TAB_KEYS[e.key])
       } else if (e.key === 'Escape') {
+        // Escape also closes dialogs — never treat it as square-off while one is open,
+        // even if the dialog's own handler failed to swallow the event.
+        if (document.querySelector('[role="dialog"]')) return
         if (confirm('Square off all open positions now?')) {
           statusApi.squareOff().catch(console.error)
         }

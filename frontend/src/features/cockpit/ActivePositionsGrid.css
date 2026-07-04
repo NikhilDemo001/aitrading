@@ -5,7 +5,7 @@
 
 .mq-positions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: var(--space-3);
   padding: var(--space-4);
 }
@@ -17,13 +17,18 @@
   padding: var(--space-3);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
+
+/* Side tint: long = profit green edge, short = loss magenta edge */
+.mq-position-card-long  { border-left: 2px solid var(--profit); }
+.mq-position-card-short { border-left: 2px solid var(--loss); }
 
 .mq-position-hdr {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
 .mq-position-sym {
@@ -32,16 +37,135 @@
   flex: 1;
 }
 
+.mq-position-pnl-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
 .mq-position-pnl {
-  font-size: 1.05rem;
+  font-size: 1.15rem;
   font-weight: 700;
 }
 
-.mq-position-meta {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  font-size: 0.62rem;
-  color: var(--ink-faint);
+.mq-position-pnl-pct {
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+/* ── SL → entry → T1 → T2 price bar ─────────────────────────────────────── */
+.mq-pos-bar {
+  padding: 2px 0 12px;
+}
+
+.mq-pos-bar-track {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.06);
+}
+
+.mq-pos-bar-zone {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-radius: 3px;
+}
+
+.mq-pos-bar-zone-loss   { background: rgba(255, 45, 85, 0.28); }
+.mq-pos-bar-zone-profit { background: rgba(0, 230, 118, 0.28); }
+
+.mq-pos-bar-mark {
+  position: absolute;
+  top: -2px;
+  width: 2px;
+  height: 10px;
+  background: var(--ink-dim);
+  transform: translateX(-50%);
+}
+
+.mq-pos-bar-live {
+  position: absolute;
+  top: -3px;
+  width: 4px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 8px 1px rgba(var(--glow-cyan), 0.8);
+  transform: translateX(-50%);
+  transition: left 0.35s var(--ease-float);
+}
+
+.mq-pos-bar-labels {
+  position: relative;
+  height: 10px;
+  margin-top: 3px;
+}
+
+.mq-pos-bar-label {
+  position: absolute;
+  transform: translateX(-50%);
   font-family: var(--font-mono);
+  font-size: 0.54rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+/* ── Stat grid ──────────────────────────────────────────────────────────── */
+.mq-pos-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px var(--space-3);
+}
+
+.mq-pos-stat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  min-width: 0;
+}
+
+.mq-pos-stat-label {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+.mq-pos-stat-value {
+  font-size: 0.68rem;
+  color: var(--ink);
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* ── Live tick flash (terminal-style) ───────────────────────────────────── */
+@keyframes mq-flash-up-kf {
+  0%   { color: var(--profit); text-shadow: 0 0 10px rgba(var(--glow-green), 0.9); }
+  100% { text-shadow: none; }
+}
+
+@keyframes mq-flash-down-kf {
+  0%   { color: var(--loss); text-shadow: 0 0 10px rgba(var(--glow-magenta), 0.9); }
+  100% { text-shadow: none; }
+}
+
+.mq-flash-up   { animation: mq-flash-up-kf 0.7s ease-out; }
+.mq-flash-down { animation: mq-flash-down-kf 0.7s ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mq-flash-up,
+  .mq-flash-down {
+    animation: none;
+  }
+  .mq-pos-bar-live {
+    transition: none;
+  }
 }

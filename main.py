@@ -645,6 +645,10 @@ def load_state():
                 "exit_time": get_ist_now().isoformat(),
                 "pnl": round(_pnl, 2),
                 "reason": "STALE_STARTUP_SQUAREOFF",
+                "stop_loss": _pos.get("stop_loss"),
+                "target_1": _pos.get("target"),
+                "target_2": _pos.get("target_2"),
+                "t1_hit": _pos.get("t1_hit", False),
                 "regime": _pos.get("regime", "unknown"),
                 "htf_trend": _pos.get("htf_trend", "neutral"),
                 "is_fno": _pos.get("is_fno", False),
@@ -2729,6 +2733,12 @@ async def execute_exit(symbol, pos, exit_price, reason, paper_trading, is_shadow
             "exit_time": get_ist_now().isoformat(),
             "pnl": round(pnl, 2),
             "reason": reason,
+            # Risk levels the position was managed with — without these the dashboard/CSV
+            # can never reconstruct R-multiples for closed trades.
+            "stop_loss": pos.get("stop_loss"),
+            "target_1": pos.get("target"),
+            "target_2": pos.get("target_2"),
+            "t1_hit": pos.get("t1_hit", False),
             "regime": pos.get("regime", "unknown"),
             "htf_trend": pos.get("htf_trend", "neutral"),
             "is_fno": pos.get("is_fno", False),
@@ -3096,7 +3106,7 @@ def export_trades_csv():
             t.get("vix_at_entry", ""),
             t.get("paper_trading", ""),
             t.get("is_shadow_trade", ""),
-            t.get("exit_reason", ""),
+            t.get("exit_reason", t.get("reason", "")),  # records store the exit reason as "reason"
             holding_time
         ])
         

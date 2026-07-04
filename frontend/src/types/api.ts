@@ -18,13 +18,18 @@ export interface BotStatus {
   [key: string]: unknown
 }
 
+// direction is a plain string: the scan path writes "LONG"/"SHORT", the manual path "BUY"/"SELL".
+// Use isLongDirection() from lib/tradeMath to branch on it.
 export interface Position {
   symbol: string
-  direction: 'BUY' | 'SELL'
+  direction: string
   quantity: number
   entry_price: number
+  entry_time?: string
   stop_loss: number
   target?: number
+  target_2?: number
+  t1_hit?: boolean
   current_price?: number
   pnl?: number
   strategy?: string
@@ -33,6 +38,15 @@ export interface Position {
   htf_trend?: string
   mae?: number
   mfe?: number
+  atr_at_entry?: number
+  trailing_high?: number | null
+  trailing_low?: number | null
+  order_id?: string
+  is_fno?: boolean
+  contract?: string
+  lot_size?: number
+  market_context?: Record<string, unknown>
+  is_shadow?: boolean
   [key: string]: unknown
 }
 
@@ -47,8 +61,29 @@ export interface Trade {
   pnl?: number
   pnl_pct?: number
   quantity: number
+  /** Backend stores the exit reason as `reason`; some older paths used `exit_reason`. */
+  reason?: string
   exit_reason?: string
   stop_loss?: number
+  target_1?: number
+  target_2?: number
+  t1_hit?: boolean | number
+  holding_minutes?: number | null
+  mae?: number
+  mfe?: number
+  confluence_score?: number
+  regime?: string
+  htf_trend?: string
+  atr_at_entry?: number
+  is_fno?: boolean
+  contract?: string
+  lot_size?: number
+  order_id?: string
+  market_context?: Record<string, unknown>
+  trigger_level_source?: string | null
+  trigger_level_price?: number | null
+  trigger_level_score?: number | null
+  is_shadow_trade?: boolean
   [key: string]: unknown
 }
 
