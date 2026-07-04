@@ -716,3 +716,24 @@ class UpstoxClient:
                     return status
         return "UNKNOWN"
 
+    def get_positions(self):
+        """Live net positions from the broker (GET /v2/portfolio/short-term-positions).
+
+        Returns a list of raw position dicts (possibly empty = confirmed flat), or None when
+        the state is UNKNOWN (paper mode, or the API call failed). Callers MUST treat None as
+        "do not reconcile" — never as "flat" — or an API blip would mass-close the book.
+        Paper positions exist only inside the bot, so there is nothing broker-side to ask."""
+        if self.paper_trading:
+            return None
+        url = "https://api.upstox.com/v2/portfolio/short-term-positions"
+        try:
+            response = self.session.get(url, headers=self.get_headers(), timeout=10)
+            if response.status_code == 200:
+                res_json = response.json()
+                if res_json.get("status") == "success":
+                    return res_json.get("data") or []
+            print(f"Error fetching broker positions: HTTP {response.status_code}")
+        except Exception as e:
+            print(f"Error fetching broker positions: {e}")
+        return None
+

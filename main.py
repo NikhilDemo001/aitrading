@@ -4,6 +4,7 @@ load_dotenv()
 import json
 import asyncio
 import functools
+import time
 import threading
 from datetime import datetime, timedelta, time as datetime_time, UTC
 from contextlib import asynccontextmanager
@@ -2009,8 +2010,96 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
 
 
 
+# ── Broker-position reconciliation (live mode only) ─────────────────────────────────────
+# active_positions is the bot's own book; the real account can diverge the moment the
+# operator closes a trade from the Upstox app/web on another device. Anything the broker no
+# longer holds must be recorded as CLOSED EXTERNALLY — with its leftover SL order cancelled
+# and WITHOUT placing any new order (a "closing" order on a flat book OPENS a reverse
+# position). None from get_positions() means "state unknown": do nothing.
+
+_BROKER_RECONCILE_INTERVAL_S = 20
+_last_broker_reconcile = 0.0
+
+
+def _net_positions_by_key(rows):
+    """Broker position rows → {instrument_key: net signed quantity}."""
+    net = {}
+    for row in rows or []:
+        key = row.get("instrument_token") or row.get("instrument_key")
+        if key:
+            net[key] = net.get(key, 0) + int(row.get("quantity") or 0)
+    return net
+
+
+def _position_still_held(pos, net_by_key):
+    """True if the broker's net quantity still covers this bot position."""
+    held = net_by_key.get(pos.get("instrument_key"), 0)
+    needed = pos["quantity"] if pos["direction"] == "LONG" else -pos["quantity"]
+    return held >= needed if needed > 0 else held <= needed
+
+
+async def reconcile_broker_positions(paper_trading):
+    """Syncs the bot's book against the broker's real positions. Returns the list of symbols
+    reconciled away as externally closed. Never raises; throttled to one API call per
+    _BROKER_RECONCILE_INTERVAL_S."""
+    global _last_broker_reconcile
+    if paper_trading or not active_positions:
+        return []
+    now_mono = time.monotonic()
+    if now_mono - _last_broker_reconcile < _BROKER_RECONCILE_INTERVAL_S:
+        return []
+    _last_broker_reconcile = now_mono
+
+    loop = asyncio.get_running_loop()
+    try:
+        broker_rows = await loop.run_in_executor(None, client.get_positions)
+    except Exception as e:
+        print(f"[Reconcile] Error fetching broker positions: {e}")
+        return []
+    if broker_rows is None:
+        return []  # unknown broker state — never treat as flat
+
+    net_by_key = _net_positions_by_key(broker_rows)
+    removed = []
+    for symbol, pos in list(active_positions.items()):
+        if _position_still_held(pos, net_by_key):
+            continue
+        held = net_by_key.get(pos.get("instrument_key"), 0)
+        log_scan(symbol, f"Broker holds {held} but bot book expects {pos['direction']} "
+                         f"{pos['quantity']} — closed/changed outside the bot (other device?). "
+                         f"Recording as CLOSED EXTERNALLY; no order will be placed.", "danger")
+        # The bot's SL order survives an external square-off and would open a reverse
+        # position if it later triggers on a flat book — cancel it first.
+        sl_order_id = pos.pop("sl_order_id", None)
+        if sl_order_id:
+            try:
+                await order_queue.submit(client.cancel_order, sl_order_id)
+                log_scan(symbol, f"Leftover SL order {sl_order_id} cancelled after external close.", "warning")
+            except Exception as cancel_err:
+                log_scan(symbol, f"Could NOT cancel leftover SL order {sl_order_id}: {cancel_err} — "
+                                 f"CHECK THE UPSTOX APP: while it stays pending it can open a "
+                                 f"reverse position.", "danger")
+        exit_price = pos.get("current_price", pos.get("entry_price"))
+        # is_broker_hit=True records the trade at the given price WITHOUT placing an order.
+        if await execute_exit(symbol, pos, exit_price, "CLOSED EXTERNALLY (BROKER RECONCILE)",
+                              paper_trading, is_broker_hit=True):
+            _remove_position(symbol)
+            removed.append(symbol)
+    if removed:
+        save_state()
+    return removed
+
+
 async def manage_existing_positions(paper_trading, trailing_enabled, trailing_mult, quotes=None):
     global active_positions, daily_pnl, trade_history
+    if not active_positions:
+        return
+    # Live-mode safety: sync the bot's book with the broker BEFORE acting on any position, so
+    # a trade the operator closed from another device is never "managed" (= reverse-ordered).
+    try:
+        await reconcile_broker_positions(paper_trading)
+    except Exception as reconcile_err:
+        print(f"[Reconcile] Unexpected error: {reconcile_err}")
     if not active_positions:
         return
     to_remove = []
@@ -2588,7 +2677,23 @@ async def execute_exit(symbol, pos, exit_price, reason, paper_trading, is_shadow
             log_scan(symbol, f"Failed to cancel pending SL order: {cancel_err}", "warning")
 
     try:
-        if is_shadow or is_broker_hit:
+        skip_order = is_shadow or is_broker_hit
+        if not skip_order and not paper_trading:
+            # Live-mode guard: verify the broker still holds this quantity before sending a
+            # closing order — if the operator squared off from another device moments ago, a
+            # "closing" order would OPEN a reverse position. On verification failure (None)
+            # proceed anyway: a stop-loss exit must never be blocked by an API blip.
+            try:
+                rows = await asyncio.get_running_loop().run_in_executor(None, client.get_positions)
+            except Exception:
+                rows = None
+            if rows is not None and not _position_still_held(pos, _net_positions_by_key(rows)):
+                log_scan(symbol, "Broker no longer holds this position — closed externally. "
+                                 "Recording exit at last price WITHOUT placing an order.", "danger")
+                reason = f"{reason} + CLOSED EXTERNALLY"
+                skip_order = True
+
+        if skip_order:
             final_price = exit_price
         else:
             order = await order_queue.submit(
