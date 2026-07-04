@@ -6,7 +6,7 @@ import { Scene3DPanel } from '../Scene3DPanel'
 
 // Decorative capital-flow visualization (no live data source in the backend for this,
 // mirrors the legacy CapitalGlobe scene's role) — a wireframe globe with an orbiting dust
-// ring, in the Midnight Quant indigo/mint palette.
+// ring, in the CIPHER·TERMINAL neon palette (cyan globe, cyber-green dust).
 function GlobeContent({ isVisible }: { isVisible: boolean }) {
   const globeRef = useRef<THREE.Mesh>(null)
   const ringRef = useRef<THREE.Points>(null)
