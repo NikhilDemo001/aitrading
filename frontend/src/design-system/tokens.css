@@ -104,6 +104,8 @@ body {
 
 .text-profit { color: var(--profit); }
 .text-loss { color: var(--loss); }
+.text-warn { color: var(--warn); }
+.text-accent { color: var(--accent); }
 .text-dim { color: var(--ink-dim); }
 .text-faint { color: var(--ink-faint); }
 

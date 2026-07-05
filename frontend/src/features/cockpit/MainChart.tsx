@@ -11,6 +11,7 @@ import { Panel } from '../../design-system/Panel'
 import { Button } from '../../design-system/Button'
 import { analyticsApi } from '../../lib/api/analyticsApi'
 import { usePositionsStore } from '../../lib/stores/usePositionsStore'
+import { toIstChartTime } from '../../lib/marketSession'
 import type { ChartCandle } from '../../types/api'
 import './MainChart.css'
 
@@ -80,14 +81,21 @@ export function MainChart({ symbol }: { symbol: string | null }) {
 
     const applyCandles = (candles: ChartCandle[]) => {
       if (cancelled || !candleSeriesRef.current) return
+      // Times shifted so the UTC-rendered axis reads IST wall-clock (NSE hours).
       candleSeriesRef.current.setData(
-        candles.map((c) => ({ time: c.time as UTCTimestamp, open: c.open, high: c.high, low: c.low, close: c.close })),
+        candles.map((c) => ({
+          time: toIstChartTime(c.time) as UTCTimestamp,
+          open: c.open,
+          high: c.high,
+          low: c.low,
+          close: c.close,
+        })),
       )
       emaSeriesRef.current?.setData(
-        candles.filter((c) => c.ema20 != null).map((c) => ({ time: c.time as UTCTimestamp, value: c.ema20! })),
+        candles.filter((c) => c.ema20 != null).map((c) => ({ time: toIstChartTime(c.time) as UTCTimestamp, value: c.ema20! })),
       )
       vwapSeriesRef.current?.setData(
-        candles.filter((c) => c.vwap != null).map((c) => ({ time: c.time as UTCTimestamp, value: c.vwap! })),
+        candles.filter((c) => c.vwap != null).map((c) => ({ time: toIstChartTime(c.time) as UTCTimestamp, value: c.vwap! })),
       )
       chartRef.current?.timeScale().fitContent()
     }

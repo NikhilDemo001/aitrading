@@ -24,6 +24,14 @@ export const MARKET_PREOPEN = 9 * 60 // 09:00
 export const MARKET_OPEN = 9 * 60 + 15 // 09:15
 export const MARKET_CLOSE = 15 * 60 + 30 // 15:30
 
+// lightweight-charts renders epoch timestamps on a UTC axis with no timezone
+// option — shift epochs by IST's offset so the axis reads NSE wall-clock time.
+export const IST_OFFSET_SECONDS = 5.5 * 3600
+
+export function toIstChartTime(epochSeconds: number): number {
+  return epochSeconds + IST_OFFSET_SECONDS
+}
+
 export function toMinutes(hhmm: string, fallback: number): number {
   const m = /^(\d{1,2}):(\d{2})$/.exec(hhmm ?? '')
   if (!m) return fallback

@@ -11,10 +11,17 @@ export const statusApi = {
     http.post('/api/manual-trade', body),
 }
 
+export interface BrokerBook {
+  available: boolean
+  reason: 'paper' | 'unavailable' | null
+  positions: Array<Record<string, unknown>>
+}
+
 export const positionsApi = {
   getPositions: () => http.get<Position[]>(cacheBust('/api/positions')),
   getTradesToday: () => http.get<Trade[]>(cacheBust('/api/trades')),
   getTradesAll: () => http.get<Trade[]>('/api/trades/all'),
+  getBrokerBook: () => http.get<BrokerBook>(cacheBust('/api/broker-positions')),
 }
 
 export const scannerApi = {

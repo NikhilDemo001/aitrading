@@ -23,10 +23,10 @@ export function useGlobalHotkeys() {
       if (isTypingTarget(e.target)) return
       if (e.key in TAB_KEYS) {
         setActiveTab(TAB_KEYS[e.key])
-      } else if (e.key === 'Escape') {
-        // Escape also closes dialogs — never treat it as square-off while one is open,
-        // even if the dialog's own handler failed to swallow the event.
-        if (document.querySelector('[role="dialog"]')) return
+      } else if (e.ctrlKey && e.shiftKey && e.key.toUpperCase() === 'Q') {
+        // Deliberate three-finger chord for the panic action. This used to be Escape,
+        // which collided with "close dialog" — a reflex key must never square off a book.
+        e.preventDefault()
         if (confirm('Square off all open positions now?')) {
           statusApi.squareOff().catch(console.error)
         }

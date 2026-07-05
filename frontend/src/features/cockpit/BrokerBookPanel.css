@@ -1,0 +1,45 @@
+.mq-broker-empty {
+  padding: var(--space-4);
+  font-size: 0.72rem;
+}
+
+.mq-broker-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.68rem;
+}
+
+.mq-broker-table th {
+  text-align: left;
+  padding: 8px 14px;
+  color: var(--ink-faint);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.mq-broker-table td {
+  padding: 7px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: var(--ink-dim);
+}
+
+.mq-broker-sym {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  color: var(--ink) !important;
+}
+
+.mq-broker-ghosts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.mq-broker-ghost {
+  font-size: 0.66rem;
+}

@@ -3529,6 +3529,50 @@ def get_chart(symbol: str):
         raise HTTPException(500, str(e))
 
 
+@app.get("/api/trade-chart/{symbol}")
+def get_trade_chart(symbol: str, date: str):
+    """5-minute candles for one symbol on one trading day — feeds the trade-detail
+    modal's chart so a closed trade can be replayed on the candles it happened on."""
+    inst = client.get_instrument_info(symbol)
+    if not inst:
+        raise HTTPException(404, f"Symbol {symbol} not found")
+    try:
+        datetime.strptime(date, "%Y-%m-%d")
+    except ValueError:
+        raise HTTPException(400, "date must be YYYY-MM-DD")
+    try:
+        if date == get_ist_now().strftime("%Y-%m-%d"):
+            candles = client.get_intraday_candles(inst["instrument_key"], "5minute")
+        else:
+            candles = client.get_historical_candles(inst["instrument_key"], "5minute", date, date)
+        return [
+            {
+                "time": int(datetime.fromisoformat(c["timestamp"].replace("Z", "+00:00")).timestamp()),
+                "open": c["open"],
+                "high": c["high"],
+                "low": c["low"],
+                "close": c["close"],
+                "volume": c["volume"],
+            }
+            for c in candles
+        ]
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@app.get("/api/broker-positions")
+def get_broker_positions():
+    """The broker's own net-position book. Live mode only — paper positions exist purely
+    inside the bot, so there is no broker-side book to show (available=False, reason=paper).
+    None from the client means UNKNOWN (API failure), which is reported distinctly so the
+    dashboard never renders an unreachable book as flat."""
+    rows = client.get_positions()
+    if rows is None:
+        reason = "paper" if client.paper_trading else "unavailable"
+        return {"available": False, "reason": reason, "positions": []}
+    return {"available": True, "reason": None, "positions": rows}
+
+
 @app.get("/api/backtest/{symbol}")
 def backtest_symbol(symbol: str, days: int = 30, slippage_pct: float | None = None):
     """

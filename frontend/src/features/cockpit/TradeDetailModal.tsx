@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Modal } from '../../design-system/Modal'
 import { Badge } from '../../design-system/Badge'
+import { TradeChart } from './TradeChart'
 import type { Trade } from '../../types/api'
 import {
   isLongDirection, rMultiple, pnlPct, invested, exitReason,
@@ -86,6 +87,8 @@ export function TradeDetailModal({ trade, onClose }: { trade: Trade; onClose: ()
           <Row label="Returned" value={returned != null ? formatINR(returned) : '—'} />
         </div>
       </div>
+
+      <TradeChart trade={trade} />
 
       <Section title="Execution">
         <Row label="Entry price" value={trade.entry_price != null ? formatINR(trade.entry_price) : '—'} />

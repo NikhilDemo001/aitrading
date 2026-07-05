@@ -3,7 +3,8 @@ import './HotkeyLegend.css'
 
 const HOTKEYS: Array<[string, string]> = [
   ['1 – 5', 'Switch tabs'],
-  ['Esc', 'Panic square-off (with confirmation)'],
+  ['Ctrl+Shift+Q', 'Panic square-off (with confirmation)'],
+  ['Esc', 'Close open dialog'],
 ]
 
 export function HotkeyLegend() {

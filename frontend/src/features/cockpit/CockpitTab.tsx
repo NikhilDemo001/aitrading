@@ -6,6 +6,7 @@ import { LiveFeedPanel } from './LiveFeedPanel'
 import { ScannerMatrix } from './ScannerMatrix'
 import { ManualTradeTicket } from './ManualTradeTicket'
 import { ActivePositionsGrid } from './ActivePositionsGrid'
+import { BrokerBookPanel } from './BrokerBookPanel'
 import { ClosedTradesTable } from './ClosedTradesTable'
 import { HistoricalTradesTable } from './HistoricalTradesTable'
 import { DecisionStream } from './DecisionStream'
@@ -34,6 +35,7 @@ export function CockpitTab() {
         </div>
       </div>
       <ActivePositionsGrid />
+      <BrokerBookPanel />
       <DecisionStream />
       <ClosedTradesTable />
       <HistoricalTradesTable />
