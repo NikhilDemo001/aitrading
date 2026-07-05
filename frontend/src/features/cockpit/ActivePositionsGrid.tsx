@@ -172,7 +172,9 @@ export function ActivePositionsGrid() {
   return (
     <Panel title={`Active Positions · ${positions.length}`} padded={false}>
       {positions.length === 0 ? (
-        <div className="mq-positions-empty text-faint">No open positions.</div>
+        <div className="mq-positions-empty text-faint">
+          No open positions. The scanner is hunting — entries land here the moment a signal clears every gate.
+        </div>
       ) : (
         <div className="mq-positions-grid">
           {positions.map((p) => (

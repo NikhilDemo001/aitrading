@@ -15,6 +15,9 @@ export interface BotStatus {
   enable_fno?: boolean
   scanner_last_loop?: string | null
   scanner_last_checked?: string | null
+  trade_start_time?: string
+  trade_end_time?: string
+  square_off_time?: string
   [key: string]: unknown
 }
 
@@ -142,4 +145,21 @@ export type WsMessage =
   | { type: 'checking_progress'; symbol: string; name?: string; status: 'checking' | 'done'; time?: string }
   | { type: 'realtime_update'; positions: Position[]; total_daily_pnl?: number; daily_pnl?: number; quotes?: Record<string, number> }
   | { type: 'research_progress'; [key: string]: unknown }
-  | { type: 'trade_event'; [key: string]: unknown }
+  | TradeEventMessage
+
+export interface TradeEventMessage {
+  type: 'trade_event'
+  event: 'entry' | 'exit'
+  symbol: string
+  direction?: string
+  quantity?: number
+  strategy?: string
+  entry_price?: number
+  stop_loss?: number
+  target?: number
+  exit_price?: number
+  pnl?: number
+  reason?: string
+  is_shadow?: boolean
+  [key: string]: unknown
+}

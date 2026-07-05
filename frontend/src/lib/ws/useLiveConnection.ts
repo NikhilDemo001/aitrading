@@ -1,15 +1,44 @@
 import { useEffect, useRef } from 'react'
-import type { WsMessage } from '../../types/api'
+import type { TradeEventMessage, WsMessage } from '../../types/api'
 import { useBotStore } from '../stores/useBotStore'
 import { usePositionsStore } from '../stores/usePositionsStore'
 import { useScannerStore } from '../stores/useScannerStore'
 import { useLogsStore } from '../stores/useLogsStore'
 import { useResearchStore } from '../stores/useResearchStore'
+import { usePnlHistoryStore } from '../stores/usePnlHistoryStore'
+import { useToastStore } from '../stores/useToastStore'
+import { isLongDirection, formatINR } from '../tradeMath'
 import { statusApi, positionsApi, scannerApi } from '../api/statusApi'
 import { analyticsApi } from '../api/analyticsApi'
 
 const POLL_INTERVAL_MS = 4000
 const RECONNECT_DELAY_MS = 10000
+
+// Turn a broadcast trade event into a toast. Entries are informational (cyan);
+// exits carry their P&L verdict (green/red) and the exit reason.
+function toastTradeEvent(msg: TradeEventMessage) {
+  const side = isLongDirection(msg.direction) ? 'LONG' : 'SHORT'
+  if (msg.event === 'entry') {
+    useToastStore.getState().push({
+      tone: 'accent',
+      title: `ENTRY · ${msg.symbol} ${side}`,
+      body: `${msg.quantity ?? '—'} @ ${msg.entry_price != null ? formatINR(msg.entry_price) : '—'} · SL ${
+        msg.stop_loss != null ? formatINR(msg.stop_loss) : '—'
+      } · T1 ${msg.target != null ? formatINR(msg.target) : '—'}${msg.strategy ? ` · ${msg.strategy}` : ''}`,
+      shadow: !!msg.is_shadow,
+    })
+  } else {
+    const pnl = msg.pnl ?? 0
+    useToastStore.getState().push({
+      tone: pnl >= 0 ? 'profit' : 'loss',
+      title: `EXIT · ${msg.symbol} ${formatINR(pnl, { sign: true })}`,
+      body: `${msg.quantity ?? '—'} @ ${msg.exit_price != null ? formatINR(msg.exit_price) : '—'}${
+        msg.reason ? ` · ${msg.reason}` : ''
+      }`,
+      shadow: !!msg.is_shadow,
+    })
+  }
+}
 
 function applyMessage(msg: WsMessage) {
   switch (msg.type) {
@@ -20,6 +49,7 @@ function applyMessage(msg: WsMessage) {
       useLogsStore.getState().setLogs(msg.logs)
       useScannerStore.getState().setScanner(msg.scanner)
       if (msg.research_status) useResearchStore.getState().setStatus(msg.research_status)
+      if (typeof msg.status?.daily_pnl === 'number') usePnlHistoryStore.getState().push(msg.status.daily_pnl)
       break
     case 'state_update':
       useBotStore.getState().setStatus(msg.status)
@@ -27,6 +57,7 @@ function applyMessage(msg: WsMessage) {
       usePositionsStore.getState().setTrades(msg.trades)
       if (msg.logs) useLogsStore.getState().setLogs(msg.logs)
       if (msg.research_status) useResearchStore.getState().setStatus(msg.research_status)
+      if (typeof msg.status?.daily_pnl === 'number') usePnlHistoryStore.getState().push(msg.status.daily_pnl)
       break
     case 'logs':
       useLogsStore.getState().appendLogs(msg.logs)
@@ -37,15 +68,19 @@ function applyMessage(msg: WsMessage) {
     case 'checking_progress':
       useScannerStore.getState().setCheckingProgress({ symbol: msg.symbol, name: msg.name, status: msg.status })
       break
-    case 'realtime_update':
-      usePositionsStore.getState().applyRealtimeUpdate(msg.positions, msg.total_daily_pnl ?? msg.daily_pnl, msg.quotes)
+    case 'realtime_update': {
+      const pnl = msg.total_daily_pnl ?? msg.daily_pnl
+      usePositionsStore.getState().applyRealtimeUpdate(msg.positions, pnl, msg.quotes)
+      if (typeof pnl === 'number') usePnlHistoryStore.getState().push(pnl)
       break
+    }
     case 'research_progress':
       useResearchStore.getState().setProgress(msg)
       break
     case 'trade_event':
-      // Consumed by fx/toast layer in a later phase; state stores already reflect the
-      // resulting position/trade change via the state_update that accompanies it.
+      // State stores already reflect the resulting position/trade change via the
+      // accompanying state_update; this is purely the notification layer.
+      toastTradeEvent(msg)
       break
   }
 }
@@ -60,7 +95,10 @@ async function pollOnce() {
     scannerApi.getScanner(),
   ])
   const [status, positions, trades, , logs, scanner] = results
-  if (status.status === 'fulfilled') useBotStore.getState().setStatus(status.value)
+  if (status.status === 'fulfilled') {
+    useBotStore.getState().setStatus(status.value)
+    if (typeof status.value.daily_pnl === 'number') usePnlHistoryStore.getState().push(status.value.daily_pnl)
+  }
   if (positions.status === 'fulfilled') usePositionsStore.getState().setPositions(positions.value)
   if (trades.status === 'fulfilled') usePositionsStore.getState().setTrades(trades.value)
   if (logs.status === 'fulfilled') useLogsStore.getState().setLogs(logs.value)

@@ -3,6 +3,8 @@ import { useLiveConnection } from '../lib/ws/useLiveConnection'
 import { useGlobalHotkeys } from '../lib/useGlobalHotkeys'
 import { useUiStore } from '../lib/stores/useUiStore'
 import { TopNav } from './TopNav'
+import { SessionRibbon } from './SessionRibbon'
+import { ToastLayer } from './ToastLayer'
 import { AmbientBackdrop } from './AmbientBackdrop'
 import { CockpitTab } from '../features/cockpit/CockpitTab'
 import { AnalyticsTab } from '../features/analytics/AnalyticsTab'
@@ -34,6 +36,8 @@ export default function App() {
     <div className="mq-app">
       <AmbientBackdrop />
       <TopNav />
+      <SessionRibbon />
+      <ToastLayer />
       <main
         className="mq-main"
         id="mq-tabpanel"

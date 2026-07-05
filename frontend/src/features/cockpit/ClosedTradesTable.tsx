@@ -4,8 +4,45 @@ import { Button } from '../../design-system/Button'
 import { usePositionsStore } from '../../lib/stores/usePositionsStore'
 import { TradeDetailModal } from './TradeDetailModal'
 import type { Trade } from '../../types/api'
-import { isLongDirection, rMultiple, pnlPct, exitReason, formatTime } from '../../lib/tradeMath'
+import { isLongDirection, rMultiple, pnlPct, exitReason, formatTime, formatINR } from '../../lib/tradeMath'
 import './ClosedTradesTable.css'
+
+// The day's verdict in one strip. Shadow trades are counterfactual simulations —
+// they never touch capital, so they are excluded from every stat here.
+function DaySummary({ trades }: { trades: Trade[] }) {
+  const real = trades.filter((t) => !t.is_shadow_trade)
+  if (real.length === 0) return null
+  const net = real.reduce((s, t) => s + (t.pnl ?? 0), 0)
+  const wins = real.filter((t) => (t.pnl ?? 0) >= 0)
+  const losses = real.filter((t) => (t.pnl ?? 0) < 0)
+  const grossWin = wins.reduce((s, t) => s + (t.pnl ?? 0), 0)
+  const grossLoss = Math.abs(losses.reduce((s, t) => s + (t.pnl ?? 0), 0))
+  const pf = grossLoss > 0 ? grossWin / grossLoss : null
+  const rs = real.map((t) => rMultiple(t)).filter((r): r is number => r != null)
+  const avgR = rs.length > 0 ? rs.reduce((s, r) => s + r, 0) / rs.length : null
+  const pnls = real.map((t) => t.pnl ?? 0)
+  const best = Math.max(...pnls)
+  const worst = Math.min(...pnls)
+
+  const stat = (label: string, value: string, tone?: 'profit' | 'loss') => (
+    <span className="mq-trades-day-stat">
+      <span className="mq-trades-day-label">{label}</span>
+      <span className={`num ${tone ? `text-${tone}` : ''}`}>{value}</span>
+    </span>
+  )
+
+  return (
+    <div className="mq-trades-day">
+      {stat('Net', formatINR(net, { sign: true }), net >= 0 ? 'profit' : 'loss')}
+      {stat('W–L', `${wins.length}–${losses.length}`)}
+      {stat('Win rate', `${((wins.length / real.length) * 100).toFixed(0)}%`)}
+      {stat('Profit factor', pf != null ? pf.toFixed(2) : grossWin > 0 ? '∞' : '—')}
+      {stat('Avg R', avgR != null ? `${avgR.toFixed(2)}R` : '—')}
+      {stat('Best', formatINR(best, { sign: true }), 'profit')}
+      {stat('Worst', formatINR(worst, { sign: true }), worst < 0 ? 'loss' : 'profit')}
+    </div>
+  )
+}
 
 type SortKey = 'symbol' | 'strategy' | 'direction' | 'quantity' | 'entry_price' | 'exit_price' | 'pnl' | 'pct' | 'r' | 'exit_time' | 'reason'
 type SortDir = 'asc' | 'desc'
@@ -115,9 +152,11 @@ export function ClosedTradesTable() {
       }
     >
       {trades.length === 0 ? (
-        <div className="mq-trades-empty text-faint">No trades closed today.</div>
+        <div className="mq-trades-empty text-faint">
+          No trades closed today. Fills appear here the moment the bot books them.
+        </div>
       ) : rows.length === 0 ? (
-        <div className="mq-trades-empty text-faint">No matching trades.</div>
+        <div className="mq-trades-empty text-faint">No matching trades — clear the filter to see all of today's fills.</div>
       ) : (
         <table className="mq-trades-table">
           <thead>
@@ -141,14 +180,17 @@ export function ClosedTradesTable() {
               return (
                 <tr
                   key={i}
-                  className="mq-trades-row"
+                  className={`mq-trades-row ${pnl >= 0 ? 'mq-trades-row-win' : 'mq-trades-row-loss'} ${
+                    t.is_shadow_trade ? 'mq-trades-row-shadow' : ''
+                  }`}
                   tabIndex={0}
                   role="button"
                   aria-label={`Open details for ${t.symbol} trade`}
+                  title={t.is_shadow_trade ? 'Shadow trade — simulated, no capital engaged' : undefined}
                   onClick={() => setSelected(t)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(t) } }}
                 >
-                  <td className="mq-trades-sym">{t.symbol}</td>
+                  <td className="mq-trades-sym">{t.symbol}{t.is_shadow_trade ? <span className="mq-trades-shadow-tag">S</span> : null}</td>
                   <td>{t.strategy ?? '—'}</td>
                   <td className={isLongDirection(t.direction) ? 'text-profit' : 'text-loss'}>{t.direction}</td>
                   <td className="num">{t.quantity}</td>
@@ -165,6 +207,7 @@ export function ClosedTradesTable() {
           </tbody>
         </table>
       )}
+      {trades.length > 0 && <DaySummary trades={trades} />}
       {selected && <TradeDetailModal trade={selected} onClose={() => setSelected(null)} />}
     </Panel>
   )

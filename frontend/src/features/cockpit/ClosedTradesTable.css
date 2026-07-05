@@ -62,6 +62,50 @@
   cursor: pointer;
 }
 
+/* Faint win/loss wash so the day's shape is readable at a glance. */
+.mq-trades-row-win td  { background: rgba(0, 230, 118, 0.035); }
+.mq-trades-row-loss td { background: rgba(255, 45, 85, 0.035); }
+
 .mq-trades-row:hover td {
-  background: rgba(0, 240, 255, 0.05);
+  background: rgba(0, 240, 255, 0.06);
+}
+
+/* Shadow trades are counterfactual — visually present but clearly not real fills. */
+.mq-trades-row-shadow td { opacity: 0.55; }
+
+.mq-trades-shadow-tag {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  font-weight: 600;
+  color: var(--info);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: var(--r-sm);
+  padding: 0 3px;
+  margin-left: 6px;
+  vertical-align: 1px;
+}
+
+/* ── Day summary strip ───────────────────────────────────────────────────── */
+.mq-trades-day {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.mq-trades-day-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.68rem;
+}
+
+.mq-trades-day-label {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
 }

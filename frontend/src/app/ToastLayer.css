@@ -1,0 +1,81 @@
+.mq-toast-layer {
+  position: fixed;
+  right: var(--space-4);
+  bottom: 44px; /* clear of the status bar */
+  z-index: 900;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: min(340px, calc(100vw - 32px));
+}
+
+.mq-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(12, 17, 27, 0.88);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  backdrop-filter: var(--blur-glass);
+  box-shadow: var(--panel-shadow);
+  animation: mq-toast-in 0.28s var(--ease-float);
+}
+
+.mq-toast .led { margin-top: 3px; flex-shrink: 0; }
+
+.mq-toast-accent { border-left: 2px solid var(--accent); }
+.mq-toast-profit { border-left: 2px solid var(--profit); }
+.mq-toast-loss   { border-left: 2px solid var(--loss); }
+
+.mq-toast-shadow { opacity: 0.72; }
+
+.mq-toast-text { flex: 1; min-width: 0; }
+
+.mq-toast-title {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mq-toast-tag {
+  font-size: 0.54rem;
+  font-weight: 600;
+  color: var(--info);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: var(--r-sm);
+  padding: 0 4px;
+}
+
+.mq-toast-body {
+  margin-top: 2px;
+  font-size: 0.64rem;
+  color: var(--ink-dim);
+  overflow-wrap: anywhere;
+}
+
+.mq-toast-close {
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  cursor: pointer;
+  font-size: 0.66rem;
+  padding: 2px;
+  line-height: 1;
+}
+
+.mq-toast-close:hover { color: var(--ink); }
+
+@keyframes mq-toast-in {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mq-toast { animation: none; }
+}

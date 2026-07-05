@@ -1,0 +1,132 @@
+.mq-session {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 6px var(--space-5);
+  background: rgba(10, 14, 22, 0.72);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: var(--blur-glass);
+  font-size: 0.66rem;
+  min-height: 34px;
+}
+
+.mq-session-phase {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.mq-session-label {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  font-size: 0.64rem;
+  color: var(--ink);
+}
+
+.mq-session-entry .mq-session-label { color: var(--accent); text-shadow: 0 0 8px rgba(var(--glow-cyan), 0.5); }
+.mq-session-manage .mq-session-label { color: var(--warn); }
+.mq-session-squareoff .mq-session-label { color: var(--live); text-shadow: 0 0 8px rgba(var(--glow-crimson), 0.5); }
+.mq-session-preopen .mq-session-label { color: var(--warn); }
+.mq-session-closed .mq-session-label { color: var(--ink-faint); }
+
+.mq-session-detail {
+  color: var(--ink-faint);
+  font-size: 0.62rem;
+  white-space: nowrap;
+}
+
+/* ── the day as a physical track ─────────────────────────────────────────── */
+.mq-session-track {
+  position: relative;
+  flex: 1;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  min-width: 160px;
+}
+
+.mq-session-track-closed { opacity: 0.35; }
+
+.mq-session-zone {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  opacity: 0.55;
+}
+
+.mq-session-zone:first-child { border-radius: 4px 0 0 4px; }
+
+.mq-session-zone-preopen   { background: rgba(255, 179, 0, 0.28); }
+.mq-session-zone-warmup    { background: rgba(0, 240, 255, 0.16); }
+.mq-session-zone-entry     { background: rgba(0, 240, 255, 0.42); }
+.mq-session-zone-manage    { background: rgba(255, 179, 0, 0.34); }
+.mq-session-zone-squareoff { background: rgba(255, 59, 48, 0.4); border-radius: 0 4px 4px 0; }
+
+.mq-session-zone.is-now { opacity: 1; }
+.mq-session-zone-entry.is-now { box-shadow: 0 0 12px rgba(var(--glow-cyan), 0.35); }
+.mq-session-zone-squareoff.is-now { box-shadow: 0 0 12px rgba(var(--glow-crimson), 0.45); }
+
+.mq-session-tick {
+  position: absolute;
+  top: -2px;
+  width: 1px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.mq-session-now {
+  position: absolute;
+  top: -4px;
+  width: 3px;
+  height: 16px;
+  border-radius: 2px;
+  background: var(--ink);
+  box-shadow: 0 0 10px 2px rgba(var(--glow-cyan), 0.8);
+  transform: translateX(-50%);
+}
+
+.mq-session-edge {
+  position: absolute;
+  top: 11px;
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.04em;
+}
+
+.mq-session-edge-l { left: 0; }
+.mq-session-edge-r { right: 0; }
+
+.mq-session-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  white-space: nowrap;
+}
+
+.mq-session-next {
+  color: var(--ink-dim);
+  font-size: 0.62rem;
+}
+
+.mq-session-next strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.mq-session-clock {
+  font-size: 0.62rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.06em;
+}
+
+/* The edge labels need breathing room below the track */
+.mq-session { padding-bottom: 14px; }
+
+@media (max-width: 760px) {
+  .mq-session-track { display: none; }
+  .mq-session-detail { display: none; }
+  .mq-session { padding-bottom: 6px; }
+}
