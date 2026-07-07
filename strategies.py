@@ -855,6 +855,15 @@ def select_best_strategy(candles, htf_candles=None, strategy_order=None, config=
         sig['confidence_score'] = conf_score
         sig['market_context'] = context
 
+        # Tag the candlestick patterns present at entry so they flow signal -> position ->
+        # exit record -> pattern_stats.jsonl (blocker #5). Detection already happens inside
+        # the confidence scorer; here we keep the names instead of discarding them.
+        try:
+            from candlestick_patterns import detected_pattern_names
+            sig['candlestick_patterns'] = detected_pattern_names(candles)
+        except Exception:
+            sig['candlestick_patterns'] = []
+
         # ── RL sizing (off by default — see comment in old code) ──────────────
         # Q-Learning sizing is OFF by default: the reward signal (pnl/risk) is
         # size-invariant, so the agent cannot actually learn sizing — Kelly +

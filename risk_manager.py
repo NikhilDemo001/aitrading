@@ -60,10 +60,14 @@ class RiskManager:
     # ── Individual gates (each independently unit-testable) ─────────────────────────
 
     def check_daily_loss(self, total_pnl_today: float, paper_trading: bool | None = None) -> RiskDecision:
-        """Section 0 rule 2: hard daily loss kill switch."""
-        is_paper = paper_trading if paper_trading is not None else self.config.get("paper_trading", True)
-        if is_paper:
-            return RiskDecision(True)
+        """Section 0 rule 2: hard daily loss kill switch.
+
+        Enforced identically in paper and live (like check_consecutive_losses). Paper must
+        faithfully rehearse live and must not keep logging trades after the halt — otherwise
+        the learning data is contaminated by post-kill-switch trades (blocker #4, fixed
+        2026-07-07; the day the halt bypassed paper, one paper day lost ₹2,069 without halting
+        on a ₹500 limit). `paper_trading` is accepted for API symmetry but never loosens this.
+        """
         max_loss = float(self.config.get("max_daily_loss", 1000.0))
         if total_pnl_today <= -max_loss:
             return RiskDecision(

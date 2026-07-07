@@ -69,26 +69,27 @@ def test_size_and_check_blocks_when_daily_loss_breached():
     assert decision.qty == 0
 
 
-def test_daily_loss_halt_applies_in_live_and_bypassed_in_paper():
-    """Verify that daily-loss halt applies when paper_trading is False (live trading)
-    but is bypassed (allowed) when paper_trading is True (paper trading)."""
+def test_daily_loss_kill_switch_trips_in_paper_mode_too():
+    """Section 0 rule 2 applies identically in paper and live: paper must faithfully rehearse
+    live and must not keep generating (contaminated) learning data after the halt. Changed
+    2026-07-07 — the daily-loss halt previously bypassed paper (blocker #4)."""
     rm = RiskManager(make_config(max_daily_loss=1000.0))
-    
-    # 1. Live trading (paper_trading=False) -> should be blocked
-    decision_live = rm.size_and_check(
-        symbol="TCS", entry_price=3500.0, stop_loss=3480.0, capital=100000.0,
-        total_pnl_today=-1500.0, weekly_pnl=0.0, open_positions={}, trade_history=[],
-        now=datetime(2026, 7, 1, 10, 0), paper_trading=False,
-    )
-    assert not decision_live.allowed
+    decision = rm.check_daily_loss(total_pnl_today=-1500.0, paper_trading=True)
+    assert not decision.allowed
+    assert "Daily loss limit" in decision.reason
 
-    # 2. Paper trading (paper_trading=True) -> should be bypassed (allowed)
-    decision_paper = rm.size_and_check(
-        symbol="TCS", entry_price=3500.0, stop_loss=3480.0, capital=100000.0,
-        total_pnl_today=-1500.0, weekly_pnl=0.0, open_positions={}, trade_history=[],
-        now=datetime(2026, 7, 1, 10, 0), paper_trading=True,
-    )
-    assert decision_paper.allowed
+
+def test_daily_loss_halt_applies_in_both_paper_and_live():
+    """The full size_and_check gate blocks a breaching trade regardless of mode."""
+    rm = RiskManager(make_config(max_daily_loss=1000.0))
+
+    for paper in (False, True):
+        decision = rm.size_and_check(
+            symbol="TCS", entry_price=3500.0, stop_loss=3480.0, capital=100000.0,
+            total_pnl_today=-1500.0, weekly_pnl=0.0, open_positions={}, trade_history=[],
+            now=datetime(2026, 7, 1, 10, 0), paper_trading=paper,
+        )
+        assert not decision.allowed, f"daily-loss halt must block in paper={paper}"
 
 
 # ── Weekly drawdown ──────────────────────────────────────────────────────────────────

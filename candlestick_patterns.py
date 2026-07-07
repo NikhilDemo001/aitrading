@@ -675,3 +675,14 @@ def detect_all_patterns(candles) -> dict:
         'strongest_bullish': bullish[0] if bullish else None,
         'strongest_bearish': bearish[0] if bearish else None
     }
+
+
+def detected_pattern_names(candles) -> list:
+    """Flat, sorted, de-duplicated list of every candlestick pattern name present on `candles`
+    (bullish + bearish + neutral), for tagging a trade at entry so pattern-reliability learning
+    (data/history/pattern_stats.jsonl) has input. Returns [] on empty/insufficient candles."""
+    try:
+        p = detect_all_patterns(candles)
+    except Exception:
+        return []
+    return sorted(set(p.get('bullish', []) + p.get('bearish', []) + p.get('neutral', [])))

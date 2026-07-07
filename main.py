@@ -126,13 +126,21 @@ _NIFTY_KEY = "NSE_INDEX|Nifty 50"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global order_queue, market_feed
+    global order_queue, market_feed, bot_running
     try:
         import research_lab
         research_lab.init_db()
     except Exception as e:
         print(f"Error initializing research database: {e}")
     load_state()
+
+    # Auto-resume scanning after a crash/watchdog restart (2026-07-06: the process died
+    # mid-session and trading stayed halted). Safe: the scanner loop re-derives every halt
+    # condition (daily loss, weekly drawdown, token expiry) from persisted state each cycle,
+    # so this cannot bypass a risk halt — it only removes the manual Start click.
+    if client.config.get("auto_start_scanner", False):
+        bot_running = True
+        log_scan("SYSTEM", "auto_start_scanner: scanner started automatically.", "info")
 
     # Initialize and start rate-limited order execution queue
     order_queue = OrderQueue(client, limit_per_second=5)
@@ -396,6 +404,35 @@ def _remove_position(symbol):
     active_positions.pop(symbol, None)
     _exiting_symbols.discard(symbol)
 
+
+def _realized_daily_pnl(trades, today):
+    """Sum of the day's REAL closed PnL. Excludes shadow (counterfactual) trades — no capital
+    was engaged — and stale-startup reconciliation rows. Discovered 2026-07-07: a +7,672
+    shadow trade inflated daily_pnl after a mid-day restart, which in live mode would have
+    delayed the daily-loss kill switch by that amount."""
+    return sum(
+        t.get("pnl", 0.0) for t in trades
+        if t.get("exit_time", "").startswith(today)
+        and t.get("reason") != "STALE_STARTUP_SQUAREOFF"
+        and not t.get("is_shadow_trade")
+    )
+
+
+def _position_is_stale_at_startup(pos, now, square_off_time_str="15:10"):
+    """True if a position restored at startup must be force-closed instead of resumed:
+    it came from a previous day, or the restart is happening at/after today's square-off
+    time (the process died before square-off could run — 2026-07-06 incident). A missing
+    entry_time only exempts the date check; past square-off the book must be flat."""
+    entry_date = str(pos.get("entry_time", ""))[:10]
+    if entry_date and entry_date != now.date().isoformat():
+        return True
+    try:
+        h, m = square_off_time_str.split(":")
+        sq = datetime_time(int(h), int(m))
+    except Exception:
+        return False
+    return now.time() >= sq
+
 def get_total_daily_pnl():
     """Returns the sum of realized P&L and unrealized P&L of open positions."""
     unrealized = sum(pos.get("pnl", 0.0) for pos in active_positions.values())
@@ -618,17 +655,19 @@ def load_state():
     else:
         trade_history = loaded_trades
 
-    # No-overnight-positions reconciliation (Section 0): any position whose entry_time is not
-    # today survived a crash/restart without going through square-off. Force-close it now at its
-    # last known mark (no live quote needed — these are stale by definition) rather than silently
-    # resuming it as a position the bot manages today. Discovered on this repo's real state: 6
-    # positions dated 2026-06-30 were sitting in SQLite's live_positions table untouched.
-    _today_str = get_ist_now().date().isoformat()
+    # No-positions-past-square-off reconciliation (Section 0): a position restored from a
+    # previous day OR restored after today's square-off time survived a crash/restart without
+    # going through square-off. Force-close it now at its last known mark (no live quote needed
+    # — these are stale by definition) rather than silently resuming it. Discovered twice on
+    # this repo's real state: 6 positions dated 2026-06-30 in SQLite untouched, and on
+    # 2026-07-06 three same-day positions resumed at a 20:50 restart (process died ~14:35,
+    # before the 15:10 square-off) and sat unmanaged until a manual kill switch.
+    _sq_off_str = client.config.get("square_off_time", "15:10")
     _reconciled_stale = False
     for _sym in list(active_positions.keys()):
         _pos = active_positions[_sym]
         _entry_date = str(_pos.get("entry_time", ""))[:10]
-        if _entry_date and _entry_date != _today_str:
+        if _position_is_stale_at_startup(_pos, get_ist_now(), _sq_off_str):
             _exit_price = _pos.get("current_price", _pos.get("entry_price"))
             if _pos.get("direction") == "LONG":
                 _pnl = (_exit_price - _pos["entry_price"]) * _pos["quantity"]
@@ -665,10 +704,10 @@ def load_state():
                 "is_shadow_trade": False,
             })
             del active_positions[_sym]
-            log_scan("SYSTEM", f"Stale overnight position {_sym} ({_pos.get('direction')} "
-                                f"{_pos.get('quantity')} from {_entry_date}) force-closed at last "
-                                f"known price ₹{_exit_price} on startup — no position may survive "
-                                f"past square-off (Section 0).", "danger")
+            log_scan("SYSTEM", f"Stale position {_sym} ({_pos.get('direction')} "
+                                f"{_pos.get('quantity')} from {_entry_date or 'unknown date'}) "
+                                f"force-closed at last known price ₹{_exit_price} on startup — "
+                                f"no position may survive past square-off (Section 0).", "danger")
             _reconciled_stale = True
 
     # Backfill symbol memory stats on startup
@@ -688,10 +727,7 @@ def load_state():
         print(f"Error backfilling symbol memory: {e}")
         
     today = get_ist_now().date().isoformat()
-    daily_pnl = sum(
-        t.get("pnl", 0.0) for t in trade_history
-        if t.get("exit_time", "").startswith(today) and t.get("reason") != "STALE_STARTUP_SQUAREOFF"
-    )
+    daily_pnl = _realized_daily_pnl(trade_history, today)
 
     # Persist the reconciliation (JSON files + SQLite) so a corrupt/stale on-disk state doesn't
     # resurface on the next restart.
@@ -1025,10 +1061,7 @@ async def scanner_loop():
 
         # ── Daily reset: zero PnL and session state at the start of each new day ──
         if _last_reset_date != today:
-            daily_pnl = sum(
-                t.get("pnl", 0.0) for t in trade_history
-                if t.get("exit_time", "").startswith(today) and t.get("reason") != "STALE_STARTUP_SQUAREOFF"
-            )
+            daily_pnl = _realized_daily_pnl(trade_history, today)
             session_ended = False
             _last_reset_date = today
             log_scan("SYSTEM", f"New trading day {today}. Daily PnL reset to ₹{daily_pnl:.2f}.", "info")
@@ -1819,6 +1852,7 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
             "trigger_level_score": signal.get("trigger_level_score"),
             "rl_state_key": signal.get("rl_state_key"),
             "rl_action_id": signal.get("rl_action_id"),
+            "candlestick_patterns": signal.get("candlestick_patterns", []),
             "is_shadow": True
         }
         log_scan(symbol, f"Entered Shadow position {action} {qty} @ ₹{entry_price:.2f}", "success")
@@ -1916,9 +1950,11 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
                 "trigger_level_price": signal.get("trigger_level_price"),
                 "trigger_level_score": signal.get("trigger_level_score"),
                 "rl_state_key": signal.get("rl_state_key"),
-                "rl_action_id": signal.get("rl_action_id")
+                "rl_action_id": signal.get("rl_action_id"),
+                "candlestick_patterns": signal.get("candlestick_patterns", [])
             }
-            await execute_exit(symbol, pos_temp, fill_price, "SLIPPAGE ANOMALY EXIT", paper_trading)
+            await execute_exit(symbol, pos_temp, fill_price, "SLIPPAGE ANOMALY EXIT", paper_trading,
+                               pos_already_removed=True)
             _exiting_symbols.discard(symbol)   # entry aborted before the position was tracked
             return
 
@@ -1962,7 +1998,8 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
             "trigger_level_price": signal.get("trigger_level_price"),
             "trigger_level_score": signal.get("trigger_level_score"),
             "rl_state_key": signal.get("rl_state_key"),
-            "rl_action_id": signal.get("rl_action_id")
+            "rl_action_id": signal.get("rl_action_id"),
+            "candlestick_patterns": signal.get("candlestick_patterns", [])
         }
 
         # Place broker-side stop loss order (real or mock)
@@ -1986,7 +2023,8 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
             log_scan(symbol, f"SL order placement FAILED: {sl_err}. Bot will exit the entry position for safety.", "danger")
             pos_temp = active_positions.pop(symbol, None)
             if pos_temp:
-                await execute_exit(symbol, pos_temp, fill_price, "ENTRY SL FAILED - SAFETY EXIT", paper_trading)
+                await execute_exit(symbol, pos_temp, fill_price, "ENTRY SL FAILED - SAFETY EXIT", paper_trading,
+                                   pos_already_removed=True)
                 _exiting_symbols.discard(symbol)   # position already popped; clear the exit claim
             return
 
@@ -2652,10 +2690,14 @@ async def position_manager_loop():
         await asyncio.sleep(1.0)
 
 
-async def execute_exit(symbol, pos, exit_price, reason, paper_trading, is_shadow=False, is_broker_hit=False):
+async def execute_exit(symbol, pos, exit_price, reason, paper_trading, is_shadow=False, is_broker_hit=False,
+                       pos_already_removed=False):
     """Closes a position. Returns True only if the exit completed (order placed / shadow /
     broker-hit recorded); returns False if it was a duplicate or the closing order failed —
-    in which case the caller MUST keep the position in active_positions so it stays monitored."""
+    in which case the caller MUST keep the position in active_positions so it stays monitored.
+
+    pos_already_removed=True is for entry-abort paths that intentionally exit a position not
+    (or no longer) tracked in active_positions; every other caller must pass the live object."""
     global trade_history, daily_pnl
 
     # ── C1: duplicate-exit guard (synchronous, no await before it) ──
@@ -2663,6 +2705,14 @@ async def execute_exit(symbol, pos, exit_price, reason, paper_trading, is_shadow
     if not is_shadow:
         if symbol in _exiting_symbols:
             log_scan(symbol, f"Exit already in progress — skipping duplicate ({reason}).", "info")
+            return False
+        # C1b: staleness check — the in-flight claim above only covers the window until
+        # _remove_position() clears it. A concurrent square-off path that snapshotted the
+        # book earlier can arrive here holding a reference to a position that has since been
+        # closed (2026-07-06: MAZDA closed twice by KILL SWITCH + MANUAL SQUARE-OFF racing)
+        # or replaced by a same-symbol re-entry. Identity check rejects both.
+        if not pos_already_removed and active_positions.get(symbol) is not pos:
+            log_scan(symbol, f"Position already closed/replaced — skipping stale exit ({reason}).", "info")
             return False
         _exiting_symbols.add(symbol)
 
@@ -2752,6 +2802,9 @@ async def execute_exit(symbol, pos, exit_price, reason, paper_trading, is_shadow
             "trigger_level_source": pos.get("trigger_level_source"),
             "trigger_level_price": pos.get("trigger_level_price"),
             "trigger_level_score": pos.get("trigger_level_score"),
+            # Candlestick patterns detected at ENTRY — without these,
+            # data/history/pattern_stats.jsonl has no input and stays 0 bytes (blocker #5).
+            "candlestick_patterns": pos.get("candlestick_patterns", []),
             "is_shadow_trade": is_shadow
         }
 
@@ -3016,6 +3069,7 @@ def update_settings(settings: dict):
         "min_scan_volume", "min_scan_price", "min_scan_change_pct",
         "enable_one_percent_risk", "min_confidence_threshold", "max_weekly_loss_pct",
         "enable_time_stop", "time_stop_minutes", "backtest_slippage_pct",
+        "auto_start_scanner",
     ]
 
     for key in allowed_keys:
