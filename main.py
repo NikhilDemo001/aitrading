@@ -376,6 +376,7 @@ import jsonl_logger  # data/wins.jsonl, losses.jsonl, decisions.log (Section 6)
 import leaderboard   # data/strategy_stats.json — Lane A recency-weighted selector bias (Section 5A)
 import history       # data/history/* daily learning snapshots — powers the date/as-of/compare UI (Section 6)
 import lane_b        # Lane B EOD: Claude/heuristic lessons + parked proposals (gated, no spend by default)
+import safety_guards  # real-time in-bot safety reactions (spec docs/superpowers/specs/2026-07-08-...)
 
 # ─── Global State ──────────────────────────────────────────────────────────────
 bot_running = False
@@ -397,6 +398,9 @@ market_feed = None
 # (square_off_all, daily-loss halt, manual close) from firing a duplicate closing order.
 # It is NOT persisted, so a crash mid-exit never blocks a later legitimate exit.
 _exiting_symbols = set()
+
+# Last cycle's total daily P&L — for the safety cycle-loss-spike guard in position_manager_loop.
+_prev_total_pnl = None
 
 
 def _remove_position(symbol):
@@ -2182,6 +2186,25 @@ async def manage_existing_positions(paper_trading, trailing_enabled, trailing_mu
                     continue
             pos["quote_miss_count"] = 0
             ltp = quote["ltp"]
+            # Stale/bad-quote guard (Tier-1): ignore a provably-broken tick and evaluate this
+            # cycle against the last good price. A real stop still fires — it's assessed on the
+            # last good price, not suppressed. Only clearly-broken ticks (<=0 / stale / absurd
+            # jump) are rejected; normal volatility passes through.
+            if client.config.get("enable_safety_guards", True):
+                _now_ts = time.monotonic()
+                _ok, _why = safety_guards.guard_quote(
+                    ltp, pos.get("current_price"),
+                    _now_ts - pos.get("_last_px_ts", _now_ts),
+                    stale_seconds=float(client.config.get("quote_stale_seconds", 30)),
+                    jump_reject_pct=float(client.config.get("quote_jump_reject_pct", 20)))
+                if _ok:
+                    pos["_last_px_ts"] = _now_ts
+                    pos["_quote_warned"] = False
+                else:
+                    if not pos.get("_quote_warned"):
+                        log_scan(symbol, f"Bad tick rejected ({_why}) — evaluating on last price ₹{pos.get('current_price')}", "warning")
+                        pos["_quote_warned"] = True
+                    ltp = pos.get("current_price") or ltp
             pos["current_price"] = ltp
 
             # Check broker-side Stop Loss status
@@ -2246,10 +2269,13 @@ async def manage_existing_positions(paper_trading, trailing_enabled, trailing_mu
                                     sl_price = round_to_tick(sl_trigger - max(0.05, sl_trigger * 0.002))
                                 else:
                                     sl_price = round_to_tick(sl_trigger + max(0.05, sl_trigger * 0.002))
-                                await loop.run_in_executor(
-                                    None, client.modify_order, sl_order_id, pos["quantity"], "SL", sl_price, sl_trigger
-                                )
-                                log_scan(symbol, f"Trailing SL order modified on broker: Trigger ₹{sl_trigger} | Limit ₹{sl_price}", "info")
+                                if safety_guards.should_send_sl_modify(
+                                        pos.get("last_sl_sent"), sl_trigger, sl_price):
+                                    await loop.run_in_executor(
+                                        None, client.modify_order, sl_order_id, pos["quantity"], "SL", sl_price, sl_trigger
+                                    )
+                                    pos["last_sl_sent"] = (sl_trigger, sl_price)
+                                    log_scan(symbol, f"Trailing SL order modified on broker: Trigger ₹{sl_trigger} | Limit ₹{sl_price}", "info")
                             except Exception as modify_err:
                                 err_msg = str(modify_err)
                                 if "UDAPI100041" in err_msg or "cancelled/rejected/completed" in err_msg:
@@ -2552,7 +2578,7 @@ async def manage_shadow_positions(quotes):
 
 
 async def position_manager_loop():
-    global bot_running, active_positions, shadow_positions, _research_ticks
+    global bot_running, active_positions, shadow_positions, _research_ticks, _prev_total_pnl
     while True:
         try:
             watchlist = client.config.get("watchlist", [])
@@ -2635,6 +2661,28 @@ async def position_manager_loop():
                             log_scan("SYSTEM", f"{fast_decision.reason} Fast halt & square-off.", "danger")
                             bot_running = False
                             await square_off_all("DAILY LOSS LIMIT")
+
+                    # Real-time safety guards (Tier-2): force-exit a position whose loss blew
+                    # past where its stop should have fired, and halt on an impossible one-cycle
+                    # P&L drop (data glitch). Additive to the daily-loss halt above.
+                    if client.config.get("enable_safety_guards", True) and bot_running and active_positions:
+                        _k = float(client.config.get("position_anomaly_k", 3.0))
+                        _paper = client.config.get("paper_trading", True)
+                        for _sym, _pos in list(active_positions.items()):
+                            if safety_guards.position_loss_anomalous(
+                                    _pos["entry_price"], _pos["stop_loss"], _pos["quantity"],
+                                    _pos.get("current_price", _pos["entry_price"]), _pos["direction"], k=_k):
+                                log_scan(_sym, f"SAFETY: loss exceeded {_k}x risk — stop failed to fire; force-exiting.", "danger")
+                                if await execute_exit(_sym, _pos, _pos.get("current_price", _pos["entry_price"]),
+                                                      "SAFETY ANOMALY FORCE-EXIT", _paper):
+                                    _remove_position(_sym)
+                        _cur_total = get_total_daily_pnl()
+                        if safety_guards.cycle_loss_spike(_prev_total_pnl, _cur_total,
+                                                          float(client.config.get("max_daily_loss", 4000))):
+                            log_scan("SYSTEM", f"SAFETY: daily P&L dropped >1 limit in one cycle ({_prev_total_pnl}->{_cur_total}) — halting (data glitch).", "danger")
+                            bot_running = False
+                            await square_off_all("SAFETY CYCLE-LOSS SPIKE")
+                        _prev_total_pnl = _cur_total
 
                 # Manage shadow positions if bot running
                 if shadow_positions:
