@@ -81,6 +81,18 @@ class OrderQueue:
         self.delay = 1.0 / limit_per_second
         self.queue = asyncio.Queue()
         self.worker_task = None
+        # Runaway-order circuit breaker (Tier-2 safety): trips if an abnormal burst of orders
+        # is submitted (a code bug looping). Threshold sits well above a legitimate square-off
+        # burst (~10-20 orders) and far below a runaway loop (hundreds). client may be None for
+        # the module-level placeholder instance (reassigned with a real client in lifespan).
+        # Local import: this class is instantiated at module-import time (the placeholder at
+        # module level), before the bottom-of-file `import safety_guards` has run.
+        import safety_guards
+        _cfg = getattr(client, "config", {}) if client is not None else {}
+        self.breaker = safety_guards.OrderRateBreaker(
+            max_orders=int(_cfg.get("order_rate_max", 30)),
+            window_seconds=float(_cfg.get("order_rate_window_s", 10)))
+        self.on_runaway = None
 
     def start(self):
         self.worker_task = asyncio.create_task(self._worker())
@@ -108,6 +120,16 @@ class OrderQueue:
                 await asyncio.sleep(1)
 
     async def submit(self, func, *args, **kwargs):
+        if (getattr(self, "breaker", None) is not None and self.client is not None
+                and self.client.config.get("enable_safety_guards", True)):
+            if self.breaker.record_and_check():
+                print("[OrderRateBreaker] Runaway order rate — refusing new orders.")
+                if self.on_runaway:
+                    try:
+                        self.on_runaway()
+                    except Exception:
+                        pass
+                raise RuntimeError("order-rate breaker tripped")
         if self.worker_task is None or self.worker_task.done():
             loop = asyncio.get_running_loop()
             return await loop.run_in_executor(None, functools.partial(func, *args, **kwargs))
@@ -144,6 +166,12 @@ async def lifespan(app: FastAPI):
 
     # Initialize and start rate-limited order execution queue
     order_queue = OrderQueue(client, limit_per_second=5)
+
+    def _runaway_halt():
+        global bot_running
+        bot_running = False
+        log_scan("SYSTEM", "Order-rate breaker tripped — bot halted. Investigate a runaway order loop.", "danger")
+    order_queue.on_runaway = _runaway_halt
     order_queue.start()
 
     # Optional decoupled market-data feed (off by default — falls back to inline REST).
@@ -472,6 +500,7 @@ _last_reset_date = None # Tracks which calendar day daily_pnl was last zeroed
 scanner_state = {       # Heartbeat info surfaced in /api/status for the dashboard
     "last_loop": None,          # last time the scanner loop ticked (even if bot stopped)
     "last_scan": None,          # last time a watchlist sweep completed
+    "last_scan_epoch": None,    # monotonic ts of last completed scan (safety stall detector)
     "last_scan_checked": 0,
     "last_scan_summary": "",
 }
@@ -1063,6 +1092,16 @@ async def scanner_loop():
         start_time_str = cfg.get("trade_start_time", "09:30")
         end_time_str = cfg.get("trade_end_time", "14:30")
 
+        # Scanner-stall detector (Tier-3, alert only): if the bot is running but no scan has
+        # completed in > scanner_stall_minutes, the loop is wedged (feed/API). Loud, throttled
+        # alert (~once/min); never halts. The watchdog covers a hard process hang.
+        if cfg.get("enable_safety_guards", True) and safety_guards.scanner_stalled(
+                scanner_state.get("last_scan_epoch"), time.monotonic(), bot_running,
+                stall_minutes=float(cfg.get("scanner_stall_minutes", 8))):
+            if get_ist_now().second < 15:
+                log_scan("SYSTEM", "SAFETY: scanner stalled — no completed scan in >"
+                         f"{cfg.get('scanner_stall_minutes', 8)} min. Check data feed / API.", "danger")
+
         # ── Daily reset: zero PnL and session state at the start of each new day ──
         if _last_reset_date != today:
             daily_pnl = _realized_daily_pnl(trade_history, today)
@@ -1618,6 +1657,7 @@ async def scan_for_entries(watchlist, max_positions, paper_trading):
 
     # ── Heartbeat: always log scan summary so user knows the bot is alive ──
     scanner_state["last_scan"] = get_ist_now().strftime("%H:%M:%S")
+    scanner_state["last_scan_epoch"] = time.monotonic()
     scanner_state["last_scan_checked"] = scanned
     scanner_state["last_scan_summary"] = (
         f"{scanned} checked, {signals_found} signals, {signals_filtered} filtered"
@@ -3118,6 +3158,9 @@ def update_settings(settings: dict):
         "enable_one_percent_risk", "min_confidence_threshold", "max_weekly_loss_pct",
         "enable_time_stop", "time_stop_minutes", "backtest_slippage_pct",
         "auto_start_scanner",
+        # Real-time safety guards (spec 2026-07-08)
+        "enable_safety_guards", "quote_stale_seconds", "quote_jump_reject_pct",
+        "position_anomaly_k", "order_rate_max", "order_rate_window_s", "scanner_stall_minutes",
     ]
 
     for key in allowed_keys:
