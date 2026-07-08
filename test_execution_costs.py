@@ -24,6 +24,15 @@ def test_slippage_safe_on_bad_price():
     assert apply_fill_slippage(None, "SELL") is None
 
 
+def test_slippage_uses_real_spread_when_provided():
+    # real_spread_bps=100 (half=50bps) overrides config spread_bps=3; slippage 0 => +0.5%
+    assert apply_fill_slippage(100.0, "BUY", spread_bps=3, slippage_bps=0,
+                               real_spread_bps=100) == pytest.approx(100.5)
+    # None/<=0 real spread falls back to config spread (10bps => half 5bps => +0.05%)
+    assert apply_fill_slippage(100.0, "BUY", spread_bps=10, slippage_bps=0,
+                               real_spread_bps=None) == pytest.approx(100.05)
+
+
 # ── transaction charges ────────────────────────────────────────────────────────────────
 def test_charges_50k_round_trip():
     ch = intraday_equity_charges(50000.0, 50000.0)

@@ -406,6 +406,7 @@ import history       # data/history/* daily learning snapshots — powers the da
 import lane_b        # Lane B EOD: Claude/heuristic lessons + parked proposals (gated, no spend by default)
 import safety_guards  # real-time in-bot safety reactions (spec docs/superpowers/specs/2026-07-08-...)
 import execution_costs  # realistic paper fills + NSE intraday transaction charges
+import microstructure   # order-book depth: spread/liquidity gate + data-driven slippage
 
 # ─── Global State ──────────────────────────────────────────────────────────────
 bot_running = False
@@ -1622,6 +1623,20 @@ async def scan_for_entries(watchlist, max_positions, paper_trading):
                             _matrix_set(symbol, f"stale signal: {price_drift_pct:.2%} drift", "filtered", candles_5m, strategy=signal.get("strategy"))
                             signals_filtered += 1
                             continue
+                        # Liquidity/spread gate (order book): skip wide-spread / illiquid names
+                        # where the bid-ask alone would eat any intraday edge. Fail-open if the
+                        # feed omits depth (mock broker / API blip). Spread-only here (size-
+                        # independent); order-size-vs-depth is enforced downstream once sized.
+                        if client.config.get("enable_liquidity_gate", True):
+                            _liq_ok, _liq_why = microstructure.liquidity_ok(
+                                fresh_quote.get("depth"),
+                                max_spread_bps=float(client.config.get("max_spread_bps", 50)),
+                                min_depth_ratio=float(client.config.get("min_depth_ratio", 0.5)))
+                            if not _liq_ok:
+                                log_scan(symbol, f"Liquidity gate: {_liq_why} — skipped.", "warning")
+                                _matrix_set(symbol, f"illiquid: {_liq_why}", "filtered", candles_5m, strategy=signal.get("strategy"))
+                                signals_filtered += 1
+                                continue
                 except Exception:
                     pass  # Non-critical: proceed without slippage check if quote fetch fails
 
@@ -3188,6 +3203,8 @@ def update_settings(settings: dict):
         # Realistic fills + transaction costs (plan 2026-07-08)
         "enable_realistic_costs", "spread_bps", "slippage_bps", "brokerage_per_order",
         "stt_pct", "exchange_txn_pct", "gst_pct", "sebi_per_crore", "stamp_pct",
+        # Market-depth / liquidity gate (plan 2026-07-08)
+        "enable_liquidity_gate", "max_spread_bps", "min_depth_ratio",
     ]
 
     for key in allowed_keys:

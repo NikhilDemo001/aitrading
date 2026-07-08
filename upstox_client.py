@@ -8,6 +8,7 @@ import threading
 from datetime import datetime, timedelta
 
 import execution_costs
+import microstructure
 
 
 class RateLimiter:
@@ -452,7 +453,8 @@ class UpstoxClient:
                         "low": float(quote.get("ohlc", {}).get("low", 0)),
                         "close": float(quote.get("ohlc", {}).get("close", 0)),
                         "volume": int(quote.get("volume") or 0),
-                        "net_change": float(quote.get("net_change", 0.0))
+                        "net_change": float(quote.get("net_change", 0.0)),
+                        "depth": microstructure.normalize_depth(quote.get("depth"))
                     }
         print(f"Error fetching quote for {instrument_key}: {response.text}")
         return None
@@ -487,7 +489,8 @@ class UpstoxClient:
                             "low": float(quote.get("ohlc", {}).get("low", 0)),
                             "close": float(quote.get("ohlc", {}).get("close", 0)),
                             "volume": int(quote.get("volume") or 0),
-                            "net_change": float(quote.get("net_change", 0.0))
+                            "net_change": float(quote.get("net_change", 0.0)),
+                            "depth": microstructure.normalize_depth(quote.get("depth"))
                         }
                 return result
         print(f"Error fetching batch quotes: {response.text}")
@@ -512,10 +515,14 @@ class UpstoxClient:
             # lifts the offer, a SELL hits the bid). SL orders fill at their trigger (below), so
             # they're excluded here. Makes paper P&L reflect real fills instead of the exact LTP.
             if self.config.get("enable_realistic_costs", True) and "SL" not in order_type:
+                _book = quote.get("depth") if quote else None
+                _rsb = (microstructure.spread_bps(_book["best_bid"], _book["best_ask"])
+                        if _book else None)
                 fill_price = execution_costs.apply_fill_slippage(
                     fill_price, transaction_type,
                     spread_bps=float(self.config.get("spread_bps", 3.0)),
-                    slippage_bps=float(self.config.get("slippage_bps", 2.0)))
+                    slippage_bps=float(self.config.get("slippage_bps", 2.0)),
+                    real_spread_bps=_rsb)
 
             # For paper stop loss orders, mark status as TRIGGER_PENDING and use mock SL ID prefix
             if "SL" in order_type:

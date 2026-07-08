@@ -9,14 +9,18 @@ Pure functions — defensive, config-driven from the callers."""
 from __future__ import annotations
 
 
-def apply_fill_slippage(ltp, transaction_type, *, spread_bps=3.0, slippage_bps=2.0):
+def apply_fill_slippage(ltp, transaction_type, *, spread_bps=3.0, slippage_bps=2.0,
+                        real_spread_bps=None):
     """Realistic paper fill price. A BUY lifts the offer (pays more), a SELL hits the bid
-    (receives less), by (half the spread + slippage) in basis points of price. Returns ltp
-    unchanged for a non-positive/absent price."""
+    (receives less), by (half the spread + slippage) in basis points of price. When
+    `real_spread_bps` is provided (from the live order book), it replaces the fixed config
+    spread so fills reflect the actual observed spread. Returns ltp unchanged for a
+    non-positive/absent price."""
     try:
         if ltp is None or ltp <= 0:
             return ltp
-        adj = (spread_bps / 2.0 + slippage_bps) / 10000.0
+        sb = real_spread_bps if (real_spread_bps is not None and real_spread_bps > 0) else spread_bps
+        adj = (sb / 2.0 + slippage_bps) / 10000.0
         if str(transaction_type).upper() == "BUY":
             return round(ltp * (1 + adj), 2)
         return round(ltp * (1 - adj), 2)
