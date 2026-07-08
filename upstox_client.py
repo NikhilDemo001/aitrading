@@ -7,6 +7,8 @@ import time
 import threading
 from datetime import datetime, timedelta
 
+import execution_costs
+
 
 class RateLimiter:
     """Thread-safe rate limiter using a sliding window of request timestamps."""
@@ -505,7 +507,16 @@ class UpstoxClient:
             print(f"[PAPER TRADE] Placing {transaction_type} order for {symbol}: {quantity} shares")
             quote = self.get_market_quote(instrument_key)
             fill_price = quote["ltp"] if quote else (price if price > 0 else 100.0)
-            
+
+            # Realistic paper fill: model spread + slippage on the actual traded price (a BUY
+            # lifts the offer, a SELL hits the bid). SL orders fill at their trigger (below), so
+            # they're excluded here. Makes paper P&L reflect real fills instead of the exact LTP.
+            if self.config.get("enable_realistic_costs", True) and "SL" not in order_type:
+                fill_price = execution_costs.apply_fill_slippage(
+                    fill_price, transaction_type,
+                    spread_bps=float(self.config.get("spread_bps", 3.0)),
+                    slippage_bps=float(self.config.get("slippage_bps", 2.0)))
+
             # For paper stop loss orders, mark status as TRIGGER_PENDING and use mock SL ID prefix
             if "SL" in order_type:
                 order_id = f"MOCK-SL-{int(datetime.now().timestamp() * 1000)}"

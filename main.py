@@ -405,6 +405,7 @@ import leaderboard   # data/strategy_stats.json — Lane A recency-weighted sele
 import history       # data/history/* daily learning snapshots — powers the date/as-of/compare UI (Section 6)
 import lane_b        # Lane B EOD: Claude/heuristic lessons + parked proposals (gated, no spend by default)
 import safety_guards  # real-time in-bot safety reactions (spec docs/superpowers/specs/2026-07-08-...)
+import execution_costs  # realistic paper fills + NSE intraday transaction charges
 
 # ─── Global State ──────────────────────────────────────────────────────────────
 bot_running = False
@@ -2848,6 +2849,27 @@ async def execute_exit(symbol, pos, exit_price, reason, paper_trading, is_shadow
         else:
             pnl = (pos["entry_price"] - final_price) * pos["quantity"]
 
+        # Realistic round-trip transaction charges (brokerage/STT/exchange/GST/SEBI/stamp).
+        # Real in paper AND live — small intraday profits are eaten by these. Shadow trades are
+        # counterfactual (no capital engaged), so they're excluded.
+        charges = 0.0
+        if not is_shadow and client.config.get("enable_realistic_costs", True):
+            _qty = pos["quantity"]
+            if pos["direction"] == "LONG":
+                _buy_v, _sell_v = pos["entry_price"] * _qty, final_price * _qty
+            else:
+                _sell_v, _buy_v = pos["entry_price"] * _qty, final_price * _qty
+            _ch = execution_costs.intraday_equity_charges(
+                _buy_v, _sell_v,
+                brokerage_per_order=float(client.config.get("brokerage_per_order", 20.0)),
+                stt_pct=float(client.config.get("stt_pct", 0.00025)),
+                exchange_txn_pct=float(client.config.get("exchange_txn_pct", 0.0000297)),
+                gst_pct=float(client.config.get("gst_pct", 0.18)),
+                sebi_per_crore=float(client.config.get("sebi_per_crore", 10.0)),
+                stamp_pct=float(client.config.get("stamp_pct", 0.00003)))
+            charges = _ch["total"]
+            pnl -= charges
+
         # Anomaly Check: Extreme Slippage on Exit
         slippage_exit = abs(final_price - exit_price)
         # If exit slippage is extremely large (e.g. > 1.5x ATR), log a warning
@@ -2870,6 +2892,7 @@ async def execute_exit(symbol, pos, exit_price, reason, paper_trading, is_shadow
             "exit_price": final_price,
             "exit_time": get_ist_now().isoformat(),
             "pnl": round(pnl, 2),
+            "charges": round(charges, 2),
             "reason": reason,
             # Risk levels the position was managed with — without these the dashboard/CSV
             # can never reconstruct R-multiples for closed trades.
@@ -2957,7 +2980,8 @@ async def execute_exit(symbol, pos, exit_price, reason, paper_trading, is_shadow
             print(f"Error in RL exit update: {rl_err}")
 
         cat = "success" if pnl >= 0 else "danger"
-        log_scan(symbol, f"Closed ₹{pnl:+.2f} ({reason}) | Daily PnL ₹{daily_pnl:+.2f}", cat)
+        _chg_note = f" | charges ₹{charges:.2f}" if charges else ""
+        log_scan(symbol, f"Closed ₹{pnl:+.2f} ({reason}){_chg_note} | Daily PnL ₹{daily_pnl:+.2f}", cat)
         try:
             loop = asyncio.get_running_loop()
             loop.create_task(manager.broadcast({
@@ -3161,6 +3185,9 @@ def update_settings(settings: dict):
         # Real-time safety guards (spec 2026-07-08)
         "enable_safety_guards", "quote_stale_seconds", "quote_jump_reject_pct",
         "position_anomaly_k", "order_rate_max", "order_rate_window_s", "scanner_stall_minutes",
+        # Realistic fills + transaction costs (plan 2026-07-08)
+        "enable_realistic_costs", "spread_bps", "slippage_bps", "brokerage_per_order",
+        "stt_pct", "exchange_txn_pct", "gst_pct", "sebi_per_crore", "stamp_pct",
     ]
 
     for key in allowed_keys:
