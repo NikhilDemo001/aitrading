@@ -32,6 +32,23 @@ def guard_quote(new_ltp, last_good_ltp, seconds_since_update, *,
         return True, "ok (guard error, fail-open)"
 
 
+def circuit_proximity_ok(price, upper=None, lower=None, *, buffer_pct=0.02):
+    """(ok, reason). ok=False => entry price is within buffer_pct of the day's upper/lower
+    circuit limit, where fills are unreliable and you can get stuck unable to exit. Fails
+    open (ok=True) when limits are absent/zero or on any internal error, so a missing field
+    never blocks a legitimate trade."""
+    try:
+        if price is None or price <= 0:
+            return True, "no price (allow)"
+        if upper and upper > 0 and price >= upper * (1.0 - buffer_pct):
+            return False, f"within {buffer_pct:.0%} of upper circuit ₹{upper}"
+        if lower and lower > 0 and price <= lower * (1.0 + buffer_pct):
+            return False, f"within {buffer_pct:.0%} of lower circuit ₹{lower}"
+        return True, "ok"
+    except Exception:
+        return True, "ok (guard error, fail-open)"
+
+
 def should_send_sl_modify(last_sent, new_trigger, new_limit):
     """last_sent: (trigger, limit) tuple or None. True to send the modify (changed / first),
     False to skip a redundant identical re-send."""

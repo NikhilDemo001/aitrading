@@ -5,8 +5,35 @@ legitimate trading on its own error."""
 from safety_guards import (
     guard_quote, should_send_sl_modify,
     position_loss_anomalous, cycle_loss_spike, scanner_stalled,
+    circuit_proximity_ok,
     OrderRateBreaker,
 )
+
+
+# ── Tier 1: circuit-limit proximity guard ──────────────────────────────────────────────
+def test_circuit_ok_mid_band():
+    ok, _ = circuit_proximity_ok(100.0, upper=110.0, lower=90.0, buffer_pct=0.02)
+    assert ok is True
+
+
+def test_circuit_rejects_near_upper():
+    # 109.5 is within 2% (2.2) of the 110 upper circuit
+    ok, why = circuit_proximity_ok(109.5, upper=110.0, lower=90.0, buffer_pct=0.02)
+    assert ok is False and "upper" in why.lower()
+
+
+def test_circuit_rejects_near_lower():
+    ok, why = circuit_proximity_ok(90.5, upper=110.0, lower=90.0, buffer_pct=0.02)
+    assert ok is False and "lower" in why.lower()
+
+
+def test_circuit_fail_open_when_limits_missing():
+    assert circuit_proximity_ok(100.0, upper=None, lower=None)[0] is True
+    assert circuit_proximity_ok(100.0, upper=0.0, lower=0.0)[0] is True
+
+
+def test_circuit_fail_open_on_bad_input():
+    assert circuit_proximity_ok(None, upper=110.0, lower=90.0)[0] is True
 
 
 # ── Tier 1: quote guard ────────────────────────────────────────────────────────────────
