@@ -496,6 +496,36 @@ class UpstoxClient:
         print(f"Error fetching batch quotes: {response.text}")
         return {}
 
+    def fetch_raw_quotes(self, instrument_keys):
+        """Returns the RAW Upstox quote dict per instrument_key — full 5-level depth plus
+        every field (oi, total_buy_quantity, total_sell_quantity, average_price). Unlike
+        get_market_quotes, nothing is normalized or dropped. Returns {} on failure/empty.
+        Used by the depth recorder to capture full-fidelity order-book snapshots."""
+        if not self.access_token or not instrument_keys:
+            return {}
+        keys_str = ",".join(instrument_keys)
+        url = f"https://api.upstox.com/v2/market-quote/quotes?instrument_key={urllib.parse.quote(keys_str)}"
+        response = self.session.get(url, headers=self.get_headers(), timeout=10)
+        if response.status_code == 200:
+            res_json = response.json()
+            if res_json.get("status") == "success":
+                data = res_json.get("data") or {}
+                result = {}
+                for key in instrument_keys:
+                    quote = data.get(key)
+                    if not quote:
+                        for v in data.values():
+                            if v.get("instrument_token") == key:
+                                quote = v
+                                break
+                    if not quote and len(data) == 1:
+                        quote = next(iter(data.values()))
+                    if quote:
+                        result[key] = quote
+                return result
+        print(f"Error fetching raw quotes: {response.text}")
+        return {}
+
     def place_order(self, symbol, transaction_type, quantity, order_type="MARKET", price=0.0, trigger_price=0.0, tag="auto_bot", instrument_key=None, product=None):
         """Places an order (either mock paper-trade or live).
         instrument_key: optional explicit key (e.g. an NSE_FO futures contract);
