@@ -122,3 +122,33 @@ def test_build_row_caps_at_five_levels():
     buy = [{"price": i, "quantity": i, "orders": 1} for i in range(1, 9)]
     r = build_row("K", {"depth": {"buy": buy, "sell": []}}, "t")
     assert len(r["bid"]) == 5
+
+
+# ── DepthWriter ──────────────────────────────────────────────────────────────────────────
+def _read_gz_lines(path):
+    with gzip.open(path, "rt", encoding="utf-8") as f:
+        return [json.loads(ln) for ln in f if ln.strip()]
+
+
+def test_depth_writer_appends_and_rotates(tmp_path):
+    from depth_recorder import DepthWriter
+    base = str(tmp_path / "depth")
+    w = DepthWriter(base_dir=base)
+    w.append([{"key": "A", "ltp": 1}, {"key": "B", "ltp": 2}], day="2026-07-13")
+    w.append([{"key": "A", "ltp": 3}], day="2026-07-13")     # same day -> same file
+    w.append([{"key": "A", "ltp": 4}], day="2026-07-14")     # new day -> new file
+    w.close()
+
+    d13 = _read_gz_lines(os.path.join(base, "2026-07-13.jsonl.gz"))
+    d14 = _read_gz_lines(os.path.join(base, "2026-07-14.jsonl.gz"))
+    assert [r["ltp"] for r in d13] == [1, 2, 3]
+    assert [r["ltp"] for r in d14] == [4]
+
+
+def test_depth_writer_empty_rows_noop(tmp_path):
+    from depth_recorder import DepthWriter
+    base = str(tmp_path / "depth")
+    w = DepthWriter(base_dir=base)
+    w.append([], day="2026-07-13")
+    w.close()
+    assert not os.path.exists(os.path.join(base, "2026-07-13.jsonl.gz"))

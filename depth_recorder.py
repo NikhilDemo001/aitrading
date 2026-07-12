@@ -78,3 +78,48 @@ def build_row(instrument_key, raw_quote, ts):
         "bid": _levels(depth.get("buy")),
         "ask": _levels(depth.get("sell")),
     }
+
+
+class DepthWriter:
+    """Append-only gzip JSONL writer, one file per calendar day:
+    <base_dir>/YYYY-MM-DD.jsonl.gz. Reopens a new file when the day changes."""
+
+    def __init__(self, base_dir="data/depth"):
+        self.base_dir = base_dir
+        self._date = None
+        self._fh = None
+        self._lock = threading.Lock()
+
+    def _path_for(self, day):
+        return os.path.join(self.base_dir, f"{day}.jsonl.gz")
+
+    def _ensure_open(self, day):
+        if self._date == day and self._fh is not None:
+            return
+        if self._fh is not None:
+            try:
+                self._fh.close()
+            except Exception:
+                pass
+        os.makedirs(self.base_dir, exist_ok=True)
+        self._fh = gzip.open(self._path_for(day), "at", encoding="utf-8")
+        self._date = day
+
+    def append(self, rows, day=None):
+        if not rows:
+            return
+        day = day or datetime.now().strftime("%Y-%m-%d")
+        with self._lock:
+            self._ensure_open(day)
+            for r in rows:
+                self._fh.write(json.dumps(r, separators=(",", ":")) + "\n")
+            self._fh.flush()
+
+    def close(self):
+        with self._lock:
+            if self._fh is not None:
+                try:
+                    self._fh.close()
+                finally:
+                    self._fh = None
+                    self._date = None
