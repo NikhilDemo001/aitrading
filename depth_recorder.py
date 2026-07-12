@@ -123,3 +123,63 @@ class DepthWriter:
                 finally:
                     self._fh = None
                     self._date = None
+
+
+class DepthRecorder:
+    """Dedicated daemon thread: fetch watchlist raw quotes -> gate market hours -> build
+    rows -> append gzip JSONL. Passive observer; never touches the order path."""
+
+    def __init__(self, client, config, writer=None, now_fn=None, sleep_fn=None):
+        self.client = client
+        self.config = config
+        self.interval = max(0.2, float(config.get("depth_recorder_interval", 1.0)))
+        self.writer = writer or DepthWriter(config.get("depth_recorder_dir", "data/depth"))
+        self._now = now_fn or datetime.now
+        self._sleep = sleep_fn or time.sleep
+        self._running = False
+        self._thread = None
+
+    def _watchlist_keys(self):
+        keys = []
+        for sym in self.config.get("watchlist", []):
+            info = self.client.get_instrument_info(sym)
+            if info and info.get("instrument_key"):
+                keys.append(info["instrument_key"])
+        return keys
+
+    def tick(self):
+        """One capture cycle. Public for testing. Returns number of rows written
+        (0 when out-of-hours or no data)."""
+        now = self._now()
+        if not market_hours_now(now, self.config):
+            return 0
+        keys = self._watchlist_keys()
+        if not keys:
+            return 0
+        raw = self.client.fetch_raw_quotes(keys)
+        ts = now.isoformat()
+        rows = [build_row(k, raw.get(k), ts) for k in keys if raw.get(k) is not None]
+        self.writer.append(rows, day=now.strftime("%Y-%m-%d"))
+        return len(rows)
+
+    def _run(self):
+        while self._running:
+            try:
+                self.tick()
+            except Exception as e:
+                print(f"[DepthRecorder] tick error: {e}")
+            self._sleep(self.interval)
+
+    def start(self):
+        if self._running:
+            return
+        self._running = True
+        self._thread = threading.Thread(target=self._run, name="DepthRecorder", daemon=True)
+        self._thread.start()
+
+    def stop(self):
+        self._running = False
+        try:
+            self.writer.close()
+        except Exception:
+            pass

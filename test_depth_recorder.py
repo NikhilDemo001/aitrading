@@ -152,3 +152,64 @@ def test_depth_writer_empty_rows_noop(tmp_path):
     w.append([], day="2026-07-13")
     w.close()
     assert not os.path.exists(os.path.join(base, "2026-07-13.jsonl.gz"))
+
+
+# ── DepthRecorder ────────────────────────────────────────────────────────────────────────
+class _FakeClient:
+    def __init__(self, keymap, quotes):
+        self._keymap = keymap        # symbol -> instrument_key
+        self._quotes = quotes        # instrument_key -> raw quote
+
+    def get_instrument_info(self, sym):
+        k = self._keymap.get(sym)
+        return {"instrument_key": k} if k else None
+
+    def fetch_raw_quotes(self, keys):
+        return {k: self._quotes[k] for k in keys if k in self._quotes}
+
+
+class _CapWriter:
+    def __init__(self):
+        self.rows = []
+
+    def append(self, rows, day=None):
+        self.rows.extend(rows)
+
+    def close(self):
+        pass
+
+
+def test_recorder_tick_writes_rows_in_hours():
+    from depth_recorder import DepthRecorder
+    client = _FakeClient(
+        {"RELIANCE": "NSE_EQ|R", "TCS": "NSE_EQ|T"},
+        {"NSE_EQ|R": {"last_price": 1, "depth": {"buy": [{"price": 1, "quantity": 5, "orders": 1}], "sell": []}},
+         "NSE_EQ|T": {"last_price": 2, "depth": {"buy": [], "sell": []}}},
+    )
+    w = _CapWriter()
+    cfg = _cfg(watchlist=["RELIANCE", "TCS"])
+    rec = DepthRecorder(client, cfg, writer=w, now_fn=lambda: datetime(2026, 7, 13, 10, 30))
+    n = rec.tick()
+    assert n == 2 and len(w.rows) == 2
+    assert {r["key"] for r in w.rows} == {"NSE_EQ|R", "NSE_EQ|T"}
+
+
+def test_recorder_tick_skips_out_of_hours():
+    from depth_recorder import DepthRecorder
+    client = _FakeClient({"RELIANCE": "NSE_EQ|R"}, {"NSE_EQ|R": {"last_price": 1}})
+    w = _CapWriter()
+    cfg = _cfg(watchlist=["RELIANCE"])
+    rec = DepthRecorder(client, cfg, writer=w, now_fn=lambda: datetime(2026, 7, 13, 8, 0))
+    assert rec.tick() == 0 and w.rows == []
+
+
+def test_recorder_start_stop_lifecycle():
+    from depth_recorder import DepthRecorder
+    client = _FakeClient({"RELIANCE": "NSE_EQ|R"}, {"NSE_EQ|R": {"last_price": 1}})
+    w = _CapWriter()
+    cfg = _cfg(watchlist=["RELIANCE"], depth_recorder_interval=0.01)
+    rec = DepthRecorder(client, cfg, writer=w, now_fn=lambda: datetime(2026, 7, 13, 10, 30))
+    rec.start()
+    time.sleep(0.05)
+    rec.stop()
+    assert len(w.rows) >= 1        # at least one tick fired while running
