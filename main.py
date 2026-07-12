@@ -148,7 +148,7 @@ _NIFTY_KEY = "NSE_INDEX|Nifty 50"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global order_queue, market_feed, bot_running
+    global order_queue, market_feed, bot_running, depth_recorder
     try:
         import research_lab
         research_lab.init_db()
@@ -186,9 +186,27 @@ async def lifespan(app: FastAPI):
             market_feed = None
             print(f"[startup] Failed to start market feed, using inline REST: {e}")
 
+    # Optional depth-snapshot recorder (off by default). Passive observer that records
+    # full 5-level order-book depth to data/depth/*.jsonl.gz for later microstructure
+    # backtesting. Fully guarded — a recorder failure can never affect trading.
+    if client.config.get("enable_depth_recorder", False):
+        try:
+            from depth_recorder import DepthRecorder
+            depth_recorder = DepthRecorder(client, client.config)
+            depth_recorder.start()
+            log_scan("SYSTEM", f"Depth recorder started (interval={depth_recorder.interval}s).", "info")
+        except Exception as e:
+            depth_recorder = None
+            print(f"[startup] Failed to start depth recorder: {e}")
+
     asyncio.create_task(scanner_loop())
     asyncio.create_task(position_manager_loop())
     yield
+    try:
+        if depth_recorder is not None:
+            depth_recorder.stop()
+    except Exception:
+        pass
 
 
 app = FastAPI(title="AutoTrade — Upstox Intraday Bot", lifespan=lifespan)
@@ -420,6 +438,10 @@ _research_ticks = 0
 # Decoupled market-data feed (price cache + REST fallback). None until startup wires it
 # when enable_market_feed is set; consumers fall back to direct REST when it's absent/stale.
 market_feed = None
+
+# Passive depth-snapshot recorder. None until startup wires it when enable_depth_recorder
+# is set. Writes order-book snapshots to data/depth/*.jsonl.gz; never touches trading.
+depth_recorder = None
 
 # Symbols whose live exit is currently in-flight. A position is "claimed" the moment
 # execute_exit() begins and stays claimed until the position is actually removed from
