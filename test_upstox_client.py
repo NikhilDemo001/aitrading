@@ -2,8 +2,40 @@
 
 import json
 import os
+import types
 
 from upstox_client import UpstoxClient
+
+
+class _FakeResp:
+    def __init__(self, payload, status=200):
+        self.status_code = status
+        self._p = payload
+        self.text = json.dumps(payload)
+
+    def json(self):
+        return self._p
+
+
+def test_get_market_quote_surfaces_circuit_limits():
+    """The circuit-proximity guard needs the day's upper/lower circuit limits, so
+    get_market_quote must surface them (they were previously dropped from the parse)."""
+    c = UpstoxClient.__new__(UpstoxClient)      # bypass __init__ (no config/network)
+    c.access_token = "tok"
+    payload = {"status": "success", "data": {"NSE_EQ:RELIANCE": {
+        "instrument_token": "NSE_EQ|INE002A01018",
+        "last_price": 100.0,
+        "ohlc": {"open": 99, "high": 101, "low": 98, "close": 99},
+        "volume": 1000,
+        "upper_circuit_limit": 110.0,
+        "lower_circuit_limit": 90.0,
+        "depth": {"buy": [{"price": 99.9, "quantity": 10, "orders": 1}],
+                  "sell": [{"price": 100.1, "quantity": 12, "orders": 1}]},
+    }}}
+    c.session = types.SimpleNamespace(get=lambda *a, **k: _FakeResp(payload))
+    q = c.get_market_quote("NSE_EQ|INE002A01018")
+    assert q["upper_circuit"] == 110.0
+    assert q["lower_circuit"] == 90.0
 
 
 def _paper_client(tmp_path) -> UpstoxClient:

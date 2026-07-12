@@ -454,6 +454,8 @@ class UpstoxClient:
                         "close": float(quote.get("ohlc", {}).get("close", 0)),
                         "volume": int(quote.get("volume") or 0),
                         "net_change": float(quote.get("net_change", 0.0)),
+                        "upper_circuit": float(quote.get("upper_circuit_limit") or 0.0),
+                        "lower_circuit": float(quote.get("lower_circuit_limit") or 0.0),
                         "depth": microstructure.normalize_depth(quote.get("depth"))
                     }
         print(f"Error fetching quote for {instrument_key}: {response.text}")
@@ -490,6 +492,8 @@ class UpstoxClient:
                             "close": float(quote.get("ohlc", {}).get("close", 0)),
                             "volume": int(quote.get("volume") or 0),
                             "net_change": float(quote.get("net_change", 0.0)),
+                            "upper_circuit": float(quote.get("upper_circuit_limit") or 0.0),
+                            "lower_circuit": float(quote.get("lower_circuit_limit") or 0.0),
                             "depth": microstructure.normalize_depth(quote.get("depth"))
                         }
                 return result
