@@ -60,3 +60,38 @@ def intraday_equity_charges(buy_value, sell_value, *, brokerage_per_order=20.0,
     except Exception:
         return {"brokerage": 0.0, "stt": 0.0, "exchange": 0.0, "gst": 0.0,
                 "sebi": 0.0, "stamp": 0.0, "total": 0.0}
+
+
+def _round_trip_cost(entry, exit_price, qty, *, spread_bps, slippage_bps, charges):
+    """Rupee cost of a round trip at `qty`: execution slippage (half-spread + slippage, in bps
+    of the traded price, on both legs) + statutory intraday charges. Uses the same slippage
+    basis as apply_fill_slippage so the gate is consistent with actual paper fills."""
+    one_way = (spread_bps / 2.0 + slippage_bps) / 10000.0
+    slip = entry * qty * one_way + exit_price * qty * one_way
+    ch = intraday_equity_charges(entry * qty, exit_price * qty, **(charges or {}))["total"]
+    return slip + ch
+
+
+def net_risk_reward(entry, stop, target, qty, *, spread_bps=3.0, slippage_bps=2.0, charges=None):
+    """Cost-adjusted reward:risk ratio for a `qty`-sized trade. Gross reward/risk (in rupees)
+    is adjusted for the round-trip execution slippage + statutory charges: the reward shrinks
+    by the win-leg cost, the risk grows by the loss-leg cost. Returns 0.0 on non-positive net
+    risk or bad input (fail-safe: a caller treats 0.0 as 'below any sane threshold', so it can
+    only ever reject — never wave through — a marginal trade)."""
+    try:
+        qty = int(qty)
+        if qty <= 0 or entry <= 0:
+            return 0.0
+        gross_reward = abs(target - entry) * qty
+        gross_risk = abs(entry - stop) * qty
+        win_cost = _round_trip_cost(entry, target, qty, spread_bps=spread_bps,
+                                    slippage_bps=slippage_bps, charges=charges)
+        loss_cost = _round_trip_cost(entry, stop, qty, spread_bps=spread_bps,
+                                     slippage_bps=slippage_bps, charges=charges)
+        net_reward = gross_reward - win_cost
+        net_risk = gross_risk + loss_cost
+        if net_risk <= 0:
+            return 0.0
+        return net_reward / net_risk
+    except Exception:
+        return 0.0

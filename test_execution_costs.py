@@ -3,7 +3,12 @@ Values hand-computed so the model is pinned, not just self-consistent."""
 
 import pytest
 
-from execution_costs import apply_fill_slippage, intraday_equity_charges
+from execution_costs import apply_fill_slippage, intraday_equity_charges, net_risk_reward
+
+
+def _no_charges():
+    return {"brokerage_per_order": 0.0, "stt_pct": 0.0, "exchange_txn_pct": 0.0,
+            "gst_pct": 0.0, "sebi_per_crore": 0.0, "stamp_pct": 0.0}
 
 
 # ── fill slippage ──────────────────────────────────────────────────────────────────────
@@ -61,6 +66,36 @@ def test_charges_percentage_brokerage_cap_on_tiny_leg():
 def test_charges_zero_safe():
     ch = intraday_equity_charges(0.0, 0.0)
     assert ch["total"] == 0.0
+
+
+# ── cost-adjusted risk:reward ────────────────────────────────────────────────────────────
+def test_net_rr_equals_gross_when_costless():
+    # entry 100, stop 99 (risk 1), target 103 (reward 3) => gross 3:1; zero costs => 3.0
+    rr = net_risk_reward(100.0, 99.0, 103.0, 100, spread_bps=0, slippage_bps=0, charges=_no_charges())
+    assert rr == pytest.approx(3.0)
+
+
+def test_net_rr_below_gross_with_default_costs():
+    rr = net_risk_reward(100.0, 99.0, 103.0, 100)   # default slippage + charges
+    assert 0 < rr < 3.0
+
+
+def test_net_rr_zero_when_no_risk_and_no_costs():
+    rr = net_risk_reward(100.0, 100.0, 103.0, 100, spread_bps=0, slippage_bps=0, charges=_no_charges())
+    assert rr == 0.0
+
+
+def test_net_rr_costs_flip_marginal_small_trade_below_one():
+    # gross 2.5:1 (reward 0.5, risk 0.2) but tiny ₹1000 leg — ₹40 round-trip brokerage
+    # dwarfs the ₹5 edge, so net R:R collapses below 1.
+    gross = abs(100.5 - 100.0) / abs(100.0 - 99.8)
+    rr = net_risk_reward(100.0, 99.8, 100.5, 10)
+    assert gross > 2.0 and rr < 1.0
+
+
+def test_net_rr_safe_on_bad_input():
+    assert net_risk_reward(0.0, 0.0, 0.0, 0) == 0.0
+    assert net_risk_reward(100.0, 99.0, 103.0, 0) == 0.0
 
 
 if __name__ == "__main__":
