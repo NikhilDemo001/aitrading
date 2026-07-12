@@ -107,6 +107,54 @@ def test_weekly_drawdown_uses_the_larger_of_pct_and_abs_floor():
     assert decision.allowed  # -6000 has not breached the 100000 floor
 
 
+# ── Size-vs-depth liquidity gate (fix #1: enforce the sized order against the book) ──────
+
+def _book(bid_qty, ask_qty, bid=99.99, ask=100.01):
+    return {"best_bid": bid, "best_ask": ask, "bid_qty": bid_qty, "ask_qty": ask_qty,
+            "mid": round((bid + ask) / 2, 2), "spread": round(ask - bid, 2)}
+
+
+def _size_args(**over):
+    args = dict(
+        symbol="RELIANCE", entry_price=100.0, stop_loss=99.0, capital=100000.0,
+        total_pnl_today=0.0, weekly_pnl=0.0, open_positions={}, trade_history=[],
+        now=datetime(2026, 7, 1, 10, 0), paper_trading=False, proposed_qty=100,
+    )
+    args.update(over)
+    return args
+
+
+def test_size_and_check_rejects_order_larger_than_book_depth():
+    rm = RiskManager(make_config(min_depth_ratio=0.5))
+    # qty resolves to 100; top-of-book has only 10 -> need 50, reject.
+    decision = rm.size_and_check(**_size_args(book=_book(10, 10)))
+    assert not decision.allowed and "liquidity" in decision.reason.lower()
+
+
+def test_size_and_check_allows_when_book_is_deep():
+    rm = RiskManager(make_config(min_depth_ratio=0.5))
+    decision = rm.size_and_check(**_size_args(book=_book(10000, 10000)))
+    assert decision.allowed and decision.qty == 100
+
+
+def test_size_and_check_fails_open_when_no_book():
+    rm = RiskManager(make_config())
+    decision = rm.size_and_check(**_size_args(book=None))
+    assert decision.allowed and decision.qty == 100
+
+
+def test_size_and_check_depth_gate_respects_disable_flag():
+    rm = RiskManager(make_config(enable_liquidity_gate=False, min_depth_ratio=0.5))
+    decision = rm.size_and_check(**_size_args(book=_book(10, 10)))
+    assert decision.allowed and decision.qty == 100
+
+
+def test_size_and_check_volume_gate_blocks_illiquid_symbol():
+    rm = RiskManager(make_config(min_scan_volume=50000))
+    decision = rm.size_and_check(**_size_args(volume=100.0))   # 100 << 50000
+    assert not decision.allowed and "Liquidity too low" in decision.reason
+
+
 # ── Per-trade risk sizing (Section 7) ────────────────────────────────────────────────
 
 def test_position_size_derived_from_stop_distance_not_fixed_lots():

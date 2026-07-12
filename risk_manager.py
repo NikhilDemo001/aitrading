@@ -26,6 +26,11 @@ except Exception:
     check_consecutive_loss_halt = None
     SECTOR_MAP = {}
 
+try:
+    import microstructure
+except Exception:
+    microstructure = None
+
 
 @dataclass
 class RiskDecision:
@@ -161,6 +166,25 @@ class RiskManager:
             return RiskDecision(False, 0, f"Liquidity too low (volume {volume} < {min_v}).")
         return RiskDecision(True)
 
+    def check_depth_vs_size(self, book, qty: int) -> RiskDecision:
+        """Reject when the sized order can't be absorbed by the top-of-book, or the spread is
+        too wide — evaluated against the ACTUAL traded instrument's order book (equity, future
+        or option). Fail-open: book=None / no microstructure module / gate disabled -> allow,
+        so a missing feed never blocks trading."""
+        if book is None or microstructure is None:
+            return RiskDecision(True)
+        if not self.config.get("enable_liquidity_gate", True):
+            return RiskDecision(True)
+        ok, why = microstructure.liquidity_ok(
+            book,
+            order_qty=qty,
+            max_spread_bps=float(self.config.get("max_spread_bps", 50.0)),
+            min_depth_ratio=float(self.config.get("min_depth_ratio", 0.5)),
+        )
+        if not ok:
+            return RiskDecision(False, 0, f"liquidity: {why}")
+        return RiskDecision(True)
+
     # ── Position sizing (Section 7) ────────────────────────────────────────────────
 
     def max_qty_by_risk_pct(self, capital: float, entry_price: float, stop_loss: float) -> int:
@@ -205,6 +229,7 @@ class RiskManager:
         paper_trading: bool = True,
         proposed_qty: int | None = None,
         volume: float | None = None,
+        book: dict | None = None,
         max_qty_cap: int | None = None,
         skip_window_check: bool = False,
         skip_size_cap: bool = False,
@@ -248,6 +273,9 @@ class RiskManager:
                 qty = min(qty, max_qty_cap)
             if qty <= 0:
                 return RiskDecision(False, 0, "Proposed quantity is zero.")
+            depth = self.check_depth_vs_size(book, qty)
+            if not depth.allowed:
+                return depth
             return RiskDecision(True, qty, "ok (size cap skipped — F&O uses its own dedicated risk budget)")
 
         risk_qty = self.max_qty_by_risk_pct(capital, entry_price, stop_loss)
@@ -262,5 +290,9 @@ class RiskManager:
         qty = max(0, int(qty))
         if qty <= 0:
             return RiskDecision(False, 0, "Final sized quantity is zero after applying all caps.")
+
+        depth = self.check_depth_vs_size(book, qty)
+        if not depth.allowed:
+            return depth
 
         return RiskDecision(True, qty, "ok")
