@@ -1956,6 +1956,60 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
             pass
         return
 
+    # ── Fresh quote on the ACTUAL traded instrument (option/future when F&O, else the
+    # equity) — feeds the size-vs-depth, circuit and volume gates below with the book that
+    # the order will really hit, not the underlying's. Best-effort; all gates fail-open. ──
+    actual_key = order_key if (fno_mode and order_key) else instrument_key
+    entry_volume = None
+    entry_book = None
+    entry_fresh = None
+    try:
+        entry_fresh = client.get_market_quote(actual_key)
+        if entry_fresh:
+            entry_volume = entry_fresh.get("volume")
+            entry_book = entry_fresh.get("depth")
+    except Exception as _q_err:
+        print(f"[execute_entry] fresh quote fetch failed for {actual_key}: {_q_err}")
+
+    # Circuit-limit proximity guard (fix #4): skip entries pinned near the daily band, where
+    # fills are unreliable and you can get stuck unable to exit. Fail-open if limits absent.
+    if entry_fresh and cfg.get("enable_circuit_guard", True):
+        # Use the fresh LTP — the actual price we'll transact at, and consistent with the
+        # circuit limits from the same quote (fall back to the signal price if LTP absent).
+        _price_for_circuit = entry_fresh.get("ltp") or entry_price
+        _cok, _cwhy = safety_guards.circuit_proximity_ok(
+            _price_for_circuit,
+            upper=entry_fresh.get("upper_circuit"),
+            lower=entry_fresh.get("lower_circuit"),
+            buffer_pct=float(cfg.get("circuit_buffer_pct", 0.02)))
+        if not _cok:
+            log_scan(symbol, f"Circuit guard: {_cwhy} — entry skipped.", "warning")
+            jsonl_logger.log_decision("skip", symbol, f"circuit: {_cwhy}", {"strategy": strat_name})
+            return
+
+    # Cost-adjusted R:R gate (fix #2): reject when the nearest-target reward:risk collapses
+    # below min_net_rr once round-trip slippage + statutory charges are subtracted. Equity
+    # only — the charges model is NSE intraday equity; F&O has its own cost structure.
+    if not fno_mode and cfg.get("enable_cost_adjusted_rr", True):
+        _charges = {
+            "brokerage_per_order": float(cfg.get("brokerage_per_order", 20.0)),
+            "stt_pct": float(cfg.get("stt_pct", 0.00025)),
+            "exchange_txn_pct": float(cfg.get("exchange_txn_pct", 0.0000297)),
+            "gst_pct": float(cfg.get("gst_pct", 0.18)),
+            "sebi_per_crore": float(cfg.get("sebi_per_crore", 10.0)),
+            "stamp_pct": float(cfg.get("stamp_pct", 0.00003)),
+        }
+        _nrr = execution_costs.net_risk_reward(
+            entry_price, stop_loss, target_1, qty,
+            spread_bps=float(cfg.get("spread_bps", 3.0)),
+            slippage_bps=float(cfg.get("slippage_bps", 2.0)),
+            charges=_charges)
+        _min_nrr = float(cfg.get("min_net_rr", 1.0))
+        if _nrr < _min_nrr:
+            log_scan(symbol, f"Cost-adjusted R:R {_nrr:.2f} < {_min_nrr:.2f} (net of costs) — entry skipped.", "warning")
+            jsonl_logger.log_decision("skip", symbol, f"net_rr {_nrr:.2f} < {_min_nrr:.2f}", {"strategy": strat_name})
+            return
+
     # ── Mandatory RiskManager gate (Section 0: "no exceptions anywhere in the code") ──
     # Re-validated here (not just upstream in scan_for_entries) so this is a true single
     # choke point every real order passes through, regardless of caller (scan loop, manual
@@ -1974,6 +2028,8 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
         now=get_ist_now(),
         paper_trading=paper_trading,
         proposed_qty=qty,
+        volume=entry_volume,   # fix #5: real volume now reaches check_liquidity
+        book=entry_book,       # fix #1/#3: enforce sized order against the real book
         skip_size_cap=fno_mode,  # F&O sizes against its own fno_max_risk_per_trade/lot budget above
     )
     if not risk_decision.allowed:

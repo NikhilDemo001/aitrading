@@ -196,20 +196,31 @@ class TestBotEnhancements(unittest.TestCase):
     def test_limit_order_entry(self):
         """Verify that execute_entry places a LIMIT order with 0.1x ATR buffer."""
         old_place_order = main.client.place_order
+        old_get_quote = main.client.get_market_quote
         old_config = main.client.config.copy()
-        
+
         try:
             import research_lab
             old_allocations = research_lab.calculate_capital_allocations
             research_lab.calculate_capital_allocations = MagicMock(return_value=[])
-            
+
             main.client.config["paper_trading"] = False  # To trigger the place_order call branch
             main.client.config["enable_fno"] = False
             main.client.config["enable_kelly_sizing"] = False
             main.client.config["enable_one_percent_risk"] = False
             main.client.config["max_risk_per_trade"] = 500.0
-            
+
             main.client.place_order = MagicMock(return_value={"order_id": "TEST-LIMIT-1", "price": 100.5})
+            # execute_entry now fetches a fresh quote on the traded instrument for the
+            # circuit / size-vs-depth / volume gates. Provide one consistent with the ₹100
+            # signal so those gates pass (band 90–110, deep book, ample volume).
+            main.client.get_market_quote = MagicMock(return_value={
+                "ltp": 100.0, "open": 100.0, "high": 101.0, "low": 99.0, "close": 99.0,
+                "volume": 100000, "net_change": 1.0,
+                "upper_circuit": 110.0, "lower_circuit": 90.0,
+                "depth": {"best_bid": 99.95, "best_ask": 100.05,
+                          "bid_qty": 10000, "ask_qty": 10000, "mid": 100.0, "spread": 0.1},
+            })
             
             signal = {
                 "strategy": "ORB-Buy",
@@ -235,6 +246,7 @@ class TestBotEnhancements(unittest.TestCase):
             
         finally:
             main.client.place_order = old_place_order
+            main.client.get_market_quote = old_get_quote
             main.client.config = old_config
             research_lab.calculate_capital_allocations = old_allocations
 

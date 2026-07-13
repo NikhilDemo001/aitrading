@@ -129,5 +129,12 @@
   "llm_provider": "anthropic",
   "llm_model": "claude-opus-4-8",
   "llm_enabled": false,
-  "llm_max_daily_calls": 50
+  "llm_max_daily_calls": 50,
+  "enable_liquidity_gate": true,
+  "max_spread_bps": 50.0,
+  "min_depth_ratio": 0.5,
+  "enable_circuit_guard": true,
+  "circuit_buffer_pct": 0.02,
+  "enable_cost_adjusted_rr": true,
+  "min_net_rr": 1.0
 }
