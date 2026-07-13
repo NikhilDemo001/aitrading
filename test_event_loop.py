@@ -52,3 +52,36 @@ def test_off_loop_returns_result_and_propagates_errors():
         raise AssertionError("exception must propagate from executor")
     except ValueError:
         pass
+
+
+class _FakeLoop:
+    """Captures whatever the handler delegates to the default handler."""
+    def __init__(self):
+        self.delegated = []
+
+    def default_exception_handler(self, context):
+        self.delegated.append(context)
+
+
+def test_quiet_handler_swallows_windows_connection_reset():
+    """WinError 10054 on socket teardown (dashboard client closed the connection) is benign
+    noise — the handler must swallow it and NOT delegate to the noisy default handler."""
+    loop = _FakeLoop()
+    main._quiet_connection_reset_handler(loop, {"exception": ConnectionResetError(10054, "reset")})
+    assert loop.delegated == []
+
+
+def test_quiet_handler_delegates_real_errors():
+    """Any non-ConnectionResetError must still reach the default handler so real bugs are
+    never silently hidden."""
+    loop = _FakeLoop()
+    ctx = {"exception": ValueError("a real bug")}
+    main._quiet_connection_reset_handler(loop, ctx)
+    assert loop.delegated == [ctx]
+
+
+def test_quiet_handler_delegates_when_no_exception():
+    loop = _FakeLoop()
+    ctx = {"message": "some loop message with no exception"}
+    main._quiet_connection_reset_handler(loop, ctx)
+    assert loop.delegated == [ctx]

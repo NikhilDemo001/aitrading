@@ -146,9 +146,27 @@ order_queue = OrderQueue(None, limit_per_second=5)
 _NIFTY_KEY = "NSE_INDEX|Nifty 50"
 
 
+def _quiet_connection_reset_handler(loop, context):
+    """asyncio exception handler that swallows the benign Windows ConnectionResetError
+    (WinError 10054) raised by the Proactor loop when a dashboard client forcibly closes
+    its socket after a request already completed — only the socket teardown fails, so it's
+    cosmetic log spam. Every other error is delegated to the default handler untouched, so
+    real failures are never hidden."""
+    exc = context.get("exception")
+    if isinstance(exc, ConnectionResetError):
+        return
+    loop.default_exception_handler(context)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global order_queue, market_feed, bot_running, depth_recorder
+    # Silence the harmless WinError 10054 teardown spam from client disconnects (dashboard
+    # polling aborts connections constantly); real errors still surface via the default handler.
+    try:
+        asyncio.get_running_loop().set_exception_handler(_quiet_connection_reset_handler)
+    except Exception:
+        pass
     try:
         import research_lab
         research_lab.init_db()
