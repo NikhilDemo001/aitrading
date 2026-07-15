@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useBotStore, EMPTY_WATCHLIST } from '../../lib/stores/useBotStore'
+import { SymbolSearch } from '../../design-system/SymbolSearch'
 import {
   fundamentalsApi,
   type CategoryHistory,
@@ -105,12 +106,7 @@ export function FundamentalsTab() {
           <h2 className="mq-fx-title">{active ?? '—'} <span className="mq-fx-sub">Fundamentals</span></h2>
           {profile?.sector && <span className="mq-fx-sector">{profile.sector}</span>}
         </div>
-        <label className="mq-fx-picker">
-          <span>Symbol</span>
-          <select value={active ?? ''} onChange={(e) => setSymbol(e.target.value)}>
-            {watchlist.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </label>
+        <SymbolSearch value={active} options={watchlist} onPick={setSymbol} id="fx-sym" />
       </div>
 
       {!active ? (

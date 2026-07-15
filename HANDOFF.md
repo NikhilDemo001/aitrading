@@ -1,4 +1,68 @@
-# HANDOFF — Session of 2026-07-04 (read this first when resuming)
+# HANDOFF — LATEST SESSION 2026-07-15 → 07-16 (READ THIS FIRST)
+
+Resuming tomorrow. Bot is in **PAPER mode**, running under the watchdog. This block is the current
+state; the older 2026-07-04 handoff (deeper architecture/context) follows below.
+
+## ▶️ RESUME TOMORROW — do these first
+1. **Re-login for the daily Upstox token** — it dies ~3:30 AM IST. Open <https://127.0.0.1:5000/login>,
+   click through the self-signed cert warning, log in (creds + OTP). **No market data flows until you do.**
+   (The bot's "Token auto-refreshed successfully" log is misleading — it does NOT mint a valid token.)
+2. **Bot should already be running** under the watchdog scheduled task ("UpstoxBot Watchdog"; auto-restarts,
+   now with AC-never-sleep + 5-min self-heal). Check <https://127.0.0.1:5000>. If down:
+   `Start-ScheduledTask -TaskName "UpstoxBot Watchdog"`.
+3. **Commit the pending UI tweaks** (uncommitted — see "Uncommitted" below).
+4. **Rotate the Anthropic API key** — it was pasted in chat (exposed). Regenerate at console.anthropic.com,
+   update `.env` `ANTHROPIC_API_KEY`.
+
+## ✅ WHAT WE BUILT TODAY (2026-07-15/16)
+- **Proxy fixed** — old account was suspended (407). New **proxy-seller.com** account (same IP
+  175.111.136.31), creds in `.env` `PROXY_URL`. Verified.
+- **Real-time WebSocket feed** — `market_feed_mode: ws` (was `rest`); real-time LTP **~50–90 ms**. Connects
+  DIRECT, bypassing the proxy (works on the home IP — the authorize step returns a pre-signed wss URL Upstox
+  doesn't IP-check). Interval 0.5s. Feed change needs a bot restart.
+- **Token-verification fix** (committed `b218781`) — added `verify_token_live()`; honest `try_refresh_token`
+  (was fabricating a mock token in paper mode → bot ran blind all day). Now fail-closed + honest re-login prompt.
+- **`min_net_rr = 1.1`** (was 1.0; briefly 1.3 but that blocked EVERY normal VWAP-Pullback T1 setup — the gate
+  is net-of-cost on the NEAREST target). Do NOT push it back up without re-checking live T1 R:R.
+- **Watchdog hardened** — `powercfg standby-timeout-ac 0` (never sleep on AC), task re-fires every 5 min for 8h
+  (self-heals after sleep/crash via the :5000 single-instance guard), RestartCount 3. (Bot had died 11:46 from
+  machine sleep.)
+- **LLM entry-confirmation gate** (committed `d35607a`) — `llm_engine.confirm_entry()` sends candidate + news +
+  technicals → `{proceed, confidence, reason}`. Hooked into `execute_entry` AFTER all deterministic gates,
+  real (non-shadow) entries only. **FAIL-CLOSED.** Config: `enable_llm_entry_gate: true`,
+  `llm_entry_gate_min_confidence: 60`, `llm_entry_gate_fail_open: false`.
+- **Claude wired + working** — `llm_provider: anthropic`, `llm_model: claude-sonnet-5`, key in `.env`,
+  **$5 credits added**. VERIFIED: "chase the +10% KSOLVES spike" → proceed:false; clean VWAP pullback →
+  proceed:true. (llama-8b had wrongly said proceed on the chase — that's why we upgraded.)
+- **News** — `get_news()`, `/api/news/{symbol}`, wired into the gate context (5-min per-symbol cache).
+- **Fundamentals** — 8 client methods (profile, balance sheet, cash flow, income, shareholding, key ratios,
+  corporate actions, competitors) + `/api/fundamentals/{symbol}` (parallel fetch, ~2s).
+- **Two new dashboard tabs** — **News** (6th) + **Fundamentals** (7th), both with a searchable SymbolSearch
+  (type-to-search + 50-symbol autocomplete).
+- **Cockpit tidied** — removed Manual Trade + the small NewsPanel; swapped Scanner ↔ Active Positions.
+
+## 📊 CURRENT STATE
+- Mode: **PAPER** (`paper_trading: true`, `max_open_positions: 8`). Gate enabled but only bites REAL entries.
+- Commits on `self-improve`: `b218781` (token fix), `d35607a` (news + gate + fundamentals + tabs). Not pushed.
+- `config.json` is gitignored (holds the token). `config.template.json` has the feature flags but is
+  UNCOMMITTED (entangled with pre-existing WIP).
+
+## ⚠️ HONEST STATUS — the real gap is EDGE, not data
+Data/parameters are now COMPLETE (a pro's full toolkit + news + fundamentals). But paper stats are weak
+(win rate ~31%, profit factor <1, negative Sharpe — small sample). That's an **edge** problem, not a data
+problem — no new feed fixes it. **Next real work:** run in paper for weeks and MEASURE per-strategy
+expectancy + whether the LLM gate/news actually lift win rate. (Offered to build an "edge report" from the
+logs.) **Do NOT go live until the numbers are positive.**
+
+## 🗂️ UNCOMMITTED (working tree)
+- **Today's UI tweaks (commit these):** `frontend/.../CockpitTab.tsx`, `NewsTab.tsx`, `FundamentalsTab.tsx`,
+  new `design-system/SymbolSearch.tsx/.css`, deleted `cockpit/NewsPanel.*`, rebuilt `static/`.
+- **Pre-existing WIP (predates today, left untouched):** `config.template.json`, `options_map.json` (321k
+  lines), `event_calendar.py`, `safety_guards.py`, `symbol_memory.py`, `research_lab.py`, etc.
+
+---
+
+# HANDOFF — Session of 2026-07-04 (earlier session — deeper architecture/context below)
 
 **Who:** Nikhil (nikhilnannajkar123@gmail.com), working with Claude Code.
 **Repo:** `D:\coarse\upstox_Redign` (branch `self-improve`) → GitHub `https://github.com/NikhilDemo001/aitrading.git` (`main` + `self-improve`, both at same tip).

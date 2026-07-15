@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useBotStore, EMPTY_WATCHLIST } from '../../lib/stores/useBotStore'
 import { newsApi } from '../../lib/api/newsApi'
+import { SymbolSearch } from '../../design-system/SymbolSearch'
 import './NewsTab.css'
 
 function timeAgo(ms?: number | null): string {
@@ -32,12 +33,7 @@ export function NewsTab() {
           <h2 className="mq-newstab-title">Market News</h2>
           <p className="mq-newstab-sub">Past 7 days · the same feed the AI entry gate reads</p>
         </div>
-        <label className="mq-newstab-picker">
-          <span>Symbol</span>
-          <select value={active ?? ''} onChange={(e) => setSymbol(e.target.value)}>
-            {watchlist.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-        </label>
+        <SymbolSearch value={active} options={watchlist} onPick={setSymbol} id="news-sym" />
       </div>
 
       {!active ? (

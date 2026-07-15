@@ -1,0 +1,32 @@
+.mq-symsearch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.mq-symsearch-icon {
+  position: absolute;
+  left: 11px;
+  font-size: 1rem;
+  color: var(--mq-text-faint, #7d8590);
+  pointer-events: none;
+}
+
+.mq-symsearch input {
+  background: var(--mq-surface, #0d1117);
+  color: var(--mq-text, #e6edf3);
+  border: 1px solid var(--mq-border, rgba(255, 255, 255, 0.14));
+  border-radius: 8px;
+  padding: 9px 12px 9px 30px;
+  font-size: 0.9rem;
+  min-width: 210px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.mq-symsearch input::placeholder { color: var(--mq-text-faint, #6b7280); }
+
+.mq-symsearch input:focus {
+  border-color: var(--mq-accent, #38bdf8);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+}

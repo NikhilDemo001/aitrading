@@ -4,8 +4,6 @@ import { WatchlistRail } from './WatchlistRail'
 import { MainChart } from './MainChart'
 import { LiveFeedPanel } from './LiveFeedPanel'
 import { ScannerMatrix } from './ScannerMatrix'
-import { ManualTradeTicket } from './ManualTradeTicket'
-import { NewsPanel } from './NewsPanel'
 import { ActivePositionsGrid } from './ActivePositionsGrid'
 import { BrokerBookPanel } from './BrokerBookPanel'
 import { ClosedTradesTable } from './ClosedTradesTable'
@@ -28,15 +26,13 @@ export function CockpitTab() {
         </div>
         <div className="mq-cockpit-col mq-cockpit-col-center">
           <MainChart symbol={activeSymbol} />
-          <ScannerMatrix />
+          <ActivePositionsGrid />
         </div>
         <div className="mq-cockpit-col mq-cockpit-col-right">
           <LiveFeedPanel />
-          <ManualTradeTicket symbol={activeSymbol} />
-          <NewsPanel symbol={activeSymbol} />
         </div>
       </div>
-      <ActivePositionsGrid />
+      <ScannerMatrix />
       <BrokerBookPanel />
       <DecisionStream />
       <ClosedTradesTable />
