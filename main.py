@@ -1288,7 +1288,7 @@ async def scanner_loop():
         # ── Token expiry check + Auto-Reauth (L2) ───────────────────────────────
         if client.access_token and client._token_expired():
             # L2: Attempt automatic token refresh before halting bot
-            log_scan("SYSTEM", "Access token has expired. Attempting auto-refresh...", "warning")
+            log_scan("SYSTEM", "Access token has expired. Checking for a fresh login...", "warning")
             reauth_success = False
             try:
                 if hasattr(client, 'try_refresh_token'):
@@ -1297,9 +1297,9 @@ async def scanner_loop():
                 print(f"[Auto-Reauth] Refresh attempt failed: {reauth_err}")
             
             if reauth_success:
-                log_scan("SYSTEM", "Token auto-refreshed successfully. Bot continues.", "success")
+                log_scan("SYSTEM", "Fresh token detected and verified with Upstox. Bot continues.", "success")
             else:
-                log_scan("SYSTEM", "Access token expired and auto-refresh failed — please re-authenticate via Login button.", "danger")
+                log_scan("SYSTEM", "Access token expired — no valid token found. Re-authenticate via the Login button (open /login).", "danger")
                 client.config["access_token"] = ""
                 client.access_token = ""
                 client.save_config()

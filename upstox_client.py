@@ -655,42 +655,41 @@ class UpstoxClient:
         except Exception:
             return False
 
-    def try_refresh_token(self):
+    def verify_token_live(self, instrument_key="NSE_INDEX|Nifty 50"):
+        """Confirm the current access token is actually accepted by Upstox via a real
+        market-data call. Returns True only on a genuine authenticated success.
+
+        Hits the live API even in paper trading: paper mode simulates orders but still
+        consumes REAL market data, so it needs a genuinely valid token. A stale, revoked,
+        or fabricated token (valid-looking JWT `exp` but rejected with UDAPI100050) fails
+        here — the whole point is to trust reality, not the local expiry claim.
         """
-        L2 Auto-Reauth: Attempts to obtain a new access token using client credentials
-        and stored configuration (if client id, secret and code/redirect are present).
-        Returns True if successful, False otherwise.
-        """
-        # Since standard Upstox access tokens do not support refreshing without a new code
-        # in standard API setups, we can attempt to check if a saved code/env exists,
-        # or if we can mock a refresh in paper trading.
-        if self.paper_trading:
-            # For paper trading, simply extend token lifetime or generate a new mock token
-            log_token = "eyJ0eXAiOiJKV1QiLCJrZXlfaWQiOiJza192MS4wIiwiYWxnIjoiSFMyNTYifQ"
-            # mock standard payload with future expiry (1 day)
-            import json as _j
-            import base64
-            mock_payload = {
-                "sub": "FP0592",
-                "iat": int(datetime.now().timestamp()),
-                "exp": int((datetime.now() + timedelta(days=1)).timestamp())
-            }
-            payload_b64 = base64.b64encode(_j.dumps(mock_payload).encode('utf-8')).decode('utf-8').rstrip('=')
-            mock_token = f"{log_token}.{payload_b64}.mocksignature"
-            self.access_token = mock_token
-            os.environ["UPSTOX_ACCESS_TOKEN"] = self.access_token
-            self.config["access_token"] = self.access_token
-            self.save_config()
-            return True
-            
-        # In live mode, we can try to re-read environment to see if a cron job updated the token
+        if not self.access_token:
+            return False
         try:
-            self.load_config()
-            if self.access_token and not self._token_expired():
-                return True
+            return self.get_market_quote(instrument_key) is not None
+        except Exception:
+            return False
+
+    def try_refresh_token(self):
+        """Recover from a lapsed access token — WITHOUT fabricating one.
+
+        Upstox access tokens cannot be silently refreshed (there is no refresh-token grant
+        in this setup); a new token only comes from an interactive OAuth login via the
+        /login button, which writes the fresh token to .env and updates this process in
+        memory. So this simply re-reads .env/config in case the user just re-logged in (or
+        an external process rotated the token), then confirms the token actually works
+        against the live API. Returns True only when a genuinely valid token is in place;
+        otherwise False, so the scanner loop halts and prompts a real re-login instead of
+        running blind on a dead feed.
+        """
+        try:
+            self.load_config()   # picks up a fresh token if the user re-logged in via /login
         except Exception:
             pass
-        return False
+        if not self.access_token or self._token_expired():
+            return False
+        return self.verify_token_live()
 
     def cancel_order(self, order_id):
         """Cancels a pending order."""

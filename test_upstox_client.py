@@ -1,10 +1,19 @@
 """Unit tests for upstox_client.py — credentials-free (paper-mode paths only)."""
 
+import base64
 import json
 import os
 import types
+from datetime import datetime
 
 from upstox_client import UpstoxClient
+
+
+def _jwt_with_exp(ts):
+    """Build a minimal JWT whose `exp` claim decodes the same way _token_expired() reads it."""
+    header = base64.b64encode(b'{"typ":"JWT","alg":"HS256"}').decode().rstrip("=")
+    body = base64.b64encode(json.dumps({"sub": "X", "exp": int(ts)}).encode()).decode().rstrip("=")
+    return f"{header}.{body}.sig"
 
 
 class _FakeResp:
@@ -47,23 +56,55 @@ def _paper_client(tmp_path) -> UpstoxClient:
     return UpstoxClient(config_path=str(p))
 
 
-def test_paper_token_refresh_produces_unexpired_token(tmp_path):
-    """L2 auto-reauth, paper mode: try_refresh_token must mint a mock token whose exp claim
-    is in the future — this is what keeps an overnight paper session running when the real
-    Upstox token lapses. Regression: the refresh path used `timedelta` without importing it,
-    so every call raised NameError (swallowed by the caller in main.py's scanner loop, which
-    then halted the bot — the feature had never worked)."""
-    prev_env = os.environ.get("UPSTOX_ACCESS_TOKEN")
-    try:
-        client = _paper_client(tmp_path)
-        client.access_token = ""  # a stale/absent token, as at ~3:30am daily expiry
-        assert client.try_refresh_token() is True
-        assert client.access_token, "refresh must install a token"
-        assert not client._token_expired(), "refreshed token must not be expired"
-    finally:
-        # try_refresh_token writes os.environ directly; don't leak the mock token into
-        # other tests (load_config prefers the env var over config.json).
-        if prev_env is None:
-            os.environ.pop("UPSTOX_ACCESS_TOKEN", None)
-        else:
-            os.environ["UPSTOX_ACCESS_TOKEN"] = prev_env
+def test_paper_token_refresh_does_not_fabricate_token():
+    """Regression: paper mode must NOT mint a mock token when the daily token lapses.
+    Paper trading still consumes REAL market data, so a fabricated token (future exp but
+    rejected by Upstox with UDAPI100050) only masks a dead feed while the bot logs
+    'auto-refreshed successfully' and runs blind all day. With no valid token loadable,
+    try_refresh_token must return False so the scanner loop halts and prompts a real
+    /login re-auth."""
+    c = UpstoxClient.__new__(UpstoxClient)        # bypass __init__ (no config/network)
+    c.paper_trading = True
+    c.access_token = ""                           # stale/absent, as at ~3:30am daily expiry
+    c.load_config = lambda: None                  # no re-login happened; nothing fresh arrives
+    assert c.try_refresh_token() is False
+    assert not c.access_token, "must not fabricate a working-looking token"
+
+
+def test_token_refresh_true_after_relogin_and_verify():
+    """Happy path: the user re-logged in via /login, so load_config now surfaces a fresh,
+    unexpired token AND a live quote confirms Upstox accepts it — only then does refresh
+    report success."""
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.paper_trading = True
+    c.access_token = ""
+    fresh = _jwt_with_exp(datetime.now().timestamp() + 86400)
+    c.load_config = lambda: setattr(c, "access_token", fresh)
+    c.verify_token_live = lambda *a, **k: True    # Upstox accepts it
+    assert c.try_refresh_token() is True
+
+
+def test_verify_token_live_false_when_upstox_rejects_token():
+    """verify_token_live must return False when Upstox rejects the token (auth error →
+    get_market_quote returns None), so a stale/revoked token can't masquerade as valid."""
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.access_token = "stale-token"
+    c.get_headers = lambda: {}
+    c.session = types.SimpleNamespace(
+        get=lambda *a, **k: _FakeResp({"status": "error",
+                                       "errors": [{"errorCode": "UDAPI100050"}]}, status=401))
+    assert c.verify_token_live() is False
+
+
+def test_verify_token_live_true_when_quote_succeeds():
+    """A working token returns a real quote → verify_token_live True."""
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.access_token = "good-token"
+    c.get_headers = lambda: {}
+    payload = {"status": "success", "data": {"NSE_INDEX|Nifty 50": {
+        "instrument_token": "NSE_INDEX|Nifty 50", "last_price": 25000.0,
+        "ohlc": {"open": 24900, "high": 25100, "low": 24800, "close": 24950}, "volume": 0,
+        "depth": {"buy": [{"price": 24999.0, "quantity": 1, "orders": 1}],
+                  "sell": [{"price": 25001.0, "quantity": 1, "orders": 1}]}}}}
+    c.session = types.SimpleNamespace(get=lambda *a, **k: _FakeResp(payload))
+    assert c.verify_token_live() is True
