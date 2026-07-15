@@ -1744,6 +1744,24 @@ async def scan_for_entries(watchlist, max_positions, paper_trading):
         pass
 
 
+_GATE_NEWS_CACHE = {}  # instrument_key -> (fetched_ts, [news]); short-TTL cache for the LLM entry gate
+
+
+def _gate_news_cached(client, instrument_key, ttl=300):
+    """Recent news for the entry gate, cached per instrument for `ttl` seconds so rapid re-scans
+    of the same candidate don't re-hit the news API. Never raises — returns [] on any problem."""
+    import time as _t
+    try:
+        hit = _GATE_NEWS_CACHE.get(instrument_key)
+        if hit and (_t.time() - hit[0]) < ttl:
+            return hit[1]
+        news = client.get_news(instrument_key, page_size=5)
+        _GATE_NEWS_CACHE[instrument_key] = (_t.time(), news)
+        return news
+    except Exception:
+        return []
+
+
 async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, is_shadow=False):
     global active_positions, shadow_positions
     entry_price = signal["entry_price"]
@@ -2056,6 +2074,44 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
         return
     qty = risk_decision.qty
     jsonl_logger.log_decision("trade", symbol, "RiskManager approved", {"strategy": strat_name, "quantity": qty})
+
+    # ── LLM entry-confirmation gate (Section 5C) — optional, OFF by default. ──────────────
+    # A forward-looking AI check layered on top of the deterministic gates above. Runs only for
+    # real (non-shadow) entries and only when enable_llm_entry_gate is set. Fail-closed: if the
+    # LLM can't confirm, the entry is skipped (set llm_entry_gate_fail_open to invert). Adds
+    # ~seconds of latency, so it sits after every cheap gate has already passed.
+    if cfg.get("enable_llm_entry_gate", False) and not is_shadow:
+        try:
+            import llm_engine
+            _gate_ctx = {
+                "symbol": symbol,
+                "strategy": strat_name,
+                "direction": "LONG" if action == "BUY" else "SHORT",
+                "entry_price": entry_price,
+                "stop_loss": stop_loss,
+                "target_1": target_1,
+                "target_2": target_2,
+                "regime": signal.get("regime", "unknown"),
+                "htf_trend": signal.get("htf_trend", "neutral"),
+                "confidence_score": signal.get("confidence_score"),
+                "institutional_details": signal.get("institutional_details"),
+                "atr": atr_val,
+                "news": (_gate_news_cached(client, instrument_key)
+                         if cfg.get("llm_entry_gate_use_news", True) else None),
+            }
+            _verdict = llm_engine.confirm_entry(_gate_ctx, cfg)
+            _min_conf = int(cfg.get("llm_entry_gate_min_confidence", 60))
+            if (not _verdict["proceed"]) or _verdict["confidence"] < _min_conf:
+                log_scan(symbol, f"LLM gate SKIP [{_verdict['source']}] conf={_verdict['confidence']}: {_verdict['reason']}", "warning")
+                jsonl_logger.log_decision("skip", symbol, f"llm_gate: {_verdict['reason']}", {"strategy": strat_name})
+                return
+            log_scan(symbol, f"LLM gate PASS [{_verdict['source']}] conf={_verdict['confidence']}: {_verdict['reason']}", "success")
+        except Exception as _gate_err:
+            if not bool(cfg.get("llm_entry_gate_fail_open", False)):
+                log_scan(symbol, f"LLM gate error — skipping entry (fail-closed): {_gate_err}", "danger")
+                jsonl_logger.log_decision("skip", symbol, f"llm_gate_error: {_gate_err}", {"strategy": strat_name})
+                return
+            log_scan(symbol, f"LLM gate error — proceeding (fail-open): {_gate_err}", "warning")
 
     try:
         # Base limit price and slippage calculation on futures contract LTP if trading F&O,
@@ -3765,6 +3821,45 @@ def get_session_report():
     today = get_ist_now().date().isoformat()
     today_trades = [t for t in trade_history if t.get("exit_time", "").startswith(today)]
     return generate_session_report(today_trades)
+
+
+@app.get("/api/news/{symbol}")
+def get_news_for_symbol(symbol: str):
+    """Recent (7-day) news for a watchlist symbol — the same feed the LLM entry gate reasons over."""
+    inst = client.get_instrument_info(symbol)
+    if not inst:
+        raise HTTPException(404, f"Symbol {symbol} not found")
+    return client.get_news(inst["instrument_key"], page_size=10)
+
+
+@app.get("/api/fundamentals/{symbol}")
+def get_fundamentals(symbol: str):
+    """Full fundamentals for a symbol (profile, ratios, financials, shareholding, corporate
+    actions, competitors), fetched in parallel. Any section that fails comes back as null."""
+    inst = client.get_instrument_info(symbol)
+    if not inst:
+        raise HTTPException(404, f"Symbol {symbol} not found")
+    isin = str(inst["instrument_key"]).split("|")[-1]
+    from concurrent.futures import ThreadPoolExecutor
+    tasks = {
+        "profile": lambda: client.get_company_profile(isin),
+        "key_ratios": lambda: client.get_key_ratios(isin),
+        "income_statement": lambda: client.get_income_statement(isin),
+        "balance_sheet": lambda: client.get_balance_sheet(isin),
+        "cash_flow": lambda: client.get_cash_flow(isin),
+        "share_holdings": lambda: client.get_share_holdings(isin),
+        "corporate_actions": lambda: client.get_corporate_actions(isin),
+        "competitors": lambda: client.get_competitors(isin),
+    }
+    out = {"symbol": symbol, "isin": isin}
+    with ThreadPoolExecutor(max_workers=len(tasks)) as ex:
+        futures = {k: ex.submit(fn) for k, fn in tasks.items()}
+        for k, f in futures.items():
+            try:
+                out[k] = f.result(timeout=15)
+            except Exception:
+                out[k] = None
+    return out
 
 
 @app.get("/api/chart/{symbol}")

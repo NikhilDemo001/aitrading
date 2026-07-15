@@ -500,6 +500,78 @@ class UpstoxClient:
         print(f"Error fetching batch quotes: {response.text}")
         return {}
 
+    def get_news(self, instrument_key, page_size=5):
+        """Recent (past-7-day) news for a single instrument, newest first. Returns a list of
+        {'heading','summary','published'} (up to page_size) or [] on failure/empty/no-token.
+        Never raises — used by the LLM entry-confirmation gate to reason over real catalysts."""
+        if not self.access_token or not instrument_key:
+            return []
+        try:
+            page_size = max(1, min(int(page_size), 100))
+            resp = self.session.get(
+                "https://api.upstox.com/v2/news",
+                headers=self.get_headers(),
+                params={"category": "instrument_keys", "instrument_keys": instrument_key,
+                        "page_number": 1, "page_size": page_size},
+                timeout=10,
+            )
+            if resp.status_code == 200:
+                res = resp.json()
+                if res.get("status") == "success":
+                    items = (res.get("data") or {}).get(instrument_key, []) or []
+                    items = sorted(items, key=lambda n: n.get("published_time", 0) or 0, reverse=True)
+                    return [{"heading": n.get("heading", ""), "summary": n.get("summary", ""),
+                             "published": n.get("published_time"),
+                             "link": n.get("article_link", "")} for n in items[:page_size]]
+            else:
+                print(f"Error fetching news for {instrument_key}: {resp.status_code} - {resp.text[:200]}")
+        except Exception as e:
+            print(f"Error fetching news for {instrument_key}: {e}")
+        return []
+
+    # ── Fundamentals (Upstox Fundamentals API, keyed by ISIN) ──────────────────────────
+    def _fundamentals_get(self, isin, path, params=None):
+        """GET a fundamentals sub-resource for an ISIN. Returns parsed `data` or None. Never raises."""
+        if not self.access_token or not isin:
+            return None
+        try:
+            resp = self.session.get(
+                f"https://api.upstox.com/v2/fundamentals/{isin}/{path}",
+                headers=self.get_headers(), params=params or {}, timeout=12)
+            if resp.status_code == 200:
+                j = resp.json()
+                if j.get("status") == "success":
+                    return j.get("data")
+            else:
+                print(f"Error fetching fundamentals/{path} for {isin}: {resp.status_code} - {resp.text[:160]}")
+        except Exception as e:
+            print(f"Error fetching fundamentals/{path} for {isin}: {e}")
+        return None
+
+    def get_company_profile(self, isin):
+        return self._fundamentals_get(isin, "profile")
+
+    def get_balance_sheet(self, isin, stmt_type="consolidated"):
+        return self._fundamentals_get(isin, "balance-sheet", {"type": stmt_type})
+
+    def get_cash_flow(self, isin, stmt_type="consolidated"):
+        return self._fundamentals_get(isin, "cash-flow", {"type": stmt_type})
+
+    def get_income_statement(self, isin, stmt_type="consolidated", time_period="yearly"):
+        return self._fundamentals_get(isin, "income-statement", {"type": stmt_type, "time_period": time_period})
+
+    def get_share_holdings(self, isin):
+        return self._fundamentals_get(isin, "share-holdings")
+
+    def get_key_ratios(self, isin):
+        return self._fundamentals_get(isin, "key-ratios")
+
+    def get_corporate_actions(self, isin):
+        return self._fundamentals_get(isin, "corporate-actions")
+
+    def get_competitors(self, isin):
+        return self._fundamentals_get(isin, "competitors")
+
     def fetch_raw_quotes(self, instrument_keys):
         """Returns the RAW Upstox quote dict per instrument_key — full 5-level depth plus
         every field (oi, total_buy_quantity, total_sell_quantity, average_price). Unlike

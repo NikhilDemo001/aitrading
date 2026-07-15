@@ -239,6 +239,16 @@ PROPOSAL_SYSTEM = (
     "\"param_changes\": {\"<key>\": <value>}}. Propose nothing that increases per-trade risk."
 )
 
+CONFIRM_SYSTEM = (
+    "You are the final risk gate for a LIVE intraday NSE equity trade that has ALREADY passed the "
+    "bot's technical filters (trend, VWAP, volume, R:R, liquidity). Your job is to catch bad-context "
+    "entries the technicals miss. PROCEED only if the setup is sound; SKIP if it looks like chasing an "
+    "over-extended move, buying into obvious resistance (or shorting into support), fighting the broader "
+    "market, or entering just before a known event. If a 'news' field is present, weigh it heavily. Be "
+    "conservative: when genuinely unsure, SKIP. Reply ONLY with compact JSON: "
+    "{\"proceed\": true|false, \"confidence\": 0-100, \"reason\": \"<=160 chars\"}. No prose outside the JSON."
+)
+
 
 def _lesson_prompt(trade: dict) -> str:
     ind = trade.get("indicators_at_entry", {})
@@ -325,6 +335,53 @@ def extract_lessons_for_trades(trades: list, config: dict | None = None, client=
         les = extract_lesson(t, config=config, client=client)
         out[tid] = les["lesson"]
     return out
+
+
+# ── public API: forward-looking entry confirmation (Section 5C) ─────────────────────────
+
+def _confirm_prompt(context: dict) -> str:
+    """Serialize the proposed-trade context the gate reasons over. `context` may carry a 'news'
+    field once a news/corporate-actions feed is wired in — that's where the real edge lives."""
+    return json.dumps(context, default=str)
+
+
+def confirm_entry(context: dict, config: dict | None = None, client=None) -> dict:
+    """Forward-looking LLM gate for ONE proposed entry.
+
+    `context` is a JSON-serializable dict describing the setup (symbol, direction,
+    entry/stop/targets, regime, technicals, and optionally 'news'). Returns
+    {'proceed': bool, 'confidence': int, 'reason': str, 'source': str}.
+
+    Fail-closed by default: if the LLM cannot actually run (disabled / no key / over budget) or
+    returns something unparseable, proceed=False so a live entry is NOT taken on an un-vetted
+    setup. Set config['llm_entry_gate_fail_open']=True to invert that. Never raises."""
+    config = config or {}
+    fail_open = bool(config.get("llm_entry_gate_fail_open", False))
+    client = client or get_client(config)
+    summary = f"confirm {context.get('symbol')} {context.get('strategy')} {context.get('direction')}"
+
+    # Mock client with nothing scripted == the engine isn't really enabled/keyed/in-budget.
+    if isinstance(client, MockLLMClient) and not client._scripted:
+        log_call("confirm", summary, "", client.model, "unavailable", ok=False)
+        return {"proceed": fail_open, "confidence": 0,
+                "reason": "LLM entry gate enabled but LLM unavailable (disabled/no key/over budget)",
+                "source": "unavailable"}
+    try:
+        raw = client.complete(CONFIRM_SYSTEM, _confirm_prompt(context))
+        parsed = _extract_json(raw)
+        ok = bool(parsed) and "proceed" in parsed
+        log_call("confirm", summary, raw, client.model, getattr(client, "source", "heuristic"), ok=ok)
+        if not ok:
+            return {"proceed": fail_open, "confidence": 0,
+                    "reason": "LLM returned an unparseable verdict", "source": "parse_error"}
+        return {"proceed": bool(parsed["proceed"]),
+                "confidence": int(parsed.get("confidence", 0) or 0),
+                "reason": str(parsed.get("reason", ""))[:200],
+                "source": getattr(client, "source", "llm")}
+    except Exception as e:
+        log_call("confirm", summary, "", getattr(client, "model", "?"), "error", ok=False, error=str(e))
+        return {"proceed": fail_open, "confidence": 0,
+                "reason": f"LLM error: {e}", "source": "error"}
 
 
 # ── public API: strategy proposal ──────────────────────────────────────────────────────

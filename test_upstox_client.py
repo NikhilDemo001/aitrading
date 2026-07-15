@@ -47,6 +47,39 @@ def test_get_market_quote_surfaces_circuit_limits():
     assert q["lower_circuit"] == 90.0
 
 
+def test_get_news_returns_recent_items_newest_first():
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.access_token = "tok"
+    c.get_headers = lambda: {}
+    payload = {"status": "success", "data": {"NSE_EQ|INE002A01018": [
+        {"heading": "older", "summary": "s1", "published_time": 100},
+        {"heading": "newest", "summary": "s2", "published_time": 200},
+    ]}}
+    c.session = types.SimpleNamespace(get=lambda *a, **k: _FakeResp(payload))
+    items = c.get_news("NSE_EQ|INE002A01018", page_size=5)
+    assert len(items) == 2
+    assert items[0]["heading"] == "newest"      # sorted newest-first
+    assert items[0]["published"] == 200
+
+
+def test_get_news_empty_when_no_articles():
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.access_token = "tok"
+    c.get_headers = lambda: {}
+    c.session = types.SimpleNamespace(get=lambda *a, **k: _FakeResp({"status": "success", "data": {}}))
+    assert c.get_news("NSE_EQ|INE002A01018") == []
+
+
+def test_get_news_never_raises_on_error():
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.access_token = "tok"
+    c.get_headers = lambda: {}
+    def _boom(*a, **k):
+        raise RuntimeError("network down")
+    c.session = types.SimpleNamespace(get=_boom)
+    assert c.get_news("NSE_EQ|INE002A01018") == []
+
+
 def _paper_client(tmp_path) -> UpstoxClient:
     """A client over a throwaway config file so tests can never touch the real config.json
     (which holds live credentials)."""

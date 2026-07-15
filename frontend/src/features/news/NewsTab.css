@@ -1,0 +1,110 @@
+.mq-newstab {
+  padding: 20px 24px 48px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.mq-newstab-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
+}
+
+.mq-newstab-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--mq-text, #e6edf3);
+}
+
+.mq-newstab-sub {
+  margin: 4px 0 0;
+  font-size: 0.8rem;
+  color: var(--mq-text-faint, #7d8590);
+}
+
+.mq-newstab-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mq-text-faint, #7d8590);
+}
+
+.mq-newstab-picker select {
+  background: var(--mq-surface, #0d1117);
+  color: var(--mq-text, #e6edf3);
+  border: 1px solid var(--mq-border, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  min-width: 180px;
+}
+
+.mq-newstab-empty {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--mq-text-faint, #7d8590);
+  border: 1px dashed var(--mq-border, rgba(255, 255, 255, 0.1));
+  border-radius: 12px;
+}
+
+.mq-newstab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.mq-newscard {
+  background: var(--mq-surface, #0d1117);
+  border: 1px solid var(--mq-border, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  padding: 16px 18px;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.mq-newscard:hover {
+  border-color: var(--mq-accent, #38bdf8);
+  transform: translateY(-2px);
+}
+
+.mq-newscard-time {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mq-accent, #38bdf8);
+  margin-bottom: 8px;
+}
+
+.mq-newscard-head {
+  display: block;
+  font-size: 0.98rem;
+  font-weight: 650;
+  line-height: 1.35;
+  color: var(--mq-text, #e6edf3);
+  text-decoration: none;
+}
+
+a.mq-newscard-head:hover { color: var(--mq-accent, #38bdf8); }
+
+.mq-newscard-summary {
+  margin: 10px 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--mq-text-faint, #9aa4ad);
+}
+
+.mq-newscard-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 0.76rem;
+  color: var(--mq-accent, #38bdf8);
+  text-decoration: none;
+}
+
+.mq-newscard-link:hover { text-decoration: underline; }

@@ -5,6 +5,7 @@ import { MainChart } from './MainChart'
 import { LiveFeedPanel } from './LiveFeedPanel'
 import { ScannerMatrix } from './ScannerMatrix'
 import { ManualTradeTicket } from './ManualTradeTicket'
+import { NewsPanel } from './NewsPanel'
 import { ActivePositionsGrid } from './ActivePositionsGrid'
 import { BrokerBookPanel } from './BrokerBookPanel'
 import { ClosedTradesTable } from './ClosedTradesTable'
@@ -32,6 +33,7 @@ export function CockpitTab() {
         <div className="mq-cockpit-col mq-cockpit-col-right">
           <LiveFeedPanel />
           <ManualTradeTicket symbol={activeSymbol} />
+          <NewsPanel symbol={activeSymbol} />
         </div>
       </div>
       <ActivePositionsGrid />
