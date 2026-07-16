@@ -126,11 +126,15 @@ def budget_remaining(config: dict | None) -> int:
 # ── call logging (Section 6 data/llm_calls.jsonl) ──────────────────────────────────────
 
 def log_call(kind: str, prompt_summary: str, response: str, model: str, source: str,
-             ok: bool = True, error: str | None = None) -> None:
+             ok: bool = True, error: str | None = None, usage: dict | None = None) -> None:
+    """Append one call to data/llm_calls.jsonl. `usage` carries the provider's real token
+    counts (input/output/thinking) when the call actually reached the API — that is the only
+    place token spend is recorded, so the usage dashboard can only report calls made after
+    this was wired in. Rows without it simply have no token fields."""
     os.makedirs(jsonl_logger.DATA_DIR, exist_ok=True)
     entry = {
         "time": datetime.now().isoformat(),
-        "kind": kind,                    # lesson | proposal
+        "kind": kind,                    # confirm | lesson | proposal | assistant
         "source": source,                # claude | openai_compat | heuristic
         "model": model,
         "prompt_summary": prompt_summary[:600],
@@ -138,8 +142,89 @@ def log_call(kind: str, prompt_summary: str, response: str, model: str, source: 
         "ok": ok,
         "error": error,
     }
+    if usage:
+        entry["input_tokens"] = usage.get("input_tokens")
+        entry["output_tokens"] = usage.get("output_tokens")
+        entry["thinking_tokens"] = usage.get("thinking_tokens")
     with open(llm_calls_path(), "a", encoding="utf-8") as f:
         f.write(json.dumps(entry) + "\n")
+
+
+def usage_summary(config: dict | None = None) -> dict:
+    """Today's LLM spend, for the AI Usage tab. Read-only; costs nothing.
+
+    Token counts are the provider's own numbers, recorded per call — but only for calls made
+    since usage logging was added, so `calls_missing_tokens` reports how many of today's rows
+    predate it rather than silently understating spend.
+
+    Cost is an ESTIMATE at the rates in config (llm_price_input_per_mtok /
+    llm_price_output_per_mtok, USD per million tokens). They default to 0 so this never invents
+    a number: set them from your provider's pricing page and the estimate appears.
+    """
+    config = config or {}
+    rows = jsonl_logger.read_jsonl(llm_calls_path())
+    today = datetime.now().strftime("%Y-%m-%d")
+    todays = [r for r in rows if str(r.get("time", "")).startswith(today)]
+
+    def _int(v):
+        try:
+            return int(v or 0)
+        except (TypeError, ValueError):
+            return 0
+
+    by_kind: dict = {}
+    for r in todays:
+        k = r.get("kind") or "unknown"
+        b = by_kind.setdefault(k, {"calls": 0, "input_tokens": 0, "output_tokens": 0,
+                                   "thinking_tokens": 0, "ok": 0, "failed": 0})
+        b["calls"] += 1
+        b["input_tokens"] += _int(r.get("input_tokens"))
+        b["output_tokens"] += _int(r.get("output_tokens"))
+        b["thinking_tokens"] += _int(r.get("thinking_tokens"))
+        b["ok" if r.get("ok") else "failed"] += 1
+
+    input_tokens = sum(b["input_tokens"] for b in by_kind.values())
+    output_tokens = sum(b["output_tokens"] for b in by_kind.values())
+    thinking_tokens = sum(b["thinking_tokens"] for b in by_kind.values())
+
+    in_rate = float(config.get("llm_price_input_per_mtok", 0.0) or 0.0)
+    out_rate = float(config.get("llm_price_output_per_mtok", 0.0) or 0.0)
+    usd_inr = float(config.get("usd_inr_rate", 0.0) or 0.0)
+    cost_usd = (input_tokens / 1_000_000.0) * in_rate + (output_tokens / 1_000_000.0) * out_rate
+    priced = in_rate > 0 or out_rate > 0
+
+    trading_cap = int(config.get("llm_max_daily_calls", 250))
+    assistant_cap = int(config.get("assistant_max_daily_calls", 100))
+    trading_used = calls_today()
+    assistant_used = calls_today(kinds=("assistant",))
+
+    return {
+        "date": today,
+        "model": config.get("llm_model") or DEFAULT_MODEL,
+        "provider": _provider(config),
+        "enabled": is_enabled(config),
+        "calls_total": len(todays),
+        "calls_missing_tokens": sum(1 for r in todays if r.get("input_tokens") is None),
+        "input_tokens": input_tokens,
+        "output_tokens": output_tokens,
+        "thinking_tokens": thinking_tokens,
+        "total_tokens": input_tokens + output_tokens,
+        "by_kind": by_kind,
+        "cost": {
+            "priced": priced,
+            "usd": round(cost_usd, 4) if priced else None,
+            "inr": round(cost_usd * usd_inr, 2) if (priced and usd_inr > 0) else None,
+            "input_rate_per_mtok_usd": in_rate,
+            "output_rate_per_mtok_usd": out_rate,
+            "usd_inr_rate": usd_inr,
+        },
+        "budgets": {
+            "trading": {"used": trading_used, "cap": trading_cap,
+                        "remaining": max(0, trading_cap - trading_used)},
+            "assistant": {"used": assistant_used, "cap": assistant_cap,
+                          "remaining": max(0, assistant_cap - assistant_used)},
+        },
+    }
 
 
 # ── client abstraction (real Anthropic vs. injectable mock) ────────────────────────────
@@ -152,6 +237,7 @@ class MockLLMClient:
     def __init__(self, scripted: list | None = None, model: str = "mock"):
         self._scripted = list(scripted or [])
         self.model = model
+        self.last_usage = None      # no network, no tokens spent
 
     def complete(self, system: str, prompt: str) -> str:
         if self._scripted:
@@ -168,6 +254,7 @@ class AnthropicClient:
         self._client = anthropic.Anthropic(api_key=api_key)
         self.model = model
         self.max_tokens = max_tokens
+        self.last_usage = None
 
     def complete(self, system: str, prompt: str) -> str:
         msg = self._client.messages.create(
@@ -176,6 +263,18 @@ class AnthropicClient:
             system=system,
             messages=[{"role": "user", "content": prompt}],
         )
+        # Real token spend, straight from the provider — the only trustworthy source for the
+        # usage dashboard. thinking_tokens matter here: this model bills them as output.
+        try:
+            u = msg.usage
+            details = getattr(u, "output_tokens_details", None)
+            self.last_usage = {
+                "input_tokens": getattr(u, "input_tokens", None),
+                "output_tokens": getattr(u, "output_tokens", None),
+                "thinking_tokens": getattr(details, "thinking_tokens", None) if details else None,
+            }
+        except Exception:
+            self.last_usage = None
         parts = [b.text for b in msg.content if getattr(b, "type", None) == "text"]
         return "\n".join(parts).strip()
 
@@ -193,6 +292,7 @@ class OpenAICompatClient:
         self._base_url = base_url.rstrip("/")
         self.max_tokens = max_tokens
         self._timeout = timeout
+        self.last_usage = None
 
     def complete(self, system: str, prompt: str) -> str:
         import requests
@@ -215,7 +315,17 @@ class OpenAICompatClient:
             timeout=self._timeout,
         )
         resp.raise_for_status()
-        content = resp.json()["choices"][0]["message"]["content"] or ""
+        body = resp.json()
+        try:
+            u = body.get("usage") or {}
+            self.last_usage = {
+                "input_tokens": u.get("prompt_tokens"),
+                "output_tokens": u.get("completion_tokens"),
+                "thinking_tokens": None,
+            }
+        except Exception:
+            self.last_usage = None
+        content = body["choices"][0]["message"]["content"] or ""
         return content.strip()
 
 
@@ -336,7 +446,8 @@ def extract_lesson(trade: dict, config: dict | None = None, client=None) -> dict
     try:
         raw = client.complete(LESSON_SYSTEM, prompt)
         parsed = _extract_json(raw)
-        log_call("lesson", summary, raw, client.model, getattr(client, "source", "heuristic"), ok=parsed is not None)
+        log_call("lesson", summary, raw, client.model, getattr(client, "source", "heuristic"), ok=parsed is not None,
+                 usage=getattr(client, "last_usage", None))
         if not parsed or "lesson" not in parsed:
             return _heuristic_lesson(trade)
         return {"lesson": str(parsed["lesson"])[:300], "tags": parsed.get("tags", []),
@@ -397,7 +508,8 @@ def confirm_entry(context: dict, config: dict | None = None, client=None) -> dic
         raw = client.complete(CONFIRM_SYSTEM, _confirm_prompt(context))
         parsed = _extract_json(raw)
         ok = bool(parsed) and "proceed" in parsed
-        log_call("confirm", summary, raw, client.model, getattr(client, "source", "heuristic"), ok=ok)
+        log_call("confirm", summary, raw, client.model, getattr(client, "source", "heuristic"), ok=ok,
+                 usage=getattr(client, "last_usage", None))
         if not ok:
             return {"proceed": fail_open, "confidence": 0,
                     "reason": "LLM returned an unparseable verdict", "source": "parse_error"}
@@ -447,7 +559,8 @@ def generate_proposal(day_context: dict, config: dict | None = None, client=None
     try:
         raw = client.complete(PROPOSAL_SYSTEM, _proposal_prompt(day_context))
         parsed = _extract_json(raw)
-        log_call("proposal", summary, raw, client.model, getattr(client, "source", "heuristic"), ok=parsed is not None)
+        log_call("proposal", summary, raw, client.model, getattr(client, "source", "heuristic"),
+                 ok=parsed is not None, usage=getattr(client, "last_usage", None))
         if not parsed or "title" not in parsed:
             return _heuristic_proposal(day_context)
         parsed["source"] = getattr(client, "source", "claude")

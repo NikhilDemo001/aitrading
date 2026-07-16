@@ -14,6 +14,7 @@ import { LearningTab } from '../features/learning/LearningTab'
 import { NewsTab } from '../features/news/NewsTab'
 import { FundamentalsTab } from '../features/fundamentals/FundamentalsTab'
 import { AssistantTab } from '../features/assistant/AssistantTab'
+import { AiUsageTab } from '../features/ai-usage/AiUsageTab'
 import { StatusBar } from './StatusBar'
 import './App.css'
 
@@ -55,6 +56,7 @@ export default function App() {
         {activeTab === 'news' && <NewsTab />}
         {activeTab === 'fundamentals' && <FundamentalsTab />}
         {activeTab === 'assistant' && <AssistantTab />}
+        {activeTab === 'ai-usage' && <AiUsageTab />}
       </main>
       <StatusBar />
     </div>

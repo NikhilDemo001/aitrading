@@ -105,7 +105,8 @@ def answer(question, history, snapshot, config, client=None):
             raw = client.complete(SYSTEM, prompt)   # the API occasionally returns empty — retry once
         text = (raw or "").strip() or "I couldn't produce an answer just now — please ask again."
         llm_engine.log_call("assistant", summary, text, getattr(client, "model", "?"),
-                            getattr(client, "source", "claude"), ok=True)
+                            getattr(client, "source", "claude"), ok=True,
+                            usage=getattr(client, "last_usage", None))
         return {"answer": text, "source": getattr(client, "source", "claude")}
     except Exception as e:
         llm_engine.log_call("assistant", summary, "", getattr(client, "model", "?"),

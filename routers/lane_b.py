@@ -73,8 +73,18 @@ def llm_status():
             "provider": cfg.get("llm_provider", "anthropic"),
             "model": cfg.get("llm_model") or llm_engine.DEFAULT_MODEL,
             "calls_today": llm_engine.calls_today(),
-            "daily_cap": int(cfg.get("llm_max_daily_calls", 50)),
+            "daily_cap": int(cfg.get("llm_max_daily_calls", 250)),
             "budget_remaining": llm_engine.budget_remaining(cfg),
         }
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@router.get("/api/llm-usage")
+def llm_usage():
+    """Today's token spend, cost estimate and per-budget usage. Read-only, costs nothing."""
+    try:
+        import llm_engine
+        return llm_engine.usage_summary(_get_config() if _get_config else {})
     except Exception as e:
         raise HTTPException(500, str(e))

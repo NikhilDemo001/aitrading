@@ -1,0 +1,87 @@
+.mq-aiu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4, 16px);
+}
+
+.mq-aiu-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--space-3, 12px);
+}
+
+.mq-aiu-note {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  max-width: 92ch;
+}
+
+.mq-aiu-engine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5, 20px);
+  align-items: center;
+  font-size: 0.72rem;
+}
+
+.mq-aiu-empty {
+  padding: var(--space-4, 16px);
+  font-size: 0.72rem;
+}
+
+.mq-aiu-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+}
+
+.mq-aiu-table th {
+  text-align: left;
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  font-weight: 600;
+  color: var(--ink-faint, rgba(255, 255, 255, 0.55));
+  text-transform: uppercase;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+}
+
+.mq-aiu-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.mq-aiu-table td.num,
+.mq-aiu-table th:not(:first-child) { text-align: right; }
+
+.mq-aiu-calls {
+  display: flex;
+  flex-direction: column;
+  max-height: 46vh;
+  overflow-y: auto;
+}
+
+/* time · kind · source · summary (flexes) · tokens */
+.mq-aiu-call {
+  display: grid;
+  grid-template-columns: 62px 86px 76px 1fr 96px;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  padding: 6px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  font-size: 0.68rem;
+}
+
+.mq-aiu-call-sum {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mq-aiu-call-tok { text-align: right; }
+
+@media (max-width: 900px) {
+  .mq-aiu-call { grid-template-columns: 54px 76px 1fr 72px; }
+  .mq-aiu-call > :nth-child(3) { display: none; }   /* source — least useful when cramped */
+}

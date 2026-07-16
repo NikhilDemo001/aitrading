@@ -13,6 +13,7 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'news', label: 'News' },
   { id: 'fundamentals', label: 'Fundamentals' },
   { id: 'assistant', label: 'Assistant' },
+  { id: 'ai-usage', label: 'AI Usage' },
 ]
 
 export function TopNav() {
