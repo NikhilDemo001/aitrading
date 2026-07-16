@@ -9,7 +9,6 @@ const TABS: { id: TabId; label: string }[] = [
   { id: 'trades', label: 'Trades' },
   { id: 'analytics', label: 'Analytics' },
   { id: 'config', label: 'Config' },
-  { id: 'research-lab', label: 'AI Research Lab' },
   { id: 'learning', label: 'Learning' },
   { id: 'news', label: 'News' },
   { id: 'fundamentals', label: 'Fundamentals' },

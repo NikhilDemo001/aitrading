@@ -168,10 +168,10 @@ async def lifespan(app: FastAPI):
     except Exception:
         pass
     try:
-        import research_lab
-        research_lab.init_db()
+        import state_db
+        state_db.init_db()
     except Exception as e:
-        print(f"Error initializing research database: {e}")
+        print(f"Error initializing state database: {e}")
     load_state()
 
     # Auto-resume scanning after a crash/watchdog restart (2026-07-06: the process died
@@ -410,7 +410,6 @@ async def websocket_endpoint(websocket: WebSocket):
         # SettingsForm still fetches /api/status directly as a belt-and-braces workaround,
         # which is now redundant but harmless.)
         status_payload = get_status()
-        import research_lab
         await websocket.send_json({
             "type": "init",
             "status": status_payload,
@@ -418,7 +417,6 @@ async def websocket_endpoint(websocket: WebSocket):
             "trades": [t for t in trade_history if t.get("exit_time", "").startswith(get_ist_now().date().isoformat())],
             "logs": scan_logs,
             "scanner": {"context": scan_context, "matrix": list(scan_matrix.values())},
-            "research_status": research_lab.research_status
         })
         while True:
             await websocket.receive_text()
@@ -451,7 +449,6 @@ active_positions = {}   # symbol → position_dict
 shadow_positions = {}   # symbol → position_dict (for simulated shadow trades)
 trade_history = []
 daily_pnl = 0.0
-_research_ticks = 0
 
 # Decoupled market-data feed (price cache + REST fallback). None until startup wires it
 # when enable_market_feed is set; consumers fall back to direct REST when it's absent/stale.
@@ -606,8 +603,8 @@ TRADES_FILE = "trade_history.json"
 
 def save_positions_sql():
     try:
-        import research_lab
-        conn = research_lab.get_db_connection()
+        import state_db
+        conn = state_db.get_db_connection()
         cursor = conn.cursor()
         cursor.execute("DELETE FROM live_positions")
         for pos in active_positions.values():
@@ -619,14 +616,12 @@ def save_positions_sql():
                     symbol, instrument_key, is_fno, lot_size, contract, strategy, direction, quantity,
                     entry_price, entry_time, stop_loss, target, target_2, t1_hit, order_id, current_price,
                     pnl, atr_at_entry, trailing_high, trailing_low, market_context, regime, htf_trend,
-                    mae, mfe, confluence_score, trigger_level_source, trigger_level_price, trigger_level_score,
-                    rl_state_key, rl_action_id
+                    mae, mfe, confluence_score, trigger_level_source, trigger_level_price, trigger_level_score
                 ) VALUES (
                     :symbol, :instrument_key, :is_fno, :lot_size, :contract, :strategy, :direction, :quantity,
                     :entry_price, :entry_time, :stop_loss, :target, :target_2, :t1_hit, :order_id, :current_price,
                     :pnl, :atr_at_entry, :trailing_high, :trailing_low, :market_context, :regime, :htf_trend,
-                    :mae, :mfe, :confluence_score, :trigger_level_source, :trigger_level_price, :trigger_level_score,
-                    :rl_state_key, :rl_action_id
+                    :mae, :mfe, :confluence_score, :trigger_level_source, :trigger_level_price, :trigger_level_score
                 )
             """, p)
         conn.commit()
@@ -637,8 +632,8 @@ def save_positions_sql():
 
 def save_trades_sql():
     try:
-        import research_lab
-        conn = research_lab.get_db_connection()
+        import state_db
+        conn = state_db.get_db_connection()
         cursor = conn.cursor()
         cursor.execute("DELETE FROM live_trades")
         for t in trade_history:
@@ -670,8 +665,8 @@ def load_state():
     loaded_trades = []
     
     try:
-        import research_lab
-        conn = research_lab.get_db_connection()
+        import state_db
+        conn = state_db.get_db_connection()
         cursor = conn.cursor()
         
         cursor.execute("SELECT * FROM live_positions")
@@ -1256,42 +1251,6 @@ async def scanner_loop():
                         report_dir = os.path.abspath(os.path.join(os.getcwd(), 'reports'))
                     analyze_trades_eod(trade_history, report_dir)
                     
-                    # RL nightly training/validation runs only when RL sizing is enabled. It's
-                    # dropped by default (size-invariant reward + leaky validator), so we don't
-                    # churn rl_policy.json or log "learning" that doesn't influence trading.
-                    if client.config.get("enable_rl_sizing", False) and today_trades:
-                        import shutil
-                        # Backup current policy
-                        if os.path.exists("rl_policy.json"):
-                            shutil.copyfile("rl_policy.json", "rl_policy_backup.json")
-
-                        # Validate proposed changes out-of-sample (in executor — CPU-heavy)
-                        from model_validator import validate_model_update
-                        approved = await _off_loop(validate_model_update, trade_history, "rl_policy.json", "rl_policy_backup.json")
-                        if not approved and os.path.exists("rl_policy_backup.json"):
-                            # Roll back policy if validation fails
-                            shutil.copyfile("rl_policy_backup.json", "rl_policy.json")
-                            log_scan("SYSTEM", "Daily RL policy update failed out-of-sample validation. Rolled back.", "warning")
-                        else:
-                            log_scan("SYSTEM", "Daily RL policy update approved by out-of-sample validation.", "success")
-
-                        # Batch train RL agent on all historical trades
-                        try:
-                            from learning_engine import QLearningAgent
-                            agent = QLearningAgent()
-                            count = await _off_loop(agent.batch_train_from_db, "ai_research.db")
-                            log_scan("SYSTEM", f"AI RL Batch training completed. Trained on {count} historical trades.", "success")
-                        except Exception as batch_err:
-                            log_scan("SYSTEM", f"Error in offline RL batch training: {batch_err}", "danger")
-                            
-                    # Trigger Autonomous AI Research Lab pipeline cycle
-                    try:
-                        import research_lab
-                        await _off_loop(research_lab.run_autonomous_research_cycle)
-                        log_scan("SYSTEM", "Autonomous AI Research Lab cycle completed successfully.", "success")
-                    except Exception as rl_cycle_err:
-                        log_scan("SYSTEM", f"Error running autonomous AI Research Lab cycle: {rl_cycle_err}", "danger")
-                        
                 except Exception as ex:
                     log_scan("SYSTEM", f"Error in daily learning loop: {ex}", "danger")
                     
@@ -1917,40 +1876,12 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
     if cfg.get("enable_one_percent_risk", False) and margin > 0:
         base_risk = round(0.01 * margin, 2)
 
-    # RL sizing is dropped by default (size-invariant reward can't learn sizing — Kelly + caps
-    # do it). Only apply the RL multiplier when explicitly re-enabled; otherwise it's a no-op.
-    if cfg.get("enable_rl_sizing", False):
-        rl_mult = signal.get("rl_multiplier", 1.0)
-        base_risk = round(base_risk * rl_mult, 2)
-
-    # Scale risk dynamically using AI Research Lab capital allocations
-    try:
-        from research_lab import calculate_capital_allocations
-        allocs = calculate_capital_allocations()
-        strat_base = strat_name.split("-")[0]
-        alloc_mult = 1.0
-        for item in allocs:
-            if item.get("strategy_id") == "CASH":
-                continue
-            alloc_id = item.get("strategy_id", "")
-            base_map = {
-                "SupportResistance": "SR",
-                "VWAPTrendPullback": "VWAP",
-                "VWAP": "VWAP",
-                "ORB": "ORB",
-                "EMA": "EMA",
-                "RSI": "RSI",
-                "MeanReversion": "RSI",
-                "Momentum": "ORB"
-            }
-            mapped_base = base_map.get(strat_base, strat_base)
-            if f"AI-{mapped_base}-" in alloc_id or mapped_base in alloc_id:
-                alloc_mult = float(item.get("percentage", 100)) / 100.0
-                break
-        base_risk = round(base_risk * alloc_mult, 2)
-        print(f"[Allocation scaling] Strat: {strat_name} | Alloc Mult: {alloc_mult:.2f}x | Scaled Risk: Rs. {base_risk:.2f}")
-    except Exception as alloc_err:
-        print(f"Error applying capital allocation scaling: {alloc_err}")
+    # Sizing is now: fixed ₹ risk budget (or 1% of equity) → Kelly/max-capacity → RiskManager's
+    # hard ceiling. Two multipliers used to sit here and both are gone:
+    #   - RL multiplier: the reward is size-invariant, so it could never learn sizing.
+    #   - AI Research Lab capital allocations: those percentages were derived from metrics the
+    #     lab generated with random.uniform(), i.e. a random number with a path to real position
+    #     size. It measured 1.00x in practice, but "harmless today" is not a risk control.
 
     is_options_fno = (fno_mode and fno_type == "OPT")
     if fno_mode and not is_options_fno:
@@ -2022,8 +1953,6 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
             "trigger_level_source": signal.get("trigger_level_source"),
             "trigger_level_price": signal.get("trigger_level_price"),
             "trigger_level_score": signal.get("trigger_level_score"),
-            "rl_state_key": signal.get("rl_state_key"),
-            "rl_action_id": signal.get("rl_action_id"),
             "candlestick_patterns": signal.get("candlestick_patterns", []),
             "is_shadow": True
         }
@@ -2215,8 +2144,6 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
                 "trigger_level_source": signal.get("trigger_level_source"),
                 "trigger_level_price": signal.get("trigger_level_price"),
                 "trigger_level_score": signal.get("trigger_level_score"),
-                "rl_state_key": signal.get("rl_state_key"),
-                "rl_action_id": signal.get("rl_action_id"),
                 "candlestick_patterns": signal.get("candlestick_patterns", [])
             }
             await execute_exit(symbol, pos_temp, fill_price, "SLIPPAGE ANOMALY EXIT", paper_trading,
@@ -2263,8 +2190,6 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
             "trigger_level_source": signal.get("trigger_level_source"),
             "trigger_level_price": signal.get("trigger_level_price"),
             "trigger_level_score": signal.get("trigger_level_score"),
-            "rl_state_key": signal.get("rl_state_key"),
-            "rl_action_id": signal.get("rl_action_id"),
             "candlestick_patterns": signal.get("candlestick_patterns", [])
         }
 
@@ -2862,7 +2787,7 @@ async def manage_shadow_positions(quotes):
 
 
 async def position_manager_loop():
-    global bot_running, active_positions, shadow_positions, _research_ticks, _prev_total_pnl
+    global bot_running, active_positions, shadow_positions, _prev_total_pnl
     while True:
         try:
             watchlist = client.config.get("watchlist", [])
@@ -3002,19 +2927,6 @@ async def position_manager_loop():
         except Exception as e:
             print(f"Error in position_manager_loop: {e}")
         
-        # Periodically tick paper trading simulation in the research lab (e.g. every 10 seconds)
-        try:
-            if bot_running:
-                _research_ticks += 1
-                if _research_ticks >= 10:
-                    _research_ticks = 0
-                    import research_lab
-                    # In executor: this does per-strategy, per-symbol candle fetches + a full
-                    # backtest — running it on the loop froze the whole server every 10s.
-                    await _off_loop(research_lab.simulate_paper_trades_daily)
-        except Exception as ex:
-            print(f"Error running paper trade simulation: {ex}")
-
         await asyncio.sleep(0.5)
 
 
@@ -3193,30 +3105,6 @@ async def execute_exit(symbol, pos, exit_price, reason, paper_trading, is_shadow
             pass  # Non-critical
         
         save_state()
-
-        # Update Q-Learning values (only when RL sizing is enabled — dropped by default so the
-        # logs/policy don't imply learning that no longer influences live trading).
-        try:
-            if client.config.get("enable_rl_sizing", False):
-                from learning_engine import QLearningAgent
-                agent = QLearningAgent()
-                state_key = pos.get("rl_state_key")
-                action_id = pos.get("rl_action_id")
-                if state_key and action_id is not None:
-                    is_win = pnl >= 0
-                    if is_shadow:
-                        # Shadow trade (Action 0): reward is positive if we skipped a losing trade
-                        reward = agent.calculate_counterfactual_reward(is_win)
-                    else:
-                        # Live trade (Actions 1, 2, 3): calculate standardized reward
-                        risk_amount = abs(pos["entry_price"] - pos["stop_loss"]) * pos["quantity"]
-                        reward = agent.calculate_reward(pnl, risk_amount, is_win)
-
-                    agent.update_q_value(state_key, action_id, reward)
-                    agent.save_policy()
-                    log_scan(symbol, f"RL policy updated | State: {state_key} | Action: {action_id} | Reward: {reward:+.4f}", "info")
-        except Exception as rl_err:
-            print(f"Error in RL exit update: {rl_err}")
 
         cat = "success" if pnl >= 0 else "danger"
         _chg_note = f" | charges ₹{charges:.2f}" if charges else ""
@@ -4073,13 +3961,11 @@ def backtest_symbol(symbol: str, days: int = 30, slippage_pct: float | None = No
 
 from routers import history as history_router
 from routers import lane_b as lane_b_router
-from routers import research as research_router
 from routers import assistant as assistant_router
 
 history_router.configure(get_now=get_ist_now, get_config=lambda: client.config)
 lane_b_router.configure(get_config=lambda: client.config)
 
-app.include_router(research_router.router)
 app.include_router(history_router.router)
 app.include_router(lane_b_router.router)
 app.include_router(assistant_router.router)

@@ -6,7 +6,6 @@ import { BacktesterPanel } from './BacktesterPanel'
 import { RecommendationsPanel } from './RecommendationsPanel'
 import { TimeOfDayPanel } from './TimeOfDayPanel'
 import { CapitalGlobeScene } from '../../lib/three/scenes/CapitalGlobeScene'
-import { QuantPerformanceScene } from '../../lib/three/scenes/QuantPerformanceScene'
 import './AnalyticsTab.css'
 
 export function AnalyticsTab() {
@@ -17,8 +16,7 @@ export function AnalyticsTab() {
         <EquityCurveChart />
         <CapitalGlobeScene />
       </div>
-      <div className="mq-analytics-row mq-analytics-row-2col">
-        <QuantPerformanceScene />
+      <div className="mq-analytics-row">
         <StrategyBreakdown />
       </div>
       <div className="mq-analytics-row mq-analytics-row-3col">

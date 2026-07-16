@@ -10,8 +10,8 @@ import main
 
 class TestBotEnhancements(unittest.TestCase):
     def setUp(self):
-        import research_lab
-        research_lab.init_db()
+        import state_db
+        state_db.init_db()
 
     def test_rate_limiter(self):
         """Verify that RateLimiter limits requests and spaces them correctly."""
@@ -200,10 +200,6 @@ class TestBotEnhancements(unittest.TestCase):
         old_config = main.client.config.copy()
 
         try:
-            import research_lab
-            old_allocations = research_lab.calculate_capital_allocations
-            research_lab.calculate_capital_allocations = MagicMock(return_value=[])
-
             main.client.config["paper_trading"] = False  # To trigger the place_order call branch
             main.client.config["enable_fno"] = False
             main.client.config["enable_kelly_sizing"] = False
@@ -250,7 +246,6 @@ class TestBotEnhancements(unittest.TestCase):
             main.client.place_order = old_place_order
             main.client.get_market_quote = old_get_quote
             main.client.config = old_config
-            research_lab.calculate_capital_allocations = old_allocations
 
     def test_adaptive_trailing_stop_multiplier(self):
         """Verify that India VIX changes scale trailing ATR stop multiplier appropriately."""
@@ -412,9 +407,6 @@ class TestBotEnhancements(unittest.TestCase):
         old_config = main.client.config.copy()
         
         try:
-            import research_lab
-            old_allocations = research_lab.calculate_capital_allocations
-            research_lab.calculate_capital_allocations = MagicMock(return_value=[])
             
             # 1. Enable F&O mode and configure risk parameters
             main.client.config["enable_fno"] = True
@@ -491,7 +483,6 @@ class TestBotEnhancements(unittest.TestCase):
             main.client.get_market_quote = old_get_market_quote
             main.client.config = old_config
             main.active_positions = {}
-            research_lab.calculate_capital_allocations = old_allocations
 
     def test_momentum_exit(self):
         """Verify that momentum exit triggers when close goes below both 9 EMA and VWAP for LONG position."""
@@ -588,9 +579,6 @@ class TestBotEnhancements(unittest.TestCase):
         old_config = main.client.config.copy()
         
         try:
-            import research_lab
-            old_allocations = research_lab.calculate_capital_allocations
-            research_lab.calculate_capital_allocations = MagicMock(return_value=[])
             
             # Enable F&O options mode
             main.client.config["enable_fno"] = True
@@ -658,7 +646,6 @@ class TestBotEnhancements(unittest.TestCase):
             main.client.get_market_quote = old_get_market_quote
             main.client.config = old_config
             main.active_positions = {}
-            research_lab.calculate_capital_allocations = old_allocations
 
     def test_get_option_for_lookup(self):
         """Verify that get_option_for correctly returns the closest strike ATM option contract."""

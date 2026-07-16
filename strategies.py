@@ -864,24 +864,6 @@ def select_best_strategy(candles, htf_candles=None, strategy_order=None, config=
         except Exception:
             sig['candlestick_patterns'] = []
 
-        # ── RL sizing (off by default — see comment in old code) ──────────────
-        # Q-Learning sizing is OFF by default: the reward signal (pnl/risk) is
-        # size-invariant, so the agent cannot actually learn sizing — Kelly +
-        # the configured caps do that job.
-        # Set enable_rl_sizing=True to re-enable the RL multiplier and RL skip.
-        if config.get('enable_rl_sizing', False):
-            from learning_engine import QLearningAgent
-            agent = QLearningAgent()
-            state_key = agent.discretize_state(context)
-            action_id, multiplier = agent.get_action(state_key)
-            sig['rl_state_key'] = state_key
-            sig['rl_action_id'] = action_id
-            sig['rl_multiplier'] = multiplier
-        else:
-            sig['rl_state_key'] = None
-            sig['rl_action_id'] = None
-            sig['rl_multiplier'] = 1.0
-
         sig['is_shadow_trade'] = False
         all_signals.append(sig)
 
@@ -896,11 +878,8 @@ def select_best_strategy(candles, htf_candles=None, strategy_order=None, config=
     best_signal = adjust_targets_with_levels(best_signal, candles, config)
 
     # ── Confidence threshold gates shadow/live ────────────────────────────────
-    # The RL skip (action 0) only applies when RL sizing is enabled — otherwise
-    # RL must not influence which trades go live.
     threshold = int(config.get('min_confidence_threshold', 60))
-    rl_skip = config.get('enable_rl_sizing', False) and best_signal.get('rl_action_id') == 0
-    if best_signal.get('confidence_score', 0) < threshold or rl_skip:
+    if best_signal.get('confidence_score', 0) < threshold:
         # Flag as shadow trade — simulated in memory, not sent to broker
         best_signal['is_shadow_trade'] = True
 

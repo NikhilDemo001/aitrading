@@ -6,8 +6,8 @@ const TAB_KEYS: Record<string, TabId> = {
   '1': 'cockpit',
   '2': 'analytics',
   '3': 'config',
-  '4': 'research-lab',
-  '5': 'learning',
+  '4': 'learning',
+  '5': 'trades',
 }
 
 function isTypingTarget(target: EventTarget | null) {

@@ -138,13 +138,12 @@ export interface LogEntry {
 
 // ── WebSocket message envelope ──────────────────────────────────────────────
 export type WsMessage =
-  | { type: 'init'; status: BotStatus; positions: Position[]; trades: Trade[]; logs: LogEntry[]; scanner: ScannerState; research_status?: unknown }
-  | { type: 'state_update'; status: BotStatus; positions: Position[]; trades: Trade[]; logs?: LogEntry[]; research_status?: unknown }
+  | { type: 'init'; status: BotStatus; positions: Position[]; trades: Trade[]; logs: LogEntry[]; scanner: ScannerState }
+  | { type: 'state_update'; status: BotStatus; positions: Position[]; trades: Trade[]; logs?: LogEntry[] }
   | { type: 'logs'; logs: LogEntry[] }
   | { type: 'scanner'; scanner: ScannerState }
   | { type: 'checking_progress'; symbol: string; name?: string; status: 'checking' | 'done'; time?: string }
   | { type: 'realtime_update'; positions: Position[]; total_daily_pnl?: number; daily_pnl?: number; quotes?: Record<string, number> }
-  | { type: 'research_progress'; [key: string]: unknown }
   | TradeEventMessage
 
 export interface TradeEventMessage {

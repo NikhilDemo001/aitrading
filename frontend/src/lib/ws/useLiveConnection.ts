@@ -4,7 +4,6 @@ import { useBotStore } from '../stores/useBotStore'
 import { usePositionsStore } from '../stores/usePositionsStore'
 import { useScannerStore } from '../stores/useScannerStore'
 import { useLogsStore } from '../stores/useLogsStore'
-import { useResearchStore } from '../stores/useResearchStore'
 import { usePnlHistoryStore } from '../stores/usePnlHistoryStore'
 import { useToastStore } from '../stores/useToastStore'
 import { isLongDirection, formatINR } from '../tradeMath'
@@ -48,7 +47,6 @@ function applyMessage(msg: WsMessage) {
       usePositionsStore.getState().setTrades(msg.trades)
       useLogsStore.getState().setLogs(msg.logs)
       useScannerStore.getState().setScanner(msg.scanner)
-      if (msg.research_status) useResearchStore.getState().setStatus(msg.research_status)
       if (typeof msg.status?.daily_pnl === 'number') usePnlHistoryStore.getState().push(msg.status.daily_pnl)
       break
     case 'state_update':
@@ -56,7 +54,6 @@ function applyMessage(msg: WsMessage) {
       usePositionsStore.getState().setPositions(msg.positions)
       usePositionsStore.getState().setTrades(msg.trades)
       if (msg.logs) useLogsStore.getState().setLogs(msg.logs)
-      if (msg.research_status) useResearchStore.getState().setStatus(msg.research_status)
       if (typeof msg.status?.daily_pnl === 'number') usePnlHistoryStore.getState().push(msg.status.daily_pnl)
       break
     case 'logs':
@@ -74,9 +71,6 @@ function applyMessage(msg: WsMessage) {
       if (typeof pnl === 'number') usePnlHistoryStore.getState().push(pnl)
       break
     }
-    case 'research_progress':
-      useResearchStore.getState().setProgress(msg)
-      break
     case 'trade_event':
       // State stores already reflect the resulting position/trade change via the
       // accompanying state_update; this is purely the notification layer.

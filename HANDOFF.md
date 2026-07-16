@@ -15,6 +15,19 @@ state; the older 2026-07-04 handoff (deeper architecture/context) follows below.
    update `.env` `ANTHROPIC_API_KEY`.
 
 ## ✅ WHAT WE BUILT TODAY (2026-07-15/16)
+- **AI Research Lab REMOVED (2026-07-16)** — it fabricated every metric with `random.uniform()`
+  (win_rate, profit_factor, sharpe, "paper trades"), never traded (its `AI-*` strategies were
+  never in `strategies._REGISTRY`), spammed `[Paper Trader]` ~every 10s, and poisoned the
+  Assistant via a journal claiming 19,119 trades / +Rs 10.29M. Deleted: `research_lab.py`,
+  `routers/research.py`, the AI Research Lab tab, `QuantPerformanceScene` (3D bars of random
+  numbers on the Analytics tab), plus RL machinery (`learning_engine.py`, `model_validator.py`,
+  `rl_policy*.json` — a size-invariant reward can't learn sizing).
+  **IMPORTANT:** `research_lab.init_db()` also owned the REAL state tables (`live_positions`,
+  `live_trades` — "SQLite is truth"). Those were extracted to **`state_db.py`**, same
+  `ai_research.db` file, same schema. Verified after restart: 70 live_trades preserved, 0 errors.
+  Also cut `calculate_capital_allocations` out of `execute_entry` — random-derived percentages
+  had a path to REAL position sizing (measured 1.00x, but that's luck, not a control).
+  The Assistant now reads the Lane-A leaderboard (real closed trades) instead of the fake journal.
 - **Assistant tab (2026-07-16)** — read-only Claude Q&A over the bot's own data. `assistant_engine.py`
   (pure snapshot + answer), `routers/assistant.py` (`POST /api/assistant/ask`), `AssistantTab.tsx`.
   Separate `assistant_max_daily_calls` (100) budget so chat never starves the trading gate;

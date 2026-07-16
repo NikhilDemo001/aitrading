@@ -6,9 +6,8 @@ combination, tracks sample count, win rate, avg R-multiple, expectancy, avg P&L,
 avg holding time, and a recency-weighted score (recent trades count more — markets are
 non-stationary). This only ever changes WHICH already-validated strategy the selector favors
 for current conditions; it never changes strategy code, so it's safe to auto-apply every cycle
-(Section 0 rule 5) — distinct from research_lab.py's own `leaderboard` SQL table, which ranks
-*candidate/discovered* strategies through the Lane B promotion pipeline, not this per-regime/
-time-bucket selection layer over the 8 production strategies.
+(Section 0 rule 5). This is the only leaderboard: it is a per-regime/time-bucket selection
+layer over the 8 production strategies, built from real closed trades.
 """
 
 from __future__ import annotations

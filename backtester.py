@@ -121,7 +121,7 @@ def run_backtest(strategy_func, candles, config=None, max_risk=500,
 
     # Transaction costs — a backtest that ignores brokerage/taxes overstates edge, because
     # intraday round-trip costs (~₹40 + statutory charges) are a large fraction of a small
-    # per-trade risk budget. Defaults mirror the live/paper friction model in research_lab.py.
+    # per-trade risk budget. Defaults mirror the live/paper friction model in execution_costs.py.
     if brokerage_flat is None:
         brokerage_flat = float(config.get("backtest_brokerage_flat", 40.0))
     if charge_pct is None:

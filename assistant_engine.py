@@ -9,7 +9,6 @@ import llm_engine
 
 MAX_DECISIONS = 40
 MAX_TRADES = 60
-MAX_LEADERBOARD = 15
 MAX_HISTORY_TURNS = 6
 
 SYSTEM = (
@@ -40,8 +39,8 @@ def _mentioned_symbols(question, known_symbols):
     return [s for s in (known_symbols or []) if s and s.upper() in q]
 
 
-def build_context(question, *, status, positions, today_trades, decisions, leaderboard,
-                  journal, known_symbols=None):
+def build_context(question, *, status, positions, today_trades, decisions,
+                  strategy_stats=None, known_symbols=None):
     trades = list(today_trades or [])[-MAX_TRADES:]
     # Shadow trades are simulated learning-only fills; the bot's status daily_pnl counts ONLY
     # real ones. Summing both into one number made the model report a false discrepancy, so
@@ -64,8 +63,8 @@ def build_context(question, *, status, positions, today_trades, decisions, leade
         "shadow_trade_count": len(shadow_trades),
         "shadow_pnl": shadow_pnl,
         "recent_decisions": list(decisions or [])[-MAX_DECISIONS:],
-        "leaderboard": list(leaderboard or [])[:MAX_LEADERBOARD],
-        "journal": journal,
+        # Lane-A stats, built from REAL closed trades (regime/time-bucket -> strategy record).
+        "strategy_stats": strategy_stats or {},
         "focus_symbols": focus,
     }
     if focus:

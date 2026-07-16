@@ -1,3 +1,0 @@
-.mq-rl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-3); }
-.mq-rl-validator { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--border); }
-.mq-rl-validator-label { font-family: var(--font-head); font-size: 0.72rem; color: var(--ink-dim); }

@@ -1,31 +1,14 @@
-"""Assistant API route. Lazy imports of main/research_lab (they import back into this app) keep
-startup free of circular imports, matching routers/research.py."""
+"""Assistant API route. The lazy `import main` (main imports this router back) keeps startup
+free of circular imports."""
 
 from fastapi import APIRouter
 
 router = APIRouter(prefix="/api/assistant", tags=["assistant"])
 
 
-def _latest_journal():
-    try:
-        import research_lab
-        conn = research_lab.get_db_connection()
-        try:
-            cur = conn.cursor()
-            cur.execute("SELECT findings, mistakes, opportunities, strengths, weaknesses, created_at "
-                        "FROM research_journal ORDER BY id DESC LIMIT 1;")
-            row = cur.fetchone()
-        finally:
-            conn.close()
-        return dict(row) if row else None
-    except Exception:
-        return None
-
-
 @router.post("/ask")
 def assistant_ask(req: dict):
     import main
-    import research_lab
     import jsonl_logger
     import assistant_engine
 
@@ -47,14 +30,17 @@ def assistant_ask(req: dict):
         decisions = jsonl_logger.read_jsonl(jsonl_logger.DECISIONS_FILE, limit=120)
     except Exception:
         decisions = []
+    # Strategy stats come from the Lane-A leaderboard, which is built from REAL closed trades.
+    # (The old research-lab leaderboard/journal were generated with random.uniform(), and the
+    # assistant kept faithfully reporting those invented numbers.)
     try:
-        leaderboard = research_lab.get_leaderboard()[:15]
+        import leaderboard as lane_a
+        strategy_stats = lane_a.load_stats()
     except Exception:
-        leaderboard = []
+        strategy_stats = {}
     known_symbols = list(status.get("watchlist") or []) + [p.get("symbol") for p in positions]
 
     snapshot = assistant_engine.build_context(
         question, status=status, positions=positions, today_trades=today_trades,
-        decisions=decisions, leaderboard=leaderboard, journal=_latest_journal(),
-        known_symbols=known_symbols)
+        decisions=decisions, strategy_stats=strategy_stats, known_symbols=known_symbols)
     return assistant_engine.answer(question, history, snapshot, main.client.config)

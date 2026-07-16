@@ -7,8 +7,8 @@ method taking explicit arguments (no module globals), so it's directly unit-test
 called identically from main.py's existing scan/execute path and from orchestrator.py.
 
 Design note: this does not replace strategy-specific sizing nuance already tuned in main.py
-(Kelly-fraction risk, max-capacity/leverage sizing, F&O lot sizing, capital-allocation scaling
-from research_lab). Those still compute a *candidate* quantity upstream. RiskManager applies the
+(Kelly-fraction risk, max-capacity/leverage sizing, F&O lot sizing). Those still compute a
+*candidate* quantity upstream. RiskManager applies the
 spec's canonical risk_per_trade_pct-derived ceiling on top of that candidate and is the mandatory
 final gate every path must call before an order is actually placed — the hard ceiling, not a
 replacement for existing sizing logic.

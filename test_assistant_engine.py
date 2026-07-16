@@ -11,13 +11,13 @@ TRADES = [{"symbol": "RELIANCE", "strategy": "VWAP-Pullback-Buy", "direction": "
            "entry_time": "2026-07-16T10:00:00", "exit_time": "2026-07-16T10:05:00"}]
 DECISIONS = [{"time": "2026-07-16T10:15:00", "type": "skip", "symbol": "RELIANCE",
               "reason": "liquidity: thin book"}]
-LEADERBOARD = [{"rank": 1, "name": "EMA Cloud", "id": "AI-EMA-1", "profit_factor": 1.7}]
+STRATEGY_STATS = {"trending_up|1000_1045": {"ORB-Buy": {"trades": 20, "win_rate": 0.6}}}
 
 
 def test_build_context_has_all_domains():
     snap = assistant_engine.build_context("how did today go?", status=STATUS, positions=POSITIONS,
-        today_trades=TRADES, decisions=DECISIONS, leaderboard=LEADERBOARD, journal=None)
-    for key in ("status", "open_positions", "today_trades", "today_pnl", "recent_decisions", "leaderboard"):
+        today_trades=TRADES, decisions=DECISIONS, strategy_stats=STRATEGY_STATS)
+    for key in ("status", "open_positions", "today_trades", "today_pnl", "recent_decisions", "strategy_stats"):
         assert key in snap
     assert snap["today_pnl"] == 25.0
 
@@ -30,7 +30,7 @@ def test_build_context_excludes_shadow_trades_from_today_pnl():
         {"symbol": "B", "pnl": -500.0, "is_shadow_trade": True},  # shadow
     ]
     snap = assistant_engine.build_context("today?", status=STATUS, positions=[],
-        today_trades=trades, decisions=[], leaderboard=[], journal=None)
+        today_trades=trades, decisions=[])
     assert snap["today_pnl"] == 25.0
     assert snap["shadow_pnl"] == -500.0
     assert snap["real_trade_count"] == 1
@@ -39,8 +39,8 @@ def test_build_context_excludes_shadow_trades_from_today_pnl():
 
 def test_build_context_symbol_filter_surfaces_named_symbol():
     snap = assistant_engine.build_context("why did you skip RELIANCE?", status=STATUS,
-        positions=POSITIONS, today_trades=TRADES, decisions=DECISIONS, leaderboard=LEADERBOARD,
-        journal=None, known_symbols=["RELIANCE", "INFY"])
+        positions=POSITIONS, today_trades=TRADES, decisions=DECISIONS,
+        strategy_stats=STRATEGY_STATS, known_symbols=["RELIANCE", "INFY"])
     assert "RELIANCE" in snap["focus_symbols"]
     assert any(d["symbol"] == "RELIANCE" for d in snap["symbol_decisions"])
 
