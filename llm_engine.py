@@ -100,14 +100,26 @@ def is_enabled(config: dict | None) -> bool:
     return bool(config.get("llm_enabled", False)) and api_key_available(config) and _client_dep_available(config)
 
 
-def calls_today() -> int:
+# Kinds that draw on the TRADING budget. The assistant is operator-initiated chat with its own
+# cap (assistant_max_daily_calls); counting it here let a chat session silently drain the entry
+# gate's quota, and because the gate is fail-closed that HALTS trading for the rest of the day.
+TRADING_KINDS = ("confirm", "lesson", "proposal")
+
+
+def calls_today(kinds: tuple | None = TRADING_KINDS) -> int:
+    """Calls made today. Defaults to the trading kinds only — pass kinds=None for every call."""
     rows = jsonl_logger.read_jsonl(llm_calls_path())
     today = datetime.now().strftime("%Y-%m-%d")
-    return sum(1 for r in rows if str(r.get("time", "")).startswith(today))
+    return sum(1 for r in rows
+               if str(r.get("time", "")).startswith(today)
+               and (kinds is None or r.get("kind") in kinds))
 
 
 def budget_remaining(config: dict | None) -> int:
-    cap = int((config or {}).get("llm_max_daily_calls", 50))
+    """Remaining TRADING budget. Sized to cover a full session: when this hits zero the
+    fail-closed entry gate blocks every remaining entry, so the cap must never be the thing
+    that stops the bot trading."""
+    cap = int((config or {}).get("llm_max_daily_calls", 250))
     return max(0, cap - calls_today())
 
 
