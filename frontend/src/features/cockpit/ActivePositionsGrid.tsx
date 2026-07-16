@@ -4,7 +4,6 @@ import { Badge } from '../../design-system/Badge'
 import { Button } from '../../design-system/Button'
 import { usePositionsStore } from '../../lib/stores/usePositionsStore'
 import { statusApi } from '../../lib/api/statusApi'
-import { useTilt } from '../../lib/useTilt'
 import type { Position } from '../../types/api'
 import { isLongDirection, formatINR, formatTime, formatDuration, minutesSince } from '../../lib/tradeMath'
 import './ActivePositionsGrid.css'
@@ -103,7 +102,6 @@ function PositionCard({ p, selected, onSelect }: {
   selected?: boolean
   onSelect?: (symbol: string) => void
 }) {
-  const tiltRef = useTilt<HTMLDivElement>(5, 4)
   const long = isLongDirection(p.direction)
   const pnl = p.pnl ?? 0
   const tone = pnl >= 0 ? 'profit' : 'loss'
@@ -117,7 +115,6 @@ function PositionCard({ p, selected, onSelect }: {
 
   return (
     <div
-      ref={tiltRef}
       className={`mq-position-card mq-position-card-${long ? 'long' : 'short'} ${selected ? 'mq-position-card-selected' : ''}`}
       role={onSelect ? 'button' : undefined}
       tabIndex={onSelect ? 0 : undefined}

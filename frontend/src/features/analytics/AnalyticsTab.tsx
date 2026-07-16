@@ -5,16 +5,14 @@ import { MaeMfeScatter } from './MaeMfeScatter'
 import { BacktesterPanel } from './BacktesterPanel'
 import { RecommendationsPanel } from './RecommendationsPanel'
 import { TimeOfDayPanel } from './TimeOfDayPanel'
-import { CapitalGlobeScene } from '../../lib/three/scenes/CapitalGlobeScene'
 import './AnalyticsTab.css'
 
 export function AnalyticsTab() {
   return (
     <div className="mq-analytics">
       <KpiCards />
-      <div className="mq-analytics-row mq-analytics-row-2col">
+      <div className="mq-analytics-row">
         <EquityCurveChart />
-        <CapitalGlobeScene />
       </div>
       <div className="mq-analytics-row">
         <StrategyBreakdown />

@@ -5,7 +5,6 @@ import { useUiStore } from '../lib/stores/useUiStore'
 import { TopNav } from './TopNav'
 import { SessionRibbon } from './SessionRibbon'
 import { ToastLayer } from './ToastLayer'
-import { AmbientBackdrop } from './AmbientBackdrop'
 import { CockpitTab } from '../features/cockpit/CockpitTab'
 import { TradesTab } from '../features/trades/TradesTab'
 import { AnalyticsTab } from '../features/analytics/AnalyticsTab'
@@ -38,7 +37,6 @@ export default function App() {
 
   return (
     <div className="mq-app">
-      <AmbientBackdrop />
       <TopNav />
       <SessionRibbon />
       <ToastLayer />

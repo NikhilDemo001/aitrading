@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { useTilt } from '../lib/useTilt'
 import './StatCard.css'
 
 export function StatCard({
@@ -17,9 +16,8 @@ export function StatCard({
   tone?: 'neutral' | 'profit' | 'loss' | 'accent'
   right?: ReactNode
 }) {
-  const tiltRef = useTilt<HTMLDivElement>(4, 3)
   return (
-    <div ref={tiltRef} className="mq-statcard">
+    <div className="mq-statcard">
       {icon && <div className={`mq-statcard-icon mq-statcard-icon-${tone}`}>{icon}</div>}
       <div className="mq-statcard-body">
         <div className="mq-statcard-label">{label}</div>
