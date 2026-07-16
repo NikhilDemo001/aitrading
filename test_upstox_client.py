@@ -80,6 +80,96 @@ def test_get_news_never_raises_on_error():
     assert c.get_news("NSE_EQ|INE002A01018") == []
 
 
+def test_get_competitors_uses_full_encoded_instrument_key():
+    """Regression: the competitors endpoint uniquely requires the FULL instrument key
+    (NSE_EQ|ISIN), URL-encoded — the bare ISIN returns 400 UDAPI100011 'Invalid Instrument
+    key'. Assert the request path carries NSE_EQ%7CINE... (pipe encoded) + /competitors."""
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.access_token = "tok"
+    c.get_headers = lambda: {}
+    captured = {}
+    def _get(url, *a, **k):
+        captured["url"] = url
+        return _FakeResp({"status": "success", "data": [{"name": "RivalCo"}]})
+    c.session = types.SimpleNamespace(get=_get)
+    out = c.get_competitors("NSE_EQ|INE423A01024")
+    assert out == [{"name": "RivalCo"}]
+    assert "NSE_EQ%7CINE423A01024/competitors" in captured["url"]
+    assert "INE423A01024/competitors" not in captured["url"].replace("%7C", "|").replace("|INE", "@")
+
+
+def test_fundamentals_bare_isin_path_unchanged():
+    """The other fundamentals endpoints pass a bare (alphanumeric) ISIN — encoding must be a
+    no-op so those still hit /fundamentals/<ISIN>/<path>."""
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.access_token = "tok"
+    c.get_headers = lambda: {}
+    captured = {}
+    c.session = types.SimpleNamespace(
+        get=lambda url, *a, **k: (captured.__setitem__("url", url),
+                                  _FakeResp({"status": "success", "data": {"x": 1}}))[1])
+    c.get_company_profile("INE002A01018")
+    assert captured["url"].endswith("/fundamentals/INE002A01018/profile")
+
+
+def test_await_fill_price_finds_completed_average():
+    """_await_fill_price returns the broker's executed average price once the order is
+    'complete', scanning all history records regardless of order."""
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.access_token = "tok"
+    c.get_headers = lambda: {}
+    c.session = types.SimpleNamespace(get=lambda *a, **k: _FakeResp({"status": "success", "data": [
+        {"status": "open", "average_price": 0},
+        {"status": "complete", "average_price": 250.75}]}))
+    assert c._await_fill_price("OID", tries=1) == 250.75
+
+
+def test_place_order_live_records_actual_fill_not_limit():
+    """Regression: a live entry must record the broker's ACTUAL average fill (250.75), not the
+    limit price we sent (100.5) — otherwise the bot's entry never matches the Upstox app."""
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.paper_trading = False
+    c.access_token = "tok"
+    c.get_headers = lambda: {}
+    c._delivery_symbols = set()
+
+    class _Sess:
+        def post(self, url, headers=None, json=None, timeout=None):
+            return _FakeResp({"status": "success", "data": {"order_id": "OID1"}})
+
+        def get(self, url, headers=None, timeout=None):
+            return _FakeResp({"status": "success", "data": [{"status": "complete", "average_price": 250.75}]})
+
+    c.session = _Sess()
+    order = c.place_order("RELIANCE", "BUY", 10, "LIMIT", price=100.5, instrument_key="NSE_EQ|X")
+    assert order["order_id"] == "OID1"
+    assert order["price"] == 250.75          # actual fill, NOT the 100.5 limit
+
+
+def test_place_order_sl_skips_fill_lookup():
+    """A pending SL order never 'completes' at placement — placing it must NOT poll order
+    history (wasted latency); it keeps the SL limit price we sent."""
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.paper_trading = False
+    c.access_token = "tok"
+    c.get_headers = lambda: {}
+    c._delivery_symbols = set()
+    calls = {"get": 0}
+
+    class _Sess:
+        def post(self, url, headers=None, json=None, timeout=None):
+            return _FakeResp({"status": "success", "data": {"order_id": "SL1"}})
+
+        def get(self, url, headers=None, timeout=None):
+            calls["get"] += 1
+            return _FakeResp({"status": "success", "data": []})
+
+    c.session = _Sess()
+    order = c.place_order("RELIANCE", "SELL", 10, "SL", price=99.0, trigger_price=99.5, instrument_key="NSE_EQ|X")
+    assert order["price"] == 99.0            # SL limit retained
+    assert calls["get"] == 0                 # no fill-history polling for a pending SL
+
+
 def _paper_client(tmp_path) -> UpstoxClient:
     """A client over a throwaway config file so tests can never touch the real config.json
     (which holds live credentials)."""

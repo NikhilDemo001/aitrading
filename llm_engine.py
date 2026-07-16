@@ -210,17 +210,32 @@ class OpenAICompatClient:
 DEFAULT_OPENAI_COMPAT_BASE_URL = "https://integrate.api.nvidia.com/v1"
 
 
+def build_client(config: dict | None, model: str | None = None, max_tokens: int | None = None):
+    """Construct the real provider client when the engine is enabled + keyed, WITHOUT the
+    trading daily-budget gate. Returns None when the engine can't run. Callers that need budget
+    enforcement (the trading gate via get_client, or the assistant) check their own budget.
+    max_tokens lets callers (e.g. the assistant) request longer answers than the 512 default."""
+    config = config or {}
+    if not is_enabled(config):
+        return None
+    model = model or config.get("llm_model") or DEFAULT_MODEL
+    mt = int(max_tokens) if max_tokens else 512
+    if _provider(config) == "openai_compat":
+        base_url = config.get("llm_base_url") or DEFAULT_OPENAI_COMPAT_BASE_URL
+        # Free/shared endpoints (NVIDIA trial) queue under load — allow a generous timeout.
+        timeout = int(config.get("llm_timeout_seconds", 180))
+        return OpenAICompatClient(model, _resolve_key(config), base_url, max_tokens=mt, timeout=timeout)
+    return AnthropicClient(model, _resolve_key(config), max_tokens=mt)
+
+
 def get_client(config: dict | None):
-    """Returns a real client when enabled + keyed + within budget, else MockLLMClient (no spend)."""
+    """Returns a real client when enabled + keyed + within the TRADING budget, else MockLLMClient."""
     config = config or {}
     model = config.get("llm_model") or DEFAULT_MODEL
-    if is_enabled(config) and budget_remaining(config) > 0:
-        if _provider(config) == "openai_compat":
-            base_url = config.get("llm_base_url") or DEFAULT_OPENAI_COMPAT_BASE_URL
-            # Free/shared endpoints (NVIDIA trial) queue under load — allow a generous timeout.
-            timeout = int(config.get("llm_timeout_seconds", 180))
-            return OpenAICompatClient(model, _resolve_key(config), base_url, timeout=timeout)
-        return AnthropicClient(model, _resolve_key(config))
+    if budget_remaining(config) > 0:
+        client = build_client(config, model=model)
+        if client is not None:
+            return client
     return MockLLMClient(model=model)
 
 

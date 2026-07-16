@@ -104,7 +104,13 @@ class UpstoxClient:
         self.access_token = os.environ.get("UPSTOX_ACCESS_TOKEN") or self.config.get("access_token")
         self.proxy = os.environ.get("PROXY_URL") or self.config.get("proxy")
 
-        self.paper_trading = self.config.get("paper_trading", True)
+        config_paper = self.config.get("paper_trading", True)
+        env_confirmed = os.environ.get("LIVE_TRADING_CONFIRMED", "").strip().lower() == "yes"
+        if not config_paper and not env_confirmed:
+            print("[SAFETY GATED] LIVE_TRADING_CONFIRMED env var is not 'yes' — forcing paper trading mode.")
+            self.paper_trading = True
+        else:
+            self.paper_trading = config_paper
         if hasattr(self, "session") and self.proxy:
             self.session.proxies = {
                 "http": self.proxy,
@@ -535,8 +541,11 @@ class UpstoxClient:
         if not self.access_token or not isin:
             return None
         try:
+            # URL-encode the identifier so a full instrument key (NSE_EQ|ISIN, needed by the
+            # competitors endpoint) survives the path; bare ISINs are alphanumeric → unchanged.
+            ident = urllib.parse.quote(str(isin), safe="")
             resp = self.session.get(
-                f"https://api.upstox.com/v2/fundamentals/{isin}/{path}",
+                f"https://api.upstox.com/v2/fundamentals/{ident}/{path}",
                 headers=self.get_headers(), params=params or {}, timeout=12)
             if resp.status_code == 200:
                 j = resp.json()
@@ -569,8 +578,11 @@ class UpstoxClient:
     def get_corporate_actions(self, isin):
         return self._fundamentals_get(isin, "corporate-actions")
 
-    def get_competitors(self, isin):
-        return self._fundamentals_get(isin, "competitors")
+    def get_competitors(self, instrument_key):
+        """Competitors uniquely needs the FULL instrument key (e.g. NSE_EQ|INE423A01024),
+        URL-encoded — not the bare ISIN the other fundamentals endpoints accept. Passing the
+        ISIN alone returns 400 UDAPI100011 'Invalid Instrument key'."""
+        return self._fundamentals_get(instrument_key, "competitors")
 
     def fetch_raw_quotes(self, instrument_keys):
         """Returns the RAW Upstox quote dict per instrument_key — full 5-level depth plus
@@ -691,15 +703,22 @@ class UpstoxClient:
             if res_json.get("status") == "success":
                 order_id = res_json["data"]["order_id"]
                 print(f"[LIVE TRADE] Order placed successfully! Order ID: {order_id}")
-                # For MARKET orders, fetch actual fill price from LTP
+                # Record the broker's ACTUAL executed average price so the bot's entry/exit
+                # matches the Upstox app — not the limit price we sent (or a post-trade LTP
+                # guess). Only for fillable orders (MARKET/LIMIT); a pending SL order never
+                # 'completes' here, so we skip the lookup and keep its trigger/limit price.
                 fill_price = price
-                if order_type == "MARKET":
-                    try:
-                        quote = self.get_market_quote(instrument_key)
-                        if quote:
-                            fill_price = quote["ltp"]
-                    except Exception:
-                        pass
+                if order_type in ("MARKET", "LIMIT"):
+                    avg = self._await_fill_price(order_id)
+                    if avg and avg > 0:
+                        fill_price = avg
+                    elif order_type == "MARKET":
+                        try:
+                            quote = self.get_market_quote(instrument_key)
+                            if quote:
+                                fill_price = quote["ltp"]
+                        except Exception:
+                            pass
                 return {
                     "order_id": order_id,
                     "symbol": symbol,
@@ -838,6 +857,28 @@ class UpstoxClient:
                         return "FILLED"
                     return status
         return "UNKNOWN"
+
+    def _await_fill_price(self, order_id, tries=6, delay=0.4):
+        """Poll Upstox order history for the ACTUAL executed average price so a live order is
+        recorded at its real fill (matching the app), not the limit price we sent. Returns the
+        average price once the order shows 'complete', or None if it hasn't filled within
+        ~tries*delay seconds or was rejected/cancelled. Scans every history record so it is
+        robust to the endpoint's ordering. Live only; never raises."""
+        for _ in range(max(1, tries)):
+            try:
+                url = f"https://api.upstox.com/v2/order/history?order_id={order_id}"
+                resp = self.session.get(url, headers=self.get_headers(), timeout=10)
+                if resp.status_code == 200:
+                    data = (resp.json() or {}).get("data") or []
+                    for rec in data:
+                        if (rec.get("status") or "").lower() == "complete" and rec.get("average_price"):
+                            return float(rec["average_price"])
+                    if any((r.get("status") or "").lower() in ("rejected", "cancelled") for r in data):
+                        return None
+            except Exception:
+                pass
+            time.sleep(delay)
+        return None
 
     def get_positions(self):
         """Live net positions from the broker (GET /v2/portfolio/short-term-positions).

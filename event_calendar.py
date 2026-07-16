@@ -10,7 +10,65 @@ Detects high-risk market events to suppress or reduce bot activity:
 """
 
 import datetime
+import json
+import os
 from datetime import timedelta
+
+# ── Per-symbol event blackout (earnings / results / board meetings) ─────────────────
+# Static, git-tracked calendar file mapping SYMBOL -> [YYYY-MM-DD, ...]. Populated by the
+# operator (Upstox exposes no earnings API). Loaded once and re-read only when the file's
+# mtime changes, so the hot scan path pays nothing per cycle.
+_EARNINGS_FILE = os.path.join(os.path.dirname(__file__), "earnings_calendar.json")
+_earnings_cache = None
+_earnings_mtime = None
+
+
+def _load_earnings_calendar():
+    """Return {SYMBOL: [YYYY-MM-DD, ...]} from _EARNINGS_FILE, cached by mtime.
+    Keys starting with '__' (docs/examples) are ignored. Fail-open to {} on any problem."""
+    global _earnings_cache, _earnings_mtime
+    try:
+        mtime = os.path.getmtime(_EARNINGS_FILE)
+    except OSError:
+        return {}
+    if _earnings_cache is None or mtime != _earnings_mtime:
+        try:
+            with open(_EARNINGS_FILE, encoding="utf-8") as f:
+                raw = json.load(f)
+            data = {}
+            for key, vals in raw.items():
+                if key.startswith("__") or not isinstance(vals, list):
+                    continue
+                data[key.upper()] = [str(d)[:10] for d in vals]
+            _earnings_cache = data
+            _earnings_mtime = mtime
+        except Exception:
+            return _earnings_cache or {}
+    return _earnings_cache or {}
+
+
+def get_symbol_event_blackout(symbol, now=None, days_before=1, days_after=0):
+    """(blocked: bool, reason: str). blocked=True when `now`'s IST date falls within
+    [event - days_before, event + days_after] of any listed event date for `symbol`.
+    Fail-open (False) when the symbol/file is absent, dates are malformed, or on any error —
+    a missing calendar must never block a legitimate trade."""
+    try:
+        if now is None:
+            now = get_ist_now()
+        today = now.date()
+        before = max(0, int(days_before))
+        after = max(0, int(days_after))
+        for ds in _load_earnings_calendar().get(str(symbol).upper(), []):
+            try:
+                ed = datetime.date.fromisoformat(ds)
+            except Exception:
+                continue
+            if (ed - timedelta(days=before)) <= today <= (ed + timedelta(days=after)):
+                return True, f"earnings/event blackout ({ds}; window -{before}/+{after}d)"
+        return False, "ok"
+    except Exception:
+        return False, "ok (blackout check error, fail-open)"
+
 
 # NSE Holidays 2025-2026
 NSE_HOLIDAYS_2025 = [

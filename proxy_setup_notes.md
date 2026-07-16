@@ -11,16 +11,16 @@ This file contains the notes and current state of the bot's proxy configuration.
   - [config.json](file:///C:/Users/nikhi/.gemini/antigravity/scratch/upstox_intraday_helper%20-%20Copy%20-%20Copy/config.json) has been updated with the proxy connection string and `"access_token"` has been cleared (ready for a fresh login).
   - [upstox_client.py](file:///C:/Users/nikhi/.gemini/antigravity/scratch/upstox_intraday_helper%20-%20Copy%20-%20Copy/upstox_client.py) has been modified to load the proxy settings and apply them to the `requests.Session()` object for all API calls.
 - **Proxy Verification:**
-  - We verified that the proxy works perfectly. Opening the URL `https://127.0.0.1:5000/api/my-ip` in the browser returns the proxy's static IP: **`119.13.230.157`** (located in Mumbai, India).
+  - We verified that the proxy works perfectly. Opening the URL `https://127.0.0.1:5000/api/my-ip` in the browser returns the proxy's static IP: **`175.111.136.31`**.
 
 ---
 
 ## 2. Proxy Credentials Reference
 
-- **Host:** `brd.superproxy.io`
-- **Port:** `33335`
+- **Host:** `175.111.136.31`
+- **Port:** `50100` (HTTP/HTTPS) / `50101` (SOCKS5)
 - **Username / Password:** stored locally in `.env` as `PROXY_URL` — never in this repo.
-- **Static IP Address:** `119.13.230.157` (This is the IP that must be registered on Upstox)
+- **Static IP Address:** `175.111.136.31` (This is the IP that must be registered on Upstox)
 
 ---
 
@@ -35,7 +35,7 @@ Upstox restricts IP modifications at the user account level to **once per calend
 1. **Register the IP on Upstox:**
    - Log into your [Upstox Developer Console](https://developer.upstox.com/).
    - Edit your app (or create a new app named `intra`).
-   - Set the **Primary IP** to: **`119.13.230.157`**.
+   - Set the **Primary IP** to: **`175.111.136.31`**.
 2. **If you created a new app:**
    - Copy the new **API Key** and **API Secret**.
    - Update `"api_key"` and `"api_secret"` in your [config.json](file:///C:/Users/nikhi/.gemini/antigravity/scratch/upstox_intraday_helper%20-%20Copy%20-%20Copy/config.json).

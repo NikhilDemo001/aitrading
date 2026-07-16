@@ -32,6 +32,23 @@ def guard_quote(new_ltp, last_good_ltp, seconds_since_update, *,
         return True, "ok (guard error, fail-open)"
 
 
+def evaluate_live_tick(new_ltp, last_good_ltp, *, jump_reject_pct=20.0):
+    """Decide the price to act on for a freshly-obtained quote during position management.
+
+    Returns (price, ok, reason). The caller only reaches this with a *fresh* quote — a live
+    REST fetch, or a market-feed cache entry already age-bounded to a few seconds — so quote
+    STALENESS is intentionally NOT re-checked here. (Re-checking it against our own processing
+    cadence, as the old code did via `seconds_since_update = now - last_accepted_tick`, made the
+    first good quote after any fetch gap get wrongly rejected as "stale", freezing current_price
+    permanently — 2026-07-13 bug.) A genuinely frozen/absent feed is caught upstream by the
+    missing-quote path. Only provably-broken ticks are rejected: non-positive, or an implausible
+    single-step jump; on rejection the last good price is retained."""
+    ok, reason = guard_quote(new_ltp, last_good_ltp, None, jump_reject_pct=jump_reject_pct)
+    if ok:
+        return new_ltp, True, reason
+    return (last_good_ltp if last_good_ltp else new_ltp), False, reason
+
+
 def circuit_proximity_ok(price, upper=None, lower=None, *, buffer_pct=0.02):
     """(ok, reason). ok=False => entry price is within buffer_pct of the day's upper/lower
     circuit limit, where fills are unreliable and you can get stuck unable to exit. Fails

@@ -14,10 +14,20 @@ import sqlite3
 MEMORY_DB = "symbol_memory.db"
 
 
+def get_db_connection():
+    """Returns a connection to the symbol memory database."""
+    conn = sqlite3.connect(MEMORY_DB, timeout=30.0)
+    try:
+        conn.execute("PRAGMA journal_mode=WAL;")
+    except Exception:
+        pass
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
 def init_memory_db():
     """Initialize the symbol memory database."""
-    conn = sqlite3.connect(MEMORY_DB)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     cursor = conn.cursor()
     
     cursor.execute("""
@@ -58,7 +68,7 @@ def record_trade(symbol, strategy, direction, pnl, regime, entry_time, holding_m
     """Record a completed trade for symbol learning."""
     init_memory_db()
     
-    conn = sqlite3.connect(MEMORY_DB)
+    conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
@@ -84,8 +94,7 @@ def record_trade(symbol, strategy, direction, pnl, regime, entry_time, holding_m
 
 def update_symbol_stats(symbol):
     """Recalculate and update aggregated stats for a symbol."""
-    conn = sqlite3.connect(MEMORY_DB)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     cursor = conn.cursor()
     
     try:
@@ -161,8 +170,7 @@ def get_symbol_bias(symbol):
     Returns 0.0 if insufficient data (< 5 trades).
     """
     init_memory_db()
-    conn = sqlite3.connect(MEMORY_DB)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     cursor = conn.cursor()
     score = 0.0
     try:
@@ -180,7 +188,7 @@ def get_symbol_bias(symbol):
 def get_best_time_for_symbol(symbol):
     """Returns best trading hour (e.g. '10', '14') or None."""
     init_memory_db()
-    conn = sqlite3.connect(MEMORY_DB)
+    conn = get_db_connection()
     cursor = conn.cursor()
     hr = None
     try:
@@ -200,8 +208,7 @@ def get_symbol_summary(symbol):
     Returns dict with symbol stats summary.
     """
     init_memory_db()
-    conn = sqlite3.connect(MEMORY_DB)
-    conn.row_factory = sqlite3.Row
+    conn = get_db_connection()
     cursor = conn.cursor()
     summary = {
         'win_rate': 0.0,
@@ -241,7 +248,7 @@ def bulk_import_from_trade_history(trade_history):
         return
         
     init_memory_db()
-    conn = sqlite3.connect(MEMORY_DB)
+    conn = get_db_connection()
     cursor = conn.cursor()
     
     symbols_to_update = set()

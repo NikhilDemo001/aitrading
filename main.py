@@ -701,34 +701,64 @@ def load_state():
     except Exception as e:
         print(f"[SQL State] Error loading state from SQLite: {e}")
         
-    if not loaded_positions and os.path.exists(POSITIONS_FILE):
+    # 1. Resolve active positions (JSON is primary ground truth, SQLite is backup)
+    loaded_from_json = False
+    if os.path.exists(POSITIONS_FILE):
         try:
             with open(POSITIONS_FILE) as f:
                 active_positions = json.load(f)
+            loaded_from_json = True
             save_positions_sql()
         except Exception as e:
-            # Nothing silent (Section 0 rule 7): a corrupt/unreadable positions file with no
-            # SQLite backing means open-position state is genuinely lost — that must be loud,
-            # not a quiet fall-through to an empty dict. The file self-heals on the next
-            # save_state() atomic write regardless.
-            active_positions = {}
-            log_scan("SYSTEM", f"active_positions.json unreadable ({e}) and no SQLite backup found — "
-                                f"starting with zero open positions. If a position was actually open, "
-                                f"reconcile manually against the broker.", "danger")
+            if not loaded_positions:
+                active_positions = {}
+                log_scan("SYSTEM", f"active_positions.json unreadable ({e}) and no SQLite backup found — "
+                                    f"starting with zero open positions. If a position was actually open, "
+                                    f"reconcile manually against the broker.", "danger")
+            else:
+                active_positions = loaded_positions
+                log_scan("SYSTEM", f"active_positions.json unreadable ({e}) — loaded backup positions from SQLite.", "warning")
     else:
-        active_positions = loaded_positions
+        if loaded_positions:
+            active_positions = loaded_positions
+            # Sync to JSON
+            try:
+                with open(POSITIONS_FILE + ".tmp", "w") as f:
+                    json.dump(active_positions, f, indent=2)
+                os.replace(POSITIONS_FILE + ".tmp", POSITIONS_FILE)
+            except Exception:
+                pass
+        else:
+            active_positions = {}
 
-    if not loaded_trades and os.path.exists(TRADES_FILE):
+    # 2. Resolve trade history (JSON is primary ground truth, SQLite is backup)
+    loaded_trades_from_json = False
+    if os.path.exists(TRADES_FILE):
         try:
             with open(TRADES_FILE) as f:
                 trade_history = json.load(f)
+            loaded_trades_from_json = True
             save_trades_sql()
         except Exception as e:
-            trade_history = []
-            log_scan("SYSTEM", f"trade_history.json unreadable ({e}) and no SQLite backup found — "
-                                f"starting with empty trade history.", "danger")
+            if not loaded_trades:
+                trade_history = []
+                log_scan("SYSTEM", f"trade_history.json unreadable ({e}) and no SQLite backup found — "
+                                    f"starting with empty trade history.", "danger")
+            else:
+                trade_history = loaded_trades
+                log_scan("SYSTEM", f"trade_history.json unreadable ({e}) — loaded backup trades from SQLite.", "warning")
     else:
-        trade_history = loaded_trades
+        if loaded_trades:
+            trade_history = loaded_trades
+            # Sync to JSON
+            try:
+                with open(TRADES_FILE + ".tmp", "w") as f:
+                    json.dump(trade_history, f, indent=2)
+                os.replace(TRADES_FILE + ".tmp", TRADES_FILE)
+            except Exception:
+                pass
+        else:
+            trade_history = []
 
     # No-positions-past-square-off reconciliation (Section 0): a position restored from a
     # previous day OR restored after today's square-off time survived a crash/restart without
@@ -787,10 +817,9 @@ def load_state():
 
     # Backfill symbol memory stats on startup
     try:
-        from symbol_memory import init_memory_db, bulk_import_from_trade_history
-        import sqlite3
+        from symbol_memory import init_memory_db, bulk_import_from_trade_history, get_db_connection
         init_memory_db()
-        conn = sqlite3.connect("symbol_memory.db")
+        conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM symbol_trade_log;")
         count = cursor.fetchone()[0]
@@ -801,6 +830,12 @@ def load_state():
     except Exception as e:
         print(f"Error backfilling symbol memory: {e}")
         
+    # Clear the per-position bad-tick warning latch on startup (a fresh process should
+    # re-warn if a feed problem recurs). Live-tick staleness is no longer tracked via a
+    # monotonic timestamp — see safety_guards.evaluate_live_tick.
+    for pos in active_positions.values():
+        pos["_quote_warned"] = False
+
     today = get_ist_now().date().isoformat()
     daily_pnl = _realized_daily_pnl(trade_history, today)
 
@@ -1500,6 +1535,25 @@ async def scan_for_entries(watchlist, max_positions, paper_trading):
             _matrix_set(symbol, symbol_cap_decision.reason, "skipped")
             continue
 
+        # Per-symbol earnings/event blackout: never auto-open a position into a stock's
+        # results/board-meeting day (dates from earnings_calendar.json). Fail-open — a symbol
+        # not listed there is never blocked. Especially important on leveraged live money,
+        # where a single earnings gap on a 4x position is outsized. Manual trades are exempt.
+        if cfg.get("enable_earnings_blackout", True):
+            try:
+                from event_calendar import get_symbol_event_blackout
+                _blk, _blk_reason = get_symbol_event_blackout(
+                    symbol, get_ist_now(),
+                    days_before=int(cfg.get("earnings_blackout_days_before", 1)),
+                    days_after=int(cfg.get("earnings_blackout_days_after", 0)))
+                if _blk:
+                    log_scan(symbol, f"Filtered: {_blk_reason}", "info")
+                    _matrix_set(symbol, f"filtered: {_blk_reason}", "filtered")
+                    jsonl_logger.log_decision("skip", symbol, _blk_reason, {"gate": "earnings_blackout"})
+                    continue
+            except Exception as _blk_err:
+                print(f"[earnings-blackout] non-fatal error for {symbol}: {_blk_err}")
+
         inst = client.get_instrument_info(symbol)
         if not inst:
             _matrix_set(symbol, "not in instrument map", "no_data")
@@ -2066,7 +2120,7 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
         proposed_qty=qty,
         volume=entry_volume,   # fix #5: real volume now reaches check_liquidity
         book=entry_book,       # fix #1/#3: enforce sized order against the real book
-        skip_size_cap=fno_mode,  # F&O sizes against its own fno_max_risk_per_trade/lot budget above
+        skip_size_cap=fno_mode or cfg.get("enable_max_capacity", False),  # F&O or Max Capacity sizes directly
     )
     if not risk_decision.allowed:
         log_scan(symbol, f"RiskManager blocked entry: {risk_decision.reason}", "warning")
@@ -2292,6 +2346,19 @@ def _position_still_held(pos, net_by_key):
     return held >= needed if needed > 0 else held <= needed
 
 
+def _position_age_seconds(pos, now):
+    """Seconds since this position was opened, per its entry_time. A missing/unparseable
+    entry_time returns inf (treated as old) so it never blocks a genuine external-close
+    reconcile."""
+    et = pos.get("entry_time")
+    if not et:
+        return float("inf")
+    try:
+        return (now - datetime.fromisoformat(et)).total_seconds()
+    except Exception:
+        return float("inf")
+
+
 async def reconcile_broker_positions(paper_trading):
     """Syncs the bot's book against the broker's real positions. Returns the list of symbols
     reconciled away as externally closed. Never raises; throttled to one API call per
@@ -2314,9 +2381,20 @@ async def reconcile_broker_positions(paper_trading):
         return []  # unknown broker state — never treat as flat
 
     net_by_key = _net_positions_by_key(broker_rows)
+    settle_s = float(client.config.get("broker_reconcile_settle_seconds", 15.0))
+    now_ist = get_ist_now()
     removed = []
     for symbol, pos in list(active_positions.items()):
         if _position_still_held(pos, net_by_key):
+            continue
+        # Settling grace: a just-filled order can take a few seconds to appear in the broker's
+        # positions feed. Treating that lag as an external close orphaned the live position and
+        # cancelled its stop-loss (the ITDC incident, 2026-07-16) — a naked, unmanaged trade.
+        # Give a fresh fill time to surface before concluding it was closed elsewhere.
+        if _position_age_seconds(pos, now_ist) < settle_s:
+            log_scan(symbol, f"Broker feed shows flat but this {pos['direction']} {pos['quantity']} "
+                             f"fill is <{settle_s:.0f}s old — waiting for the positions feed to "
+                             f"settle before reconciling.", "info")
             continue
         held = net_by_key.get(pos.get("instrument_key"), 0)
         log_scan(symbol, f"Broker holds {held} but bot book expects {pos['direction']} "
@@ -2394,25 +2472,23 @@ async def manage_existing_positions(paper_trading, trailing_enabled, trailing_mu
                     continue
             pos["quote_miss_count"] = 0
             ltp = quote["ltp"]
-            # Stale/bad-quote guard (Tier-1): ignore a provably-broken tick and evaluate this
-            # cycle against the last good price. A real stop still fires — it's assessed on the
-            # last good price, not suppressed. Only clearly-broken ticks (<=0 / stale / absurd
-            # jump) are rejected; normal volatility passes through.
+            # Bad-quote guard (Tier-1): ignore a provably-broken tick and evaluate this cycle
+            # against the last good price. A real stop still fires — it's assessed on the last
+            # good price, not suppressed. Only clearly-broken ticks (<=0 / absurd single-step
+            # jump) are rejected; normal volatility passes through. Staleness is NOT re-checked
+            # here: the quote in hand is always fresh (live REST, or a cache entry age-bounded
+            # to a few seconds), and a genuinely absent/frozen feed is handled above by the
+            # missing-quote path. (Checking staleness on our own processing cadence used to
+            # freeze current_price permanently after any fetch gap — 2026-07-13 bug.)
             if client.config.get("enable_safety_guards", True):
-                _now_ts = time.monotonic()
-                _ok, _why = safety_guards.guard_quote(
+                ltp, _ok, _why = safety_guards.evaluate_live_tick(
                     ltp, pos.get("current_price"),
-                    _now_ts - pos.get("_last_px_ts", _now_ts),
-                    stale_seconds=float(client.config.get("quote_stale_seconds", 30)),
                     jump_reject_pct=float(client.config.get("quote_jump_reject_pct", 20)))
                 if _ok:
-                    pos["_last_px_ts"] = _now_ts
                     pos["_quote_warned"] = False
-                else:
-                    if not pos.get("_quote_warned"):
-                        log_scan(symbol, f"Bad tick rejected ({_why}) — evaluating on last price ₹{pos.get('current_price')}", "warning")
-                        pos["_quote_warned"] = True
-                    ltp = pos.get("current_price") or ltp
+                elif not pos.get("_quote_warned"):
+                    log_scan(symbol, f"Bad tick rejected ({_why}) — evaluating on last price ₹{pos.get('current_price')}", "warning")
+                    pos["_quote_warned"] = True
             pos["current_price"] = ltp
 
             # Check broker-side Stop Loss status
@@ -2791,7 +2867,12 @@ async def position_manager_loop():
         try:
             watchlist = client.config.get("watchlist", [])
             if active_positions or shadow_positions or watchlist:
-                # Gather all instrument keys
+                # Gather instrument keys for OPEN positions only. The watchlist is
+                # deliberately excluded here: this loop runs ~2x/sec and quoting the whole
+                # watchlist every tick hammered the Upstox market-quote endpoint into
+                # UDAPI10005 "Too Many Request Sent", starving the quotes the open positions
+                # actually need. The UI's watchlist prices come from the scanner matrix
+                # (scanner_loop), not from this broadcast, so nothing is lost.
                 instrument_keys = []
                 # 1. Active positions
                 for pos in active_positions.values():
@@ -2801,12 +2882,7 @@ async def position_manager_loop():
                 for pos in shadow_positions.values():
                     if pos["instrument_key"] not in instrument_keys:
                         instrument_keys.append(pos["instrument_key"])
-                # 2. Watchlist
-                for sym in watchlist:
-                    inst = client.get_instrument_info(sym)
-                    if inst and inst["instrument_key"] not in instrument_keys:
-                        instrument_keys.append(inst["instrument_key"])
-                
+
                 # Fetch quotes. When the decoupled market feed is healthy, read the warm
                 # cache (non-blocking) and only REST-fetch the keys it's missing/stale on;
                 # otherwise fall back to a single inline REST batch (original behavior).
@@ -2908,14 +2984,10 @@ async def position_manager_loop():
                                 else:
                                     pos["pnl"] = (pos["entry_price"] - ltp) * pos["quantity"]
 
-                # Build symbol -> ltp quotes map for the client
+                # Build symbol -> ltp quotes map for open positions (watchlist quotes are no
+                # longer fetched here — see the instrument_keys note above; the UI sources
+                # watchlist prices from the scanner matrix).
                 quotes_by_symbol = {}
-                for sym in watchlist:
-                    inst = client.get_instrument_info(sym)
-                    if inst:
-                        q = quotes.get(inst["instrument_key"])
-                        if q:
-                            quotes_by_symbol[sym] = q["ltp"]
                 for pos in active_positions.values():
                     quotes_by_symbol[pos["symbol"]] = pos["current_price"]
                 
@@ -2943,7 +3015,7 @@ async def position_manager_loop():
         except Exception as ex:
             print(f"Error running paper trade simulation: {ex}")
 
-        await asyncio.sleep(1.0)
+        await asyncio.sleep(0.5)
 
 
 async def execute_exit(symbol, pos, exit_price, reason, paper_trading, is_shadow=False, is_broker_hit=False,
@@ -3357,6 +3429,8 @@ def update_settings(settings: dict):
         "stt_pct", "exchange_txn_pct", "gst_pct", "sebi_per_crore", "stamp_pct",
         # Market-depth / liquidity gate (plan 2026-07-08)
         "enable_liquidity_gate", "max_spread_bps", "min_depth_ratio",
+        # Per-symbol earnings/event blackout (2026-07-13)
+        "enable_earnings_blackout", "earnings_blackout_days_before", "earnings_blackout_days_after",
     ]
 
     for key in allowed_keys:
@@ -3543,6 +3617,7 @@ async def manual_trade(trade_data: dict):
         paper_trading=paper_trading,
         proposed_qty=qty,
         skip_window_check=True,  # manual override of the auto-entry window is an intentional feature
+        skip_size_cap=client.config.get("enable_max_capacity", False),
     )
     if not risk_decision.allowed:
         jsonl_logger.log_decision("skip", symbol, risk_decision.reason, {"strategy": "Manual-Entry"})
@@ -3849,7 +3924,7 @@ def get_fundamentals(symbol: str):
         "cash_flow": lambda: client.get_cash_flow(isin),
         "share_holdings": lambda: client.get_share_holdings(isin),
         "corporate_actions": lambda: client.get_corporate_actions(isin),
-        "competitors": lambda: client.get_competitors(isin),
+        "competitors": lambda: client.get_competitors(inst["instrument_key"]),
     }
     out = {"symbol": symbol, "isin": isin}
     with ThreadPoolExecutor(max_workers=len(tasks)) as ex:
@@ -3999,6 +4074,7 @@ def backtest_symbol(symbol: str, days: int = 30, slippage_pct: float | None = No
 from routers import history as history_router
 from routers import lane_b as lane_b_router
 from routers import research as research_router
+from routers import assistant as assistant_router
 
 history_router.configure(get_now=get_ist_now, get_config=lambda: client.config)
 lane_b_router.configure(get_config=lambda: client.config)
@@ -4006,6 +4082,7 @@ lane_b_router.configure(get_config=lambda: client.config)
 app.include_router(research_router.router)
 app.include_router(history_router.router)
 app.include_router(lane_b_router.router)
+app.include_router(assistant_router.router)
 
 
 if __name__ == "__main__":

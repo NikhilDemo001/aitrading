@@ -48,9 +48,14 @@ def update_research_status(status, active_task, progress=0, last_activity=None):
 
 def get_db_connection():
     """Returns a connection to the SQLite database."""
-    conn = sqlite3.connect(DB_FILE)
+    conn = sqlite3.connect(DB_FILE, timeout=30.0)
+    try:
+        conn.execute("PRAGMA journal_mode=WAL;")
+    except Exception:
+        pass
     conn.row_factory = sqlite3.Row
     return conn
+
 
 def init_db():
     """Initializes the database schema if tables do not exist."""

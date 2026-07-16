@@ -143,9 +143,13 @@ async def battle_arena_endpoint(req: dict):
 
 @router.get("/leaderboard")
 def get_leaderboard_endpoint():
+    """Pure read of the current leaderboard. The rankings + daily journal are rebuilt by the
+    autonomous research cycle / manual EOD rebuild — NOT here. Calling generate_daily_journal()
+    on every poll did a DELETE + bulk-INSERT write that collided with the paper-trader's
+    concurrent SQLite writes (intermittent 'database is locked' → HTTP 500) and spammed
+    research_journal with a near-duplicate row per dashboard poll."""
     try:
         import research_lab
-        research_lab.generate_daily_journal()
         return research_lab.get_leaderboard()
     except Exception as e:
         raise HTTPException(500, str(e))

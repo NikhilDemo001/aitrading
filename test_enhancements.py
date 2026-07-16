@@ -209,6 +209,8 @@ class TestBotEnhancements(unittest.TestCase):
             main.client.config["enable_kelly_sizing"] = False
             main.client.config["enable_one_percent_risk"] = False
             main.client.config["max_risk_per_trade"] = 500.0
+            main.client.config["enable_max_capacity"] = False
+            main.client.config["max_position_value"] = 50000.0
 
             main.client.place_order = MagicMock(return_value={"order_id": "TEST-LIMIT-1", "price": 100.5})
             # execute_entry now fetches a fresh quote on the traded instrument for the
@@ -421,6 +423,7 @@ class TestBotEnhancements(unittest.TestCase):
             main.client.config["enable_one_percent_risk"] = False
             main.client.config["fno_max_risk_per_trade"] = 2000.0
             main.client.config["fno_max_lots"] = 1
+            main.client.config["enable_max_capacity"] = False
             
             # Mock get_future_for to return a mock contract with lot_size 100
             main.client.get_future_for = MagicMock(return_value={

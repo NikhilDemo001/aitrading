@@ -8,6 +8,7 @@ order (which would OPEN a reverse position on a flat book). None from get_positi
 
 import asyncio
 import types
+from datetime import timedelta
 
 import pytest
 
@@ -106,7 +107,7 @@ def wired(monkeypatch):
 
     ns.oq = _StubOrderQueue()
     ns.client = types.SimpleNamespace(get_positions=lambda: ns.broker_rows,
-                                      cancel_order=lambda oid: None)
+                                      cancel_order=lambda oid: None, config={})
     monkeypatch.setattr(main, "execute_exit", fake_execute_exit)
     monkeypatch.setattr(main, "order_queue", ns.oq)
     monkeypatch.setattr(main, "client", ns.client)
@@ -159,6 +160,34 @@ def test_short_position_covered_externally(wired):
     main._last_broker_reconcile = 0.0  # reset throttle for the second pass
     wired.broker_rows = []             # operator covered the short from another device
     assert asyncio.run(main.reconcile_broker_positions(paper_trading=False)) == ["TCS"]
+
+
+def test_fresh_fill_not_reconciled_during_settle_window(wired):
+    """Regression (ITDC, 2026-07-16): a just-filled position missing from the broker's
+    positions feed (propagation lag) must NOT be treated as CLOSED EXTERNALLY within the
+    settling window — that orphaned a live short and cancelled its stop-loss 1s after entry,
+    leaving a naked, unmanaged real-money position."""
+    fresh = _pos(sl="SL-9")
+    fresh["entry_time"] = main.get_ist_now().isoformat()   # opened just now
+    main.active_positions["RELIANCE"] = fresh
+    wired.broker_rows = []                                   # feed hasn't caught up to the fill
+    assert asyncio.run(main.reconcile_broker_positions(paper_trading=False)) == []
+    assert "RELIANCE" in main.active_positions               # still under management
+    assert wired.exits == []                                 # not exited
+    assert wired.oq.submitted == []                          # SL NOT cancelled
+    assert main.active_positions["RELIANCE"].get("sl_order_id") == "SL-9"   # stop retained
+
+
+def test_position_reconciled_after_settle_window(wired):
+    """The grace period only DELAYS, never disables: once the fill is older than the settling
+    window, a genuinely flat broker book still reconciles the position away."""
+    aged = _pos(sl="SL-2")
+    aged["entry_time"] = (main.get_ist_now() - timedelta(seconds=60)).isoformat()
+    main.active_positions["RELIANCE"] = aged
+    wired.broker_rows = []
+    assert asyncio.run(main.reconcile_broker_positions(paper_trading=False)) == ["RELIANCE"]
+    assert "RELIANCE" not in main.active_positions
+    assert len(wired.exits) == 1
 
 
 def test_throttle_limits_api_calls(wired):
