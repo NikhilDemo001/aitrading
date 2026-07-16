@@ -4,20 +4,15 @@
   gap: var(--space-4);
 }
 
-.mq-cockpit-columns {
+/* Watchlist + Live Feed share one row, half each. They stack on narrow screens so neither
+   gets squeezed into an unreadable column. */
+.mq-cockpit-halves {
   display: grid;
-  grid-template-columns: 220px 1fr 300px;
+  grid-template-columns: 1fr 1fr;
   gap: var(--space-4);
   align-items: start;
 }
 
-.mq-cockpit-col {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-  min-width: 0;
-}
-
 @media (max-width: 1200px) {
-  .mq-cockpit-columns { grid-template-columns: 1fr; }
+  .mq-cockpit-halves { grid-template-columns: 1fr; }
 }

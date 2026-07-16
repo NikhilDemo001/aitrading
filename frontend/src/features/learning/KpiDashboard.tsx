@@ -3,9 +3,12 @@ import { Panel } from '../../design-system/Panel'
 import { StatCard } from '../../design-system/StatCard'
 import { historyApi } from '../../lib/api/historyApi'
 import type { DateRangeState } from './useDateRange'
+import { usePanelRange } from './usePanelRange'
+import { PanelRangeSelect } from './PanelRangeSelect'
 import './KpiDashboard.css'
 
-export function KpiDashboard({ range }: { range: DateRangeState }) {
+export function KpiDashboard({ range: globalRange }: { range: DateRangeState }) {
+  const { range, override, setOverride } = usePanelRange(globalRange)
   const effectiveStart = range.singleDay ? range.end : range.start
   const { data: summary } = useQuery({
     queryKey: ['history', 'summary', effectiveStart, range.end],
@@ -26,7 +29,11 @@ export function KpiDashboard({ range }: { range: DateRangeState }) {
         <StatCard label="Max Drawdown" value={`₹${(summary?.max_drawdown ?? 0).toFixed(2)}`} tone="loss" />
         <StatCard label="Avg R" value={(summary?.avg_r ?? 0).toFixed(2)} />
       </div>
-      <Panel title="Learning over time — daily KPI trend" padded={false}>
+      <Panel
+        title="Learning over time — daily KPI trend"
+        padded={false}
+        actions={<PanelRangeSelect value={override} onChange={setOverride} label="Date filter for the KPI trend and stats above" />}
+      >
         {(kpiRows ?? []).length === 0 ? (
           <div className="mq-kpi-empty text-faint">No daily snapshots in this range yet — snapshots are written at end-of-day.</div>
         ) : (

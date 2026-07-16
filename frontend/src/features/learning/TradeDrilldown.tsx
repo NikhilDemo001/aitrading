@@ -3,10 +3,13 @@ import { useQuery } from '@tanstack/react-query'
 import { Panel } from '../../design-system/Panel'
 import { historyApi } from '../../lib/api/historyApi'
 import type { DateRangeState } from './useDateRange'
+import { usePanelRange } from './usePanelRange'
+import { PanelRangeSelect } from './PanelRangeSelect'
 import './LearningTables.css'
 import './TradeDrilldown.css'
 
-export function TradeDrilldown({ range }: { range: DateRangeState }) {
+export function TradeDrilldown({ range: globalRange }: { range: DateRangeState }) {
+  const { range, override, setOverride } = usePanelRange(globalRange)
   const [mode, setMode] = useState('')
   const [symbol, setSymbol] = useState('')
   const [strategy, setStrategy] = useState('')
@@ -23,6 +26,7 @@ export function TradeDrilldown({ range }: { range: DateRangeState }) {
       padded={false}
       actions={
         <>
+          <PanelRangeSelect value={override} onChange={setOverride} label="Date filter for Trade Drilldown" />
           <select value={mode} onChange={(e) => setMode(e.target.value)}>
             <option value="">All modes</option>
             <option value="paper">Paper</option>

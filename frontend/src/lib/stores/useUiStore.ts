@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 
-export type TabId = 'cockpit' | 'analytics' | 'config' | 'research-lab' | 'learning' | 'news' | 'fundamentals'
+export type TabId =
+  | 'cockpit' | 'trades' | 'analytics' | 'config' | 'research-lab' | 'learning' | 'news' | 'fundamentals' | 'assistant'
 
 interface UiStoreState {
   activeTab: TabId

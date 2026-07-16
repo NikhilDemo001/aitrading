@@ -7,20 +7,19 @@ import type { Trade } from '../../types/api'
 import { isLongDirection, rMultiple, pnlPct, exitReason, formatTime, formatINR } from '../../lib/tradeMath'
 import './ClosedTradesTable.css'
 
-// The day's verdict in one strip. Shadow trades are counterfactual simulations —
-// they never touch capital, so they are excluded from every stat here.
+// The verdict for one set of trades. Each panel passes only its own rows — real capital in
+// Closed Trades, counterfactual fills in Shadow Trades — so the two are never averaged together.
 function DaySummary({ trades }: { trades: Trade[] }) {
-  const real = trades.filter((t) => !t.is_shadow_trade)
-  if (real.length === 0) return null
-  const net = real.reduce((s, t) => s + (t.pnl ?? 0), 0)
-  const wins = real.filter((t) => (t.pnl ?? 0) >= 0)
-  const losses = real.filter((t) => (t.pnl ?? 0) < 0)
+  if (trades.length === 0) return null
+  const net = trades.reduce((s, t) => s + (t.pnl ?? 0), 0)
+  const wins = trades.filter((t) => (t.pnl ?? 0) >= 0)
+  const losses = trades.filter((t) => (t.pnl ?? 0) < 0)
   const grossWin = wins.reduce((s, t) => s + (t.pnl ?? 0), 0)
   const grossLoss = Math.abs(losses.reduce((s, t) => s + (t.pnl ?? 0), 0))
   const pf = grossLoss > 0 ? grossWin / grossLoss : null
-  const rs = real.map((t) => rMultiple(t)).filter((r): r is number => r != null)
+  const rs = trades.map((t) => rMultiple(t)).filter((r): r is number => r != null)
   const avgR = rs.length > 0 ? rs.reduce((s, r) => s + r, 0) / rs.length : null
-  const pnls = real.map((t) => t.pnl ?? 0)
+  const pnls = trades.map((t) => t.pnl ?? 0)
   const best = Math.max(...pnls)
   const worst = Math.min(...pnls)
 
@@ -35,7 +34,7 @@ function DaySummary({ trades }: { trades: Trade[] }) {
     <div className="mq-trades-day">
       {stat('Net', formatINR(net, { sign: true }), net >= 0 ? 'profit' : 'loss')}
       {stat('W–L', `${wins.length}–${losses.length}`)}
-      {stat('Win rate', `${((wins.length / real.length) * 100).toFixed(0)}%`)}
+      {stat('Win rate', `${((wins.length / trades.length) * 100).toFixed(0)}%`)}
       {stat('Profit factor', pf != null ? pf.toFixed(2) : grossWin > 0 ? '∞' : '—')}
       {stat('Avg R', avgR != null ? `${avgR.toFixed(2)}R` : '—')}
       {stat('Best', formatINR(best, { sign: true }), 'profit')}
@@ -60,7 +59,7 @@ function csvCell(v: unknown): string {
   return /[",\n]/.test(s) ? `"${s.replaceAll('"', '""')}"` : s
 }
 
-function downloadTodayCsv(trades: Trade[]) {
+function downloadTodayCsv(trades: Trade[], filePrefix: string) {
   const keys = new Set<string>()
   for (const t of trades) Object.keys(t).forEach((k) => keys.add(k))
   const ordered = [
@@ -75,13 +74,19 @@ function downloadTodayCsv(trades: Trade[]) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `trades_today_${new Date().toISOString().slice(0, 10)}.csv`
+  a.download = `${filePrefix}_${new Date().toISOString().slice(0, 10)}.csv`
   a.click()
   URL.revokeObjectURL(url)
 }
 
-export function ClosedTradesTable() {
-  const trades = usePositionsStore((s) => s.trades)
+// One sortable, filterable, exportable table of closed trades. Rendered twice: once for real
+// fills and once for shadow fills, so each set keeps its own stats, search and CSV.
+function TradesPanel({ trades, title, empty, csvPrefix }: {
+  trades: Trade[]
+  title: string
+  empty: string
+  csvPrefix: string
+}) {
   const [selected, setSelected] = useState<Trade | null>(null)
   const [q, setQ] = useState('')
   const [sortKey, setSortKey] = useState<SortKey>('exit_time')
@@ -134,7 +139,7 @@ export function ClosedTradesTable() {
 
   return (
     <Panel
-      title={`Closed Trades — Today · ${trades.length}`}
+      title={title}
       padded={false}
       actions={
         trades.length > 0 ? (
@@ -142,19 +147,17 @@ export function ClosedTradesTable() {
             <input
               className="mq-hist-search"
               placeholder="Filter symbol / strategy / reason"
-              aria-label="Filter today's trades by symbol, strategy, direction or exit reason"
+              aria-label="Filter these trades by symbol, strategy, direction or exit reason"
               value={q}
               onChange={(e) => setQ(e.target.value)}
             />
-            <Button variant="ghost" onClick={() => downloadTodayCsv(trades)}>Export CSV</Button>
+            <Button variant="ghost" onClick={() => downloadTodayCsv(trades, csvPrefix)}>Export CSV</Button>
           </>
         ) : undefined
       }
     >
       {trades.length === 0 ? (
-        <div className="mq-trades-empty text-faint">
-          No trades closed today. Fills appear here the moment the bot books them.
-        </div>
+        <div className="mq-trades-empty text-faint">{empty}</div>
       ) : rows.length === 0 ? (
         <div className="mq-trades-empty text-faint">No matching trades — clear the filter to see all of today's fills.</div>
       ) : (
@@ -190,7 +193,7 @@ export function ClosedTradesTable() {
                   onClick={() => setSelected(t)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelected(t) } }}
                 >
-                  <td className="mq-trades-sym">{t.symbol}{t.is_shadow_trade ? <span className="mq-trades-shadow-tag">S</span> : null}</td>
+                  <td className="mq-trades-sym">{t.symbol}</td>
                   <td>{t.strategy ?? '—'}</td>
                   <td className={isLongDirection(t.direction) ? 'text-profit' : 'text-loss'}>{t.direction}</td>
                   <td className="num">{t.quantity}</td>
@@ -210,5 +213,34 @@ export function ClosedTradesTable() {
       {trades.length > 0 && <DaySummary trades={trades} />}
       {selected && <TradeDetailModal trade={selected} onClose={() => setSelected(null)} />}
     </Panel>
+  )
+}
+
+/** Real fills only — the trades that actually moved capital today. */
+export function ClosedTradesTable() {
+  const all = usePositionsStore((s) => s.trades)
+  const real = useMemo(() => all.filter((t) => !t.is_shadow_trade), [all])
+  return (
+    <TradesPanel
+      trades={real}
+      title={`Closed Trades — Today · ${real.length}`}
+      empty="No trades closed today. Fills appear here the moment the bot books them."
+      csvPrefix="trades_today"
+    />
+  )
+}
+
+/** Shadow fills only — setups the bot simulated to learn from. They never touch capital, so
+ *  they are kept out of the real book and summarised separately. */
+export function ShadowTradesTable() {
+  const all = usePositionsStore((s) => s.trades)
+  const shadow = useMemo(() => all.filter((t) => t.is_shadow_trade), [all])
+  return (
+    <TradesPanel
+      trades={shadow}
+      title={`Shadow Trades — Today · ${shadow.length}`}
+      empty="No shadow trades today. These are simulated fills the bot tracks to learn from — they never engage capital."
+      csvPrefix="shadow_trades_today"
+    />
   )
 }

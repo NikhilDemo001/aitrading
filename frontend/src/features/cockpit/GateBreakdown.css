@@ -1,0 +1,49 @@
+.mq-gate-empty {
+  padding: var(--space-4, 16px);
+  font-size: 0.72rem;
+}
+
+.mq-gate-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-4, 16px);
+}
+
+.mq-gate-row {
+  display: grid;
+  grid-template-columns: 150px 1fr 44px 44px;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  font-size: 0.72rem;
+}
+
+.mq-gate-name {
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mq-gate-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+/* The blocks are the bot protecting capital, not failures — amber reads as "held back",
+   which is what actually happened, rather than red for "error". */
+.mq-gate-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 190, 90, 0.85), rgba(255, 140, 70, 0.85));
+}
+
+.mq-gate-count { text-align: right; }
+.mq-gate-pct { text-align: right; }
+
+@media (max-width: 640px) {
+  .mq-gate-row { grid-template-columns: 110px 1fr 36px 38px; }
+}

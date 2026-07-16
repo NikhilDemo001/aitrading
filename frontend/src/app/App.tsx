@@ -7,12 +7,14 @@ import { SessionRibbon } from './SessionRibbon'
 import { ToastLayer } from './ToastLayer'
 import { AmbientBackdrop } from './AmbientBackdrop'
 import { CockpitTab } from '../features/cockpit/CockpitTab'
+import { TradesTab } from '../features/trades/TradesTab'
 import { AnalyticsTab } from '../features/analytics/AnalyticsTab'
 import { ConfigTab } from '../features/config/ConfigTab'
 import { ResearchLabTab } from '../features/research-lab/ResearchLabTab'
 import { LearningTab } from '../features/learning/LearningTab'
 import { NewsTab } from '../features/news/NewsTab'
 import { FundamentalsTab } from '../features/fundamentals/FundamentalsTab'
+import { AssistantTab } from '../features/assistant/AssistantTab'
 import { StatusBar } from './StatusBar'
 import './App.css'
 
@@ -47,12 +49,14 @@ export default function App() {
         aria-labelledby={`mq-tab-${activeTab}`}
       >
         {activeTab === 'cockpit' && <CockpitTab />}
+        {activeTab === 'trades' && <TradesTab />}
         {activeTab === 'analytics' && <AnalyticsTab />}
         {activeTab === 'config' && <ConfigTab />}
         {activeTab === 'research-lab' && <ResearchLabTab />}
         {activeTab === 'learning' && <LearningTab />}
         {activeTab === 'news' && <NewsTab />}
         {activeTab === 'fundamentals' && <FundamentalsTab />}
+        {activeTab === 'assistant' && <AssistantTab />}
       </main>
       <StatusBar />
     </div>

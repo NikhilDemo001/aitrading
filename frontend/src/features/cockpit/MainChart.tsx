@@ -120,10 +120,16 @@ export function MainChart({ symbol }: { symbol: string | null }) {
     priceLinesRef.current = []
     if (!position) return
 
+    // Once T1 hits, the backend re-aims `target` at target_2 and lifts the stop to break-even
+    // (main.py), so drawing a "T1" line then would just duplicate T2 at the same price. Show
+    // T1 only while it's still the level being worked toward.
     const lines: Array<[number | undefined, string, string]> = [
       [position.entry_price, '#F4F5F7', 'ENTRY'],
-      [position.stop_loss, '#FF2D55', 'SL'],
-      [position.target, '#00E676', 'T1'],
+      [position.stop_loss, '#FF2D55', position.t1_hit ? 'SL · B/E' : 'SL'],
+      ...(position.t1_hit
+        ? []
+        : ([[position.target, '#00E676', 'T1']] as Array<[number | undefined, string, string]>)),
+      [position.target_2, '#00B894', 'T2'],
     ]
     for (const [price, color, title] of lines) {
       if (price == null) continue

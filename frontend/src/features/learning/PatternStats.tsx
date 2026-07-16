@@ -2,9 +2,12 @@ import { useQuery } from '@tanstack/react-query'
 import { Panel } from '../../design-system/Panel'
 import { historyApi } from '../../lib/api/historyApi'
 import type { DateRangeState } from './useDateRange'
+import { usePanelRange } from './usePanelRange'
+import { PanelRangeSelect } from './PanelRangeSelect'
 import './LearningTables.css'
 
-export function PatternStats({ range }: { range: DateRangeState }) {
+export function PatternStats({ range: globalRange }: { range: DateRangeState }) {
+  const { range, override, setOverride } = usePanelRange(globalRange)
   const { data } = useQuery({
     queryKey: ['history', 'patterns', range.start, range.end],
     queryFn: () => historyApi.getPatterns(range.start, range.end),
@@ -12,7 +15,11 @@ export function PatternStats({ range }: { range: DateRangeState }) {
   const rows = data ?? []
 
   return (
-    <Panel title="Candlestick Pattern Learning" padded={false}>
+    <Panel
+      title="Candlestick Pattern Learning"
+      padded={false}
+      actions={<PanelRangeSelect value={override} onChange={setOverride} label="Date filter for Candlestick Pattern Learning" />}
+    >
       {rows.length === 0 ? (
         <div className="text-faint" style={{ padding: 16, fontSize: '0.72rem' }}>No candlestick patterns recorded on trades in this range.</div>
       ) : (

@@ -21,6 +21,21 @@ function daysAgoIso(n: number) {
 
 const DEFAULT_STATE: DateRangeState = { start: daysAgoIso(30), end: todayIso(), singleDay: false, asOf: '' }
 
+/** The concrete range a preset resolves to. Pure, so both the tab-wide control and each
+ *  panel's own date filter (usePanelRange) derive their dates from one place. */
+export function presetRange(preset: DateRangePreset): DateRangeState {
+  const end = todayIso()
+  switch (preset) {
+    case 'today': return { start: end, end, singleDay: true, asOf: '' }
+    case 'yesterday': { const y = daysAgoIso(1); return { start: y, end: y, singleDay: true, asOf: '' } }
+    case 'last5': return { start: daysAgoIso(5), end, singleDay: false, asOf: '' }
+    case 'week': return { start: daysAgoIso(7), end, singleDay: false, asOf: '' }
+    case 'month': return { start: daysAgoIso(30), end, singleDay: false, asOf: '' }
+    case 'last30': return { start: daysAgoIso(30), end, singleDay: false, asOf: '' }
+    case 'all': return { start: '2020-01-01', end, singleDay: false, asOf: '' }
+  }
+}
+
 // Hand-rolled hash sync (no react-router needed for a single tab's state): reads
 // `#/learning?start=...&end=...&singleDay=...&asOf=...` on mount and keeps it updated on
 // every change, so the Learning tab's range is bookmarkable/shareable and survives reload,
@@ -70,16 +85,7 @@ export function useDateRange() {
   }, [])
 
   const applyPreset = useCallback((preset: DateRangePreset) => {
-    const end = todayIso()
-    switch (preset) {
-      case 'today': setRange({ start: end, end, singleDay: true, asOf: '' }); break
-      case 'yesterday': { const y = daysAgoIso(1); setRange({ start: y, end: y, singleDay: true, asOf: '' }); break }
-      case 'last5': setRange({ start: daysAgoIso(5), end, singleDay: false, asOf: '' }); break
-      case 'week': setRange({ start: daysAgoIso(7), end, singleDay: false, asOf: '' }); break
-      case 'month': setRange({ start: daysAgoIso(30), end, singleDay: false, asOf: '' }); break
-      case 'last30': setRange({ start: daysAgoIso(30), end, singleDay: false, asOf: '' }); break
-      case 'all': setRange({ start: '2020-01-01', end, singleDay: false, asOf: '' }); break
-    }
+    setRange(presetRange(preset))
   }, [setRange])
 
   return { range, setRange, applyPreset }

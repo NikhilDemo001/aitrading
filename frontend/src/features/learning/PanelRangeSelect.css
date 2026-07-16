@@ -1,0 +1,28 @@
+/* Panel-level date filter. Quiet by default so it reads as a control, not a status; when the
+   panel is pinned away from the tab range it lights up in the terminal's cyan so a diverging
+   panel can never be misread as part of the global view. */
+.mq-panel-range {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  padding: 4px 8px;
+  border-radius: var(--r-sm, 6px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.14));
+  color: inherit;
+  cursor: pointer;
+}
+
+.mq-panel-range:hover {
+  border-color: rgba(80, 200, 255, 0.5);
+}
+
+.mq-panel-range:focus-visible {
+  outline: 2px solid var(--accent, #50c8ff);
+  outline-offset: 1px;
+}
+
+.mq-panel-range-pinned {
+  border-color: var(--accent, #50c8ff);
+  color: var(--accent, #50c8ff);
+  background: rgba(80, 200, 255, 0.10);
+}

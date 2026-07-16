@@ -1,5 +1,6 @@
+/* Shares a half-width row with the Live Feed — matched heights so the row reads as one band. */
 .mq-watchlist-panel {
-  height: 420px;
+  height: 280px;
 }
 
 .mq-watchlist-search {
@@ -23,9 +24,14 @@
   border-color: var(--accent);
 }
 
+/* At half-screen width a single 50-row column would be mostly dead space with a long scroll,
+   so the symbols flow into as many columns as fit. */
 .mq-watchlist-list {
   overflow-y: auto;
   height: calc(100% - 45px);
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  align-content: start;
 }
 
 .mq-watchlist-row {
@@ -33,9 +39,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: var(--space-2);
   background: transparent;
   border: none;
   border-bottom: 1px solid rgba(255,255,255,0.03);
+  border-right: 1px solid rgba(255,255,255,0.03);
   padding: 8px 14px;
   cursor: pointer;
   text-align: left;
@@ -56,6 +64,7 @@
 }
 
 .mq-watchlist-empty {
+  grid-column: 1 / -1;   /* the list is a grid now — don't let this shrink into one cell */
   padding: var(--space-4);
   font-size: 0.72rem;
 }

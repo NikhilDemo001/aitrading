@@ -98,7 +98,11 @@ function PriceLevelBar({ p }: { p: Position }) {
   )
 }
 
-function PositionCard({ p }: { p: Position }) {
+function PositionCard({ p, selected, onSelect }: {
+  p: Position
+  selected?: boolean
+  onSelect?: (symbol: string) => void
+}) {
   const tiltRef = useTilt<HTMLDivElement>(5, 4)
   const long = isLongDirection(p.direction)
   const pnl = p.pnl ?? 0
@@ -112,7 +116,18 @@ function PositionCard({ p }: { p: Position }) {
   const holding = formatDuration(minutesSince(p.entry_time))
 
   return (
-    <div ref={tiltRef} className={`mq-position-card mq-position-card-${long ? 'long' : 'short'}`}>
+    <div
+      ref={tiltRef}
+      className={`mq-position-card mq-position-card-${long ? 'long' : 'short'} ${selected ? 'mq-position-card-selected' : ''}`}
+      role={onSelect ? 'button' : undefined}
+      tabIndex={onSelect ? 0 : undefined}
+      aria-pressed={onSelect ? !!selected : undefined}
+      aria-label={onSelect ? `Show ${p.symbol} on the chart with its entry, stop and targets` : undefined}
+      onClick={() => onSelect?.(p.symbol)}
+      onKeyDown={(e) => {
+        if (onSelect && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onSelect(p.symbol) }
+      }}
+    >
       <div className="mq-position-hdr">
         <span className="mq-position-sym">{p.symbol}</span>
         <Badge tone={long ? 'profit' : 'loss'}>{p.direction}</Badge>
@@ -158,7 +173,10 @@ function PositionCard({ p }: { p: Position }) {
 
       <Button
         variant="ghost"
-        onClick={() => statusApi.closePosition(p.symbol).catch(console.error)}
+        onClick={(e) => {
+          e.stopPropagation()   // the card itself charts the symbol; Close must not also select
+          statusApi.closePosition(p.symbol).catch(console.error)
+        }}
       >
         Close
       </Button>
@@ -166,7 +184,10 @@ function PositionCard({ p }: { p: Position }) {
   )
 }
 
-export function ActivePositionsGrid() {
+export function ActivePositionsGrid({ selected, onSelect }: {
+  selected?: string | null
+  onSelect?: (symbol: string) => void
+} = {}) {
   const positions = usePositionsStore((s) => s.positions)
 
   return (
@@ -178,7 +199,7 @@ export function ActivePositionsGrid() {
       ) : (
         <div className="mq-positions-grid">
           {positions.map((p) => (
-            <PositionCard key={p.symbol} p={p} />
+            <PositionCard key={p.symbol} p={p} selected={selected === p.symbol} onSelect={onSelect} />
           ))}
         </div>
       )}

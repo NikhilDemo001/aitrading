@@ -10,6 +10,20 @@
   padding: var(--space-4);
 }
 
+/* Cards chart their symbol on click, so they need to read as pressable — and the charted one
+   has to be identifiable at a glance once several are open. */
+.mq-position-card[role='button'] { cursor: pointer; }
+
+.mq-position-card[role='button']:focus-visible {
+  outline: 2px solid var(--accent, #00F0FF);
+  outline-offset: 2px;
+}
+
+.mq-position-card-selected {
+  border-color: var(--accent, #00F0FF);
+  box-shadow: 0 0 0 1px var(--accent, #00F0FF), 0 0 18px rgba(0, 240, 255, 0.16);
+}
+
 .mq-position-card {
   background: rgba(255,255,255,0.03);
   border: 1px solid var(--border);

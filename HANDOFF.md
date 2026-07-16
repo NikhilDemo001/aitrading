@@ -15,6 +15,22 @@ state; the older 2026-07-04 handoff (deeper architecture/context) follows below.
    update `.env` `ANTHROPIC_API_KEY`.
 
 ## ✅ WHAT WE BUILT TODAY (2026-07-15/16)
+- **Assistant tab (2026-07-16)** — read-only Claude Q&A over the bot's own data. `assistant_engine.py`
+  (pure snapshot + answer), `routers/assistant.py` (`POST /api/assistant/ask`), `AssistantTab.tsx`.
+  Separate `assistant_max_daily_calls` (100) budget so chat never starves the trading gate;
+  `assistant_max_tokens=4000` — claude-sonnet-5 emits a thinking block, so a smaller budget gets
+  eaten by thinking and returns an EMPTY answer. `llm_engine.build_client()` added (budget-independent).
+- **UI (2026-07-16):** new **Trades tab** (`features/trades/`) holds Closed/Historical/**Shadow**
+  tables + a Real-vs-Shadow strip — Cockpit is now live-operation only and gained a
+  **Why-no-trades gate breakdown** (`GateBreakdown.tsx`, aggregates `/api/decisions` skips).
+  Active Positions moved out of the centre column → full width. Learning panels (Drilldown, KPI
+  trend, Pattern) got per-panel date dropdowns (`usePanelRange` + `PanelRangeSelect`).
+  Status strip no longer claims "Unlimited (Paper Trading)" — the daily-loss halt fires in paper too.
+- **Fixes (2026-07-16):** leaderboard 500 (GET no longer runs generate_daily_journal write);
+  `/api/fundamentals` competitors needs the FULL instrument key (NSE_EQ|ISIN), not bare ISIN;
+  **reconcile-vs-fill race** — a just-filled live position no longer gets orphaned + its SL cancelled
+  (`broker_reconcile_settle_seconds=15` grace window); live orders now record the **actual broker
+  fill price** (`_await_fill_price`), not the limit price.
 - **Proxy fixed** — old account was suspended (407). New **proxy-seller.com** account (same IP
   175.111.136.31), creds in `.env` `PROXY_URL`. Verified.
 - **Real-time WebSocket feed** — `market_feed_mode: ws` (was `rest`); real-time LTP **~50–90 ms**. Connects

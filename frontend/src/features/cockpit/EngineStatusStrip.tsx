@@ -20,10 +20,12 @@ export function EngineStatusStrip() {
   const pnlTone = dailyPnl >= 0 ? 'profit' : 'loss'
   const maxLoss = status?.max_daily_loss ?? 0
   const lossBudgetUsed = maxLoss ? Math.min(100, Math.max(0, (-dailyPnl / maxLoss) * 100)) : 0
-  const isPaper = status?.paper_trading ?? true
-  const budgetText = isPaper
-    ? 'Unlimited (Paper Trading)'
-    : `Loss budget used ${lossBudgetUsed.toFixed(0)}% of ₹${maxLoss}`
+  // The daily-loss halt runs in paper exactly as it does live (main.py squares off and stops the
+  // bot either way), so the budget is shown in both. Calling it "unlimited" in paper hid a halt
+  // that genuinely fires.
+  const budgetText = maxLoss
+    ? `Loss budget used ${lossBudgetUsed.toFixed(0)}% of ${formatINR(maxLoss, { decimals: 0 })}`
+    : 'No daily loss limit set'
 
   // Capital protection, made visible: worst case if every stop hits right now,
   // and how much notional the open book is holding.
@@ -52,16 +54,14 @@ export function EngineStatusStrip() {
           )
         }
         right={
-          isPaper ? (
-            <ProgressRing pct={0} tone="profit" label="∞" sub="Paper" />
-          ) : (
+          maxLoss ? (
             <ProgressRing
               pct={lossBudgetUsed}
               tone={lossBudgetUsed >= 80 ? 'loss' : lossBudgetUsed >= 50 ? 'warn' : 'profit'}
               label={`${lossBudgetUsed.toFixed(0)}%`}
               sub="Loss used"
             />
-          )
+          ) : undefined
         }
       />
       <StatCard

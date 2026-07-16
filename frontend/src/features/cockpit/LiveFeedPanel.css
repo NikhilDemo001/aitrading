@@ -1,5 +1,7 @@
+/* Full-width strip (it used to be a 420px tall rail in the right column). Shorter now that
+   each line has the whole width, so it reads as a feed rather than a wall. */
 .mq-feed-panel {
-  height: 420px;
+  height: 280px;
 }
 
 .mq-feed-filters {

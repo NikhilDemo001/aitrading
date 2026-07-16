@@ -1,0 +1,12 @@
+.mq-assist { display: flex; flex-direction: column; gap: 12px; min-height: 60vh; }
+.mq-assist-log { display: flex; flex-direction: column; gap: 12px; overflow-y: auto; max-height: 62vh; padding-right: 6px; }
+.mq-assist-msg { display: flex; flex-direction: column; gap: 4px; }
+.mq-assist-role { font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.6; }
+.mq-assist-text { white-space: pre-wrap; line-height: 1.5; padding: 10px 12px; border-radius: 10px; max-width: 80ch; }
+.mq-assist-user .mq-assist-text { align-self: flex-end; background: rgba(80, 200, 255, 0.10); }
+.mq-assist-assistant .mq-assist-text { background: rgba(255, 255, 255, 0.04); }
+.mq-assist-input { display: flex; gap: 8px; }
+.mq-assist-input input { flex: 1; padding: 10px 12px; border-radius: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: inherit; }
+.mq-assist-suggest { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.mq-assist-chip { padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14); color: inherit; cursor: pointer; }
+.mq-assist-chip:hover { background: rgba(80, 200, 255, 0.12); }

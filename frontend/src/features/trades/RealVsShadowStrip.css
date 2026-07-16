@@ -1,0 +1,12 @@
+.mq-rvs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-3, 12px);
+}
+
+.mq-rvs-note {
+  margin: var(--space-3, 12px) 0 0;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  max-width: 90ch;
+}

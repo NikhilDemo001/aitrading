@@ -6,12 +6,14 @@ import './TopNav.css'
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'cockpit', label: 'Cockpit' },
+  { id: 'trades', label: 'Trades' },
   { id: 'analytics', label: 'Analytics' },
   { id: 'config', label: 'Config' },
   { id: 'research-lab', label: 'AI Research Lab' },
   { id: 'learning', label: 'Learning' },
   { id: 'news', label: 'News' },
   { id: 'fundamentals', label: 'Fundamentals' },
+  { id: 'assistant', label: 'Assistant' },
 ]
 
 export function TopNav() {
