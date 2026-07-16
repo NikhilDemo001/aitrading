@@ -13,6 +13,9 @@ active_positions.json
 trade_history.json
 *.db
 *.db-journal
+# WAL-mode sidecars — SQLite recreates them; committing them corrupts nothing but adds churn.
+*.db-wal
+*.db-shm
 *.log
 logs/
 *.pem
