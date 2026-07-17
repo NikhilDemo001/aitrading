@@ -1890,7 +1890,18 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
             qty = _calc_quantity(entry_price, stop_loss, cfg, available_margin=avail_margin, is_fno=True, lot_size=lot_size)
         else:
             pass # use the lots * lot_size calculated above
-    elif cfg.get("enable_max_capacity", False) and avail_margin is not None:
+    elif cfg.get("enable_max_capacity", False):
+        # Max-capacity sizing is the operator saying "size to the margin I actually have". If the
+        # funds call failed we do NOT know that number, and the fallbacks below are margin-blind:
+        # they size off max_risk_per_trade alone and will happily build a position the account
+        # can't fund. A transient funds/proxy blip on 2026-07-17 did exactly that — ~Rs 19k orders
+        # against Rs 1,678 of available margin, every one rejected by the broker. Fail safe.
+        if avail_margin is None:
+            log_scan(symbol, "Funds/margin unavailable — cannot size against real margin; entry skipped "
+                             "(retrying next scan). Check the broker API/proxy.", "warning")
+            jsonl_logger.log_decision("skip", symbol, "funds unavailable: cannot size to margin",
+                                      {"strategy": strat_name, "gate": "funds_unavailable"})
+            return
         qty = _calc_quantity(
             entry_price, stop_loss, cfg,
             available_margin=avail_margin,

@@ -201,6 +201,11 @@ class TestBotEnhancements(unittest.TestCase):
 
         try:
             main.client.config["paper_trading"] = False  # To trigger the place_order call branch
+            # Unit tests must not call the live LLM: it is non-deterministic (Claude can veto the
+            # entry, so no order is placed and the assert below sees an empty call list), it costs
+            # money, and it draws down the same daily budget the live entry gate depends on.
+            main.client.config["enable_llm_entry_gate"] = False
+
             main.client.config["enable_fno"] = False
             main.client.config["enable_kelly_sizing"] = False
             main.client.config["enable_one_percent_risk"] = False
@@ -411,6 +416,11 @@ class TestBotEnhancements(unittest.TestCase):
             # 1. Enable F&O mode and configure risk parameters
             main.client.config["enable_fno"] = True
             main.client.config["paper_trading"] = False  # trigger live order path
+            # Unit tests must not call the live LLM: it is non-deterministic (Claude can veto the
+            # entry, so no order is placed and the assert below sees an empty call list), it costs
+            # money, and it draws down the same daily budget the live entry gate depends on.
+            main.client.config["enable_llm_entry_gate"] = False
+
             main.client.config["enable_kelly_sizing"] = False
             main.client.config["enable_one_percent_risk"] = False
             main.client.config["fno_max_risk_per_trade"] = 2000.0
@@ -585,6 +595,10 @@ class TestBotEnhancements(unittest.TestCase):
             main.client.config["fno_type"] = "OPT"
             main.client.config["option_delta"] = 0.50
             main.client.config["paper_trading"] = False
+            # Unit tests must not call the live LLM: it is non-deterministic (Claude can veto the
+            # entry, so no order is placed and the assert below sees an empty call list), it costs
+            # money, and it draws down the same daily budget the live entry gate depends on.
+            main.client.config["enable_llm_entry_gate"] = False
             main.client.config["enable_kelly_sizing"] = False
             main.client.config["enable_one_percent_risk"] = False
             main.client.config["fno_max_risk_per_trade"] = 1000.0
