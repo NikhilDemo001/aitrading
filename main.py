@@ -2121,9 +2121,18 @@ async def execute_entry(symbol, instrument_key, signal, candles, paper_trading, 
 
         raw_limit = (base_entry_price + 0.1 * atr_val) if action == "BUY" else (base_entry_price - 0.1 * atr_val)
         limit_price = round_to_tick(raw_limit)
-        order = await order_queue.submit(
-            client.place_order, symbol, action, qty, "LIMIT", limit_price, tag="autobot", instrument_key=order_key
-        )
+        try:
+            order = await order_queue.submit(
+                client.place_order, symbol, action, qty, "LIMIT", limit_price, tag="autobot", instrument_key=order_key
+            )
+        except Exception as _entry_err:
+            # The broker refused the entry (insufficient funds, RMS block, ...). Nothing was
+            # bought, so book nothing: no position, no stop-loss against a holding we don't
+            # have, no invented P&L in the trade history.
+            log_scan(symbol, f"Entry order rejected by broker — no position opened: {_entry_err}", "danger")
+            jsonl_logger.log_decision("skip", symbol, f"entry_rejected: {_entry_err}",
+                                      {"strategy": strat_name, "gate": "broker_rejected"})
+            return
         fill_price = order["price"]
 
         # Anomaly Check: Entry Slippage (relative to the baseline instrument price we placed the order on)

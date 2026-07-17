@@ -709,7 +709,16 @@ class UpstoxClient:
                 # 'completes' here, so we skip the lookup and keep its trigger/limit price.
                 fill_price = price
                 if order_type in ("MARKET", "LIMIT"):
-                    avg = self._await_fill_price(order_id)
+                    avg, status, msg = self._await_order_outcome(order_id)
+                    # An order_id only means Upstox ACCEPTED the request — the exchange/RMS can
+                    # still reject it (insufficient funds, RMS block). Returning success here let
+                    # the bot book a position that never existed, place a stop-loss against it
+                    # ("This stock is not available in your holdings"), and log fabricated P&L.
+                    # A rejected order is a failed order: say so, loudly, and place nothing.
+                    if status in ("rejected", "cancelled"):
+                        raise Exception(
+                            f"Order {status} by broker for {symbol} "
+                            f"({transaction_type} {quantity} {order_type}): {msg or 'no reason given'}")
                     if avg and avg > 0:
                         fill_price = avg
                     elif order_type == "MARKET":
@@ -858,12 +867,20 @@ class UpstoxClient:
                     return status
         return "UNKNOWN"
 
-    def _await_fill_price(self, order_id, tries=6, delay=0.4):
-        """Poll Upstox order history for the ACTUAL executed average price so a live order is
-        recorded at its real fill (matching the app), not the limit price we sent. Returns the
-        average price once the order shows 'complete', or None if it hasn't filled within
-        ~tries*delay seconds or was rejected/cancelled. Scans every history record so it is
-        robust to the endpoint's ordering. Live only; never raises."""
+    def _await_order_outcome(self, order_id, tries=6, delay=0.4):
+        """Poll Upstox order history for this order's terminal outcome.
+
+        Returns (avg_price, status, message):
+          - ("complete") avg_price is the REAL executed average, so the bot records the fill the
+            app shows rather than the limit price we sent.
+          - ("rejected"/"cancelled") avg_price None and message carries the broker's reason
+            (e.g. "You need to add Rs. 19,152.37 in your account"). The caller MUST NOT treat
+            this as a fill.
+          - ("pending") it hasn't reached a terminal state within ~tries*delay seconds.
+
+        Scans every history record, so it doesn't depend on the endpoint's ordering. Never raises.
+        """
+        last_msg = ""
         for _ in range(max(1, tries)):
             try:
                 url = f"https://api.upstox.com/v2/order/history?order_id={order_id}"
@@ -871,14 +888,18 @@ class UpstoxClient:
                 if resp.status_code == 200:
                     data = (resp.json() or {}).get("data") or []
                     for rec in data:
-                        if (rec.get("status") or "").lower() == "complete" and rec.get("average_price"):
-                            return float(rec["average_price"])
-                    if any((r.get("status") or "").lower() in ("rejected", "cancelled") for r in data):
-                        return None
+                        st = (rec.get("status") or "").lower()
+                        msg = rec.get("status_message") or rec.get("status_message_raw") or ""
+                        if st == "complete" and rec.get("average_price"):
+                            return float(rec["average_price"]), "complete", msg
+                        if st in ("rejected", "cancelled"):
+                            return None, st, (msg or last_msg)
+                        if msg:
+                            last_msg = msg
             except Exception:
                 pass
             time.sleep(delay)
-        return None
+        return None, "pending", last_msg
 
     def get_positions(self):
         """Live net positions from the broker (GET /v2/portfolio/short-term-positions).

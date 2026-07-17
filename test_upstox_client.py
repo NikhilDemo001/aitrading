@@ -4,6 +4,7 @@ import base64
 import json
 import os
 import types
+import pytest
 from datetime import datetime
 
 from upstox_client import UpstoxClient
@@ -112,18 +113,6 @@ def test_fundamentals_bare_isin_path_unchanged():
     assert captured["url"].endswith("/fundamentals/INE002A01018/profile")
 
 
-def test_await_fill_price_finds_completed_average():
-    """_await_fill_price returns the broker's executed average price once the order is
-    'complete', scanning all history records regardless of order."""
-    c = UpstoxClient.__new__(UpstoxClient)
-    c.access_token = "tok"
-    c.get_headers = lambda: {}
-    c.session = types.SimpleNamespace(get=lambda *a, **k: _FakeResp({"status": "success", "data": [
-        {"status": "open", "average_price": 0},
-        {"status": "complete", "average_price": 250.75}]}))
-    assert c._await_fill_price("OID", tries=1) == 250.75
-
-
 def test_place_order_live_records_actual_fill_not_limit():
     """Regression: a live entry must record the broker's ACTUAL average fill (250.75), not the
     limit price we sent (100.5) — otherwise the bot's entry never matches the Upstox app."""
@@ -144,6 +133,43 @@ def test_place_order_live_records_actual_fill_not_limit():
     order = c.place_order("RELIANCE", "BUY", 10, "LIMIT", price=100.5, instrument_key="NSE_EQ|X")
     assert order["order_id"] == "OID1"
     assert order["price"] == 250.75          # actual fill, NOT the 100.5 limit
+
+
+def test_place_order_raises_when_broker_rejects():
+    """Regression (2026-07-17 live): an order_id only means Upstox ACCEPTED the request — the
+    exchange/RMS can still reject it. place_order used to return success with the limit price,
+    so the bot booked a position that never existed, fired a stop-loss at it ("This stock is not
+    available in your holdings"), and logged fabricated P&L. A rejection must raise."""
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.paper_trading = False
+    c.access_token = "tok"
+    c.get_headers = lambda: {}
+    c._delivery_symbols = set()
+
+    class _Sess:
+        def post(self, url, headers=None, json=None, timeout=None):
+            return _FakeResp({"status": "success", "data": {"order_id": "OID9"}})
+
+        def get(self, url, headers=None, timeout=None):
+            return _FakeResp({"status": "success", "data": [
+                {"status": "rejected",
+                 "status_message": "You need to add Rs. 19,152.37 in your account to place this trade."}]})
+
+    c.session = _Sess()
+    with pytest.raises(Exception) as e:
+        c.place_order("SHAREINDIA", "BUY", 144, "LIMIT", price=180.75, instrument_key="NSE_EQ|X")
+    assert "rejected" in str(e.value).lower()
+    assert "19,152.37" in str(e.value)      # the broker's real reason reaches the operator
+
+
+def test_await_order_outcome_reports_complete_fill():
+    c = UpstoxClient.__new__(UpstoxClient)
+    c.access_token = "tok"
+    c.get_headers = lambda: {}
+    c.session = types.SimpleNamespace(get=lambda *a, **k: _FakeResp({"status": "success", "data": [
+        {"status": "complete", "average_price": 250.75}]}))
+    avg, status, _ = c._await_order_outcome("OID", tries=1)
+    assert (avg, status) == (250.75, "complete")
 
 
 def test_place_order_sl_skips_fill_lookup():
